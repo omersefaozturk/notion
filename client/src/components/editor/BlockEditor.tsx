@@ -4,9 +4,13 @@ import {
   convertBlock,
   findBlock,
   flattenVisible,
+  indentBlock,
+  INDENTABLE_TYPES,
   insertAfter,
   insertFirstChild,
+  isToggleOpen,
   newBlock,
+  outdentBlock,
   removeBlock,
   updateBlock,
 } from '../../lib/blocks';
@@ -102,7 +106,8 @@ function AutoTextarea({
 export function BlockEditor({ blocks, setBlocks, readOnly }: Props) {
   const refs = useRef(new Map<string, HTMLElement>());
   const pendingFocus = useRef<FocusTarget | null>(null);
-  const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
+  // Read-only viewers can open/close toggles locally without changing the page.
+  const [localOpen, setLocalOpen] = useState<Map<string, boolean>>(() => new Map());
   const [focusedId, setFocusedId] = useState<string | null>(null);
   const [slash, setSlash] = useState<SlashState | null>(null);
   const [, setFocusTick] = useState(0);
@@ -127,19 +132,21 @@ export function BlockEditor({ blocks, setBlocks, readOnly }: Props) {
     setFocusTick((t) => t + 1);
   };
 
-  const visible = flattenVisible(blocks, expanded);
+  const isOpen = (b: Block) => (localOpen.has(b.id) ? !!localOpen.get(b.id) : isToggleOpen(b));
+  const visible = flattenVisible(blocks, isOpen);
   const visibleIndex = (id: string) => visible.findIndex((b) => b.id === id);
 
   const setText = (id: string, text: string) => setBlocks((prev) => updateBlock(prev, id, (b) => ({ ...b, text })));
 
-  const toggleExpanded = (id: string, open?: boolean) =>
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      const shouldOpen = open ?? !next.has(id);
-      if (shouldOpen) next.add(id);
-      else next.delete(id);
-      return next;
-    });
+  /** Open/close a toggle. The state is stored on the block (`collapsed`) so it persists. */
+  const toggleExpanded = (block: Block) => {
+    const open = !isOpen(block);
+    if (readOnly) {
+      setLocalOpen((prev) => new Map(prev).set(block.id, open));
+      return;
+    }
+    setBlocks((prev) => updateBlock(prev, block.id, (b) => ({ ...b, collapsed: !open })));
+  };
 
   /* ----------------------------- slash menu ----------------------------- */
 
@@ -159,7 +166,6 @@ export function BlockEditor({ blocks, setBlocks, readOnly }: Props) {
         setBlocks((prev) => insertAfter(prev, block.id, after));
         focus(after.id, 'start');
       } else {
-        if (type === 'toggle') toggleExpanded(block.id, true);
         focus(block.id, 'start');
       }
     } else {
@@ -230,6 +236,13 @@ export function BlockEditor({ blocks, setBlocks, readOnly }: Props) {
 
     const idx = visibleIndex(block.id);
 
+    if (e.key === 'Tab' && INDENTABLE_TYPES.includes(block.type)) {
+      e.preventDefault();
+      setBlocks((prev) => (e.shiftKey ? outdentBlock(prev, block.id) : indentBlock(prev, block.id)));
+      focus(block.id, ss);
+      return;
+    }
+
     if (e.key === 'Enter' && !e.shiftKey && (block.type !== 'code' || e.metaKey || e.ctrlKey)) {
       e.preventDefault();
       if (LIST_TYPES.includes(block.type) && text === '') {
@@ -240,10 +253,11 @@ export function BlockEditor({ blocks, setBlocks, readOnly }: Props) {
       const after = text.slice(se);
       const keepType = block.type === 'todo' || block.type === 'bullet' || block.type === 'numbered';
       const nb = newBlock(keepType ? block.type : 'paragraph', after);
-      const intoToggle = block.type === 'toggle' && expanded.has(block.id);
+      // An open toggle, or a list item with nested items, gets the new block as its first child.
+      const intoChildren = block.type === 'toggle' ? isOpen(block) : !!block.children?.length;
       setBlocks((prev) => {
         const updated = updateBlock(prev, block.id, (b) => ({ ...b, text: before }));
-        return intoToggle ? insertFirstChild(updated, block.id, nb) : insertAfter(updated, block.id, nb);
+        return intoChildren ? insertFirstChild(updated, block.id, nb) : insertAfter(updated, block.id, nb);
       });
       focus(nb.id, 'start');
       return;
@@ -325,7 +339,7 @@ export function BlockEditor({ blocks, setBlocks, readOnly }: Props) {
 
   function openInsertMenu(after: Block) {
     const nb = newBlock('paragraph', '/');
-    setBlocks((p) => (after.type === 'toggle' && expanded.has(after.id) ? insertFirstChild(p, after.id, nb) : insertAfter(p, after.id, nb)));
+    setBlocks((p) => (after.type === 'toggle' && isOpen(after) ? insertFirstChild(p, after.id, nb) : insertAfter(p, after.id, nb)));
     setSlash({ blockId: nb.id, start: 0, query: '', index: 0 });
     focus(nb.id, 'end');
   }
@@ -357,7 +371,7 @@ export function BlockEditor({ blocks, setBlocks, readOnly }: Props) {
       if (el) refs.current.set(block.id, el);
       else refs.current.delete(block.id);
     };
-    const isOpen = expanded.has(block.id);
+    const open = isOpen(block);
 
     if (block.type === 'divider') {
       return (
@@ -397,11 +411,12 @@ export function BlockEditor({ blocks, setBlocks, readOnly }: Props) {
       prefix = (
         <button
           type="button"
-          onClick={() => toggleExpanded(block.id)}
-          aria-label={isOpen ? 'Daralt' : 'Genişlet'}
+          onClick={() => toggleExpanded(block)}
+          aria-label={open ? 'Daralt' : 'Genişlet'}
+          aria-expanded={open}
           className="flex h-7 w-6 shrink-0 items-center justify-center rounded text-xs text-neutral-600 hover:bg-neutral-100"
         >
-          <span className={cx('transition-transform', isOpen && 'rotate-90')}>▶</span>
+          <span className={cx('transition-transform', open && 'rotate-90')}>▶</span>
         </button>
       );
     } else if (block.type === 'callout') {
@@ -409,7 +424,7 @@ export function BlockEditor({ blocks, setBlocks, readOnly }: Props) {
     }
 
     return (
-      <div key={block.id}>
+      <div key={block.id} data-block-type={block.type} data-depth={depth}>
         <div className={cx('group relative flex items-start', WRAP_STYLES[block.type])}>
           {!readOnly && (
             <button
@@ -446,7 +461,10 @@ export function BlockEditor({ blocks, setBlocks, readOnly }: Props) {
             <SlashMenu query={slash.query} index={slash.index} onHover={(i) => setSlash({ ...slash, index: i })} onSelect={applySlash} />
           )}
         </div>
-        {block.type === 'toggle' && isOpen && (
+        {block.type !== 'toggle' && block.children && block.children.length > 0 && (
+          <div className="pl-6">{renderList(block.children, depth + 1)}</div>
+        )}
+        {block.type === 'toggle' && open && (
           <div className="pl-6">
             {block.children && block.children.length > 0 ? (
               renderList(block.children, depth + 1)

@@ -18,11 +18,22 @@ export const BLOCK_TYPES: Array<{ type: BlockType; label: string; hint: string; 
 
 export const BLOCK_TYPE_SET = new Set(BLOCK_TYPES.map((b) => b.type));
 
+/** Block types that can be indented with Tab (nested under the previous block). */
+export const INDENTABLE_TYPES: BlockType[] = ['todo', 'bullet', 'numbered', 'toggle'];
+
 export function newBlock(type: BlockType = 'paragraph', text = ''): Block {
   const b: Block = { id: uid(), type, text };
   if (type === 'todo') b.checked = false;
-  if (type === 'toggle') b.children = [];
+  if (type === 'toggle') {
+    b.children = [];
+    b.collapsed = false;
+  }
   return b;
+}
+
+/** Whether a toggle is open. Toggles without a stored state are closed. */
+export function isToggleOpen(b: Block): boolean {
+  return b.type === 'toggle' && b.collapsed === false;
 }
 
 /** Normalise unknown content into a valid block list. */
@@ -38,7 +49,12 @@ export function normalizeBlocks(input: unknown): Block[] {
         text: typeof b.text === 'string' ? b.text : '',
       };
       if (type === 'todo') block.checked = !!b.checked;
-      if (type === 'toggle') block.children = normalizeBlocks(b.children);
+      if (type === 'toggle') {
+        block.children = normalizeBlocks(b.children);
+        block.collapsed = b.collapsed !== false;
+      } else if (Array.isArray(b.children) && b.children.length) {
+        block.children = normalizeBlocks(b.children);
+      }
       return block;
     });
 }
@@ -46,7 +62,12 @@ export function normalizeBlocks(input: unknown): Block[] {
 export function convertBlock(b: Block, type: BlockType): Block {
   const next: Block = { id: b.id, type, text: type === 'divider' ? '' : b.text };
   if (type === 'todo') next.checked = b.checked ?? false;
-  if (type === 'toggle') next.children = b.children ?? [];
+  if (type === 'toggle') {
+    next.children = b.children ?? [];
+    next.collapsed = b.collapsed ?? false;
+  } else if (b.children?.length) {
+    next.children = b.children;
+  }
   return next;
 }
 
@@ -73,8 +94,8 @@ export function removeBlock(tree: Block[], id: string): Block[] {
   const idx = tree.findIndex((b) => b.id === id);
   if (idx >= 0) {
     const removed = tree[idx];
-    // Lift a toggle's children into its place so content is not lost silently.
-    const lifted = removed.type === 'toggle' && removed.children?.length ? removed.children : [];
+    // Lift nested children into its place so content is not lost silently.
+    const lifted = removed.children?.length ? removed.children : [];
     return [...tree.slice(0, idx), ...lifted, ...tree.slice(idx + 1)];
   }
   let changed = false;
@@ -123,15 +144,73 @@ export function findBlock(tree: Block[], id: string): Block | null {
   return null;
 }
 
-/** Visible blocks in document order; children of a toggle only when it is expanded. */
-export function flattenVisible(tree: Block[], expanded: Set<string>): Block[] {
+/** Visible blocks in document order; children of a toggle only when it is open. */
+export function flattenVisible(tree: Block[], isOpen: (b: Block) => boolean): Block[] {
   const out: Block[] = [];
   const walk = (list: Block[]) => {
     for (const b of list) {
       out.push(b);
-      if (b.type === 'toggle' && expanded.has(b.id) && b.children) walk(b.children);
+      if (b.children?.length && (b.type !== 'toggle' || isOpen(b))) walk(b.children);
     }
   };
   walk(tree);
   return out;
+}
+
+/** Locate a block: the list containing it, its index there, and its parent block (null at root). */
+function locate(tree: Block[], id: string, parent: Block | null = null): { list: Block[]; index: number; parent: Block | null } | null {
+  const index = tree.findIndex((b) => b.id === id);
+  if (index >= 0) return { list: tree, index, parent };
+  for (const b of tree) {
+    if (b.children?.length) {
+      const f = locate(b.children, id, b);
+      if (f) return f;
+    }
+  }
+  return null;
+}
+
+/** Replace the list that contains `id` (root or some block's children). */
+function replaceList(tree: Block[], parentId: string | null, next: Block[]): Block[] {
+  if (parentId === null) return next;
+  return updateBlock(tree, parentId, (b) => ({ ...b, children: next }));
+}
+
+/**
+ * Tab: nest the block as the last child of its previous sibling.
+ * Returns the tree unchanged when it cannot be indented.
+ */
+export function indentBlock(tree: Block[], id: string): Block[] {
+  const loc = locate(tree, id);
+  if (!loc || loc.index === 0) return tree;
+  const block = loc.list[loc.index];
+  const prev = loc.list[loc.index - 1];
+  if (prev.type === 'divider' || prev.type === 'code') return tree;
+  const newPrev: Block = {
+    ...prev,
+    children: [...(prev.children ?? []), block],
+    ...(prev.type === 'toggle' ? { collapsed: false } : {}),
+  };
+  const nextList = [...loc.list.slice(0, loc.index - 1), newPrev, ...loc.list.slice(loc.index + 1)];
+  return replaceList(tree, loc.parent?.id ?? null, nextList);
+}
+
+/**
+ * Shift+Tab: move the block out of its parent, right after the parent. Siblings
+ * that followed it become its children (like Notion), so the visual order is kept.
+ */
+export function outdentBlock(tree: Block[], id: string): Block[] {
+  const loc = locate(tree, id);
+  if (!loc || !loc.parent) return tree;
+  const parent = loc.parent;
+  const block = loc.list[loc.index];
+  const following = loc.list.slice(loc.index + 1);
+  const moved: Block = following.length ? { ...block, children: [...(block.children ?? []), ...following] } : block;
+  const parentChildren = loc.list.slice(0, loc.index);
+  const newParent: Block = { ...parent, children: parentChildren };
+  if (!parentChildren.length && parent.type !== 'toggle') delete newParent.children;
+  const gp = locate(tree, parent.id);
+  if (!gp) return tree;
+  const nextList = [...gp.list.slice(0, gp.index), newParent, moved, ...gp.list.slice(gp.index + 1)];
+  return replaceList(tree, gp.parent?.id ?? null, nextList);
 }

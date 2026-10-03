@@ -133,7 +133,10 @@ export interface Block {
   type: BlockType;
   text: string;
   checked?: boolean;
+  /** Nested blocks: a toggle's content, or indented list items (Tab). */
   children?: Block[];
+  /** Toggle only: whether it is closed. Missing = closed. */
+  collapsed?: boolean;
 }
 
 export interface PageSummary {

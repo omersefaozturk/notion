@@ -93,3 +93,22 @@ test('pages: plans with period normalisation and filters', async () => {
   const noPeriod = await mk(omer, { title: 'X', periodStart: '2026-10-01' });
   assert.equal(noPeriod.status, 400);
 });
+
+test('page content keeps toggle collapsed state and nested list children', async () => {
+  const { api } = setup();
+  const { omer } = await couple(api);
+  const content = [
+    { id: 'a', type: 'toggle', text: 'Aç/kapa', collapsed: false, children: [{ id: 'b', type: 'paragraph', text: 'iç' }] },
+    { id: 'c', type: 'bullet', text: 'Üst', children: [{ id: 'd', type: 'bullet', text: 'Alt' }] },
+  ];
+  const created = await api.post('/api/pages').set('Authorization', omer.auth).send({ title: 'Bloklar', content });
+  assert.equal(created.status, 201);
+  const patched = await api
+    .patch(`/api/pages/${created.body.id}`)
+    .set('Authorization', omer.auth)
+    .send({ content: [{ ...content[0], collapsed: true }, content[1]] });
+  assert.equal(patched.status, 200);
+  const got = await api.get(`/api/pages/${created.body.id}`).set('Authorization', omer.auth);
+  assert.equal(got.body.content[0].collapsed, true);
+  assert.equal(got.body.content[1].children[0].text, 'Alt');
+});

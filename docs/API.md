@@ -76,8 +76,17 @@ that week; monthly → first day of the month.
   "text": "plain text", "checked": false, "children": [] }
 ```
 
-`checked` is used only by `todo`; `children` only by `toggle`. Backend stores it opaquely
-(validates it is an array).
+```json
+{ "id": "uuid", "type": "toggle", "text": "Seçenekler", "collapsed": false, "children": [ … ] }
+```
+
+- `checked` is used only by `todo`.
+- `children` holds nested blocks: a `toggle`'s content, or list items indented with
+  Tab under a `todo` / `bullet` / `numbered` / `toggle` block (Shift+Tab outdents).
+- `collapsed` (toggle only) persists the open/closed state; missing means closed.
+
+Backend stores `content` opaquely (validates it is an array), so these fields round-trip
+unchanged.
 
 ## Endpoints
 
