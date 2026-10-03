@@ -24,14 +24,27 @@ UI language: **Turkish**. Code/identifiers: English.
 ## Stack
 
 - Node 22, npm workspaces monorepo: `server/` and `client/`, root `package.json`.
-- Backend: Express 5, **built-in `node:sqlite`** (`DatabaseSync`, no native deps),
-  `bcryptjs`, `jsonwebtoken`, `zod` for validation. Plain ESM JavaScript (`"type": "module"`).
-  DB file: `server/data/app.db` (gitignored), overridable by `DB_PATH`; tests use `:memory:`.
-  Port `PORT` (default 3001). In production it also serves `client/dist` statically with SPA fallback.
+- Backend: Express 5, **PostgreSQL**, `bcryptjs`, `jsonwebtoken`, `zod` for validation.
+  Plain ESM JavaScript (`"type": "module"`). Small async DB layer in `server/src/db.js`
+  (`query` / `one` / `many` / `exec` / `tx`, `?` placeholders):
+  - `DATABASE_URL` set → `postgres` (postgres.js) driver, prepared statements off and a
+    pool of 2 (`PG_POOL_MAX`) so it works behind Supabase's transaction pooler (port 6543)
+    and in serverless functions; SSL required for non-local hosts (`?sslmode=disable` opts out).
+  - `DATABASE_URL` unset → **PGlite** (Postgres compiled to WASM), data in
+    `server/data/pglite` (gitignored, overridable by `PGLITE_DIR`); tests use in-memory
+    PGlite (or `TEST_DATABASE_URL`).
+  - Schema: `server/sql/schema.sql` (idempotent), applied by `npm run db:migrate` and
+    automatically on the first query of a process when tables are missing. Dates/times are
+    ISO-8601 `TEXT COLLATE "C"`, page content is `JSONB`, flags are `BOOLEAN`.
+  Port `PORT` (default 3001). `npm start` also serves `client/dist` statically with SPA fallback.
+- Deployment: Vercel — `api/index.js` exports the Express app as one serverless function
+  (`/api/*` rewritten to it), the client is served from `client/dist` with an SPA
+  fallback (`vercel.json`). Database: Supabase Postgres. `JWT_SECRET` is mandatory when
+  `NODE_ENV=production`.
 - Frontend: React 18 + Vite + TypeScript + Tailwind CSS, `react-router-dom`, `date-fns`
   (with `tr` locale, weeks start Monday). Dev server 5173 proxies `/api` → `http://localhost:3001`.
 - Root scripts: `npm run dev` (both, via `concurrently`), `npm run build`, `npm start`,
-  `npm test`, `npm run seed`.
+  `npm test`, `npm run seed`, `npm run db:migrate`, `npm run e2e`.
 
 ## Conventions
 
