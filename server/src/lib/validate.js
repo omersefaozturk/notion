@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { badRequest } from './errors.js';
-import { isDateString, isIsoString } from './dates.js';
+import { isDateString, isIsoString, isValidTimeZone } from './dates.js';
 
 const LABELS = {
   name: 'Ad',
@@ -34,6 +34,7 @@ const LABELS = {
   from: 'Başlangıç tarihi',
   to: 'Bitiş tarihi',
   date: 'Tarih',
+  tz: 'Saat dilimi',
 };
 
 function label(path) {
@@ -88,6 +89,12 @@ export const dateStr = z.string().trim().refine(isDateString, {
 export const isoStr = z.string().trim().refine(isIsoString, {
   error: (iss) => `${label(iss.path)} geçerli bir tarih/saat olmalıdır`,
 });
+/** Optional IANA time zone (e.g. "Europe/Istanbul") sent by the client. */
+export const tz = z
+  .string()
+  .trim()
+  .refine(isValidTimeZone, { error: 'Saat dilimi geçersiz' })
+  .optional();
 export const id = z.coerce.number().int().positive();
 /** Accept "" / null as null for optional nullable strings. */
 export const nullableDate = z.preprocess((v) => (v === '' ? null : v), dateStr.nullable());

@@ -2,6 +2,7 @@ import { DatabaseSync } from 'node:sqlite';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { migrateEventTimes } from './services/events.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const DEFAULT_DB_PATH = path.resolve(__dirname, '../data/app.db');
@@ -106,6 +107,7 @@ export function openDb(dbPath = process.env.DB_PATH || DEFAULT_DB_PATH) {
   db.exec('PRAGMA foreign_keys = ON;');
   if (dbPath !== ':memory:') db.exec('PRAGMA journal_mode = WAL;');
   db.exec(SCHEMA);
+  migrateEventTimes(db);
   return db;
 }
 

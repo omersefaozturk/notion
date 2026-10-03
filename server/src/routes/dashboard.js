@@ -1,18 +1,18 @@
 import { Router } from 'express';
-import { z, parse, scope, dateStr } from '../lib/validate.js';
+import { z, parse, scope, dateStr, tz } from '../lib/validate.js';
 import { today, addDays, startOfWeek, startOfMonth } from '../lib/dates.js';
 import { listEvents } from '../services/events.js';
 import { listTasks, taskCounts } from '../services/tasks.js';
 import { listGoals } from '../services/goals.js';
 import { listPages } from '../services/pages.js';
 
-const schema = z.object({ scope, date: dateStr.optional() });
+const schema = z.object({ scope, tz, date: dateStr.optional() });
 
 export default function dashboardRoutes(db) {
   const r = Router();
   r.get('/', (req, res) => {
     const q = parse(schema, req.query);
-    const date = q.date ?? today();
+    const date = q.date ?? today(q.tz);
     const sc = q.scope;
     const user = req.user;
     const weekStart = startOfWeek(date);
@@ -22,7 +22,7 @@ export default function dashboardRoutes(db) {
     res.json({
       date,
       today: {
-        events: listEvents(db, user, { scope: sc, from: date, to: date }),
+        events: listEvents(db, user, { scope: sc, from: date, to: date, tz: q.tz }),
         // due today, plus overdue tasks that are not done yet
         tasks: listTasks(db, user, {
           scope: sc,

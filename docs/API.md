@@ -105,6 +105,23 @@ that week; monthly → first day of the month.
 `event` = `{ id, title, description, start, end, allDay, location, color, visibility, owner, createdAt, updatedAt }`
 (`end` defaults to `start`.)
 
+Event time storage (normalised by the server on every write):
+
+- **All-day** (`allDay: true`): `start`/`end` are calendar dates `YYYY-MM-DD`, `end` inclusive.
+  A date-time sent for an all-day event is converted to its date in `tz`.
+- **Timed**: `start`/`end` are UTC instants `YYYY-MM-DDTHH:MM:SS.sssZ`. Inputs with an
+  offset are converted; inputs without offset (`2026-10-10T09:00`) or plain dates are
+  wall-clock times in `tz`.
+
+`tz` (optional IANA zone, e.g. `Europe/Istanbul`) may be sent as a body field on
+`POST/PATCH /api/events` and as a query param on `GET /api/events`, `/api/calendar` and
+`/api/dashboard`. It defaults to the household zone `APP_TIMEZONE` (default
+`Europe/Istanbul`). Date bounds (`from`/`to`/`date`) are whole local days in `tz`:
+all-day events match by date (so they show on their date in any zone), timed events
+match by instant overlap (so an event spanning several days matches each of them; an
+event ending exactly at midnight does not leak into the next day). The client always
+sends the browser's zone.
+
 ### Tasks (kanban: Yapılacak / Yapılıyor / Yapıldı)
 - `GET /api/tasks?scope=&status=&dueFrom=&dueTo=` → `[task]` ordered by `status, position`
 - `POST /api/tasks` `{ title, description?, status?, priority?, dueDate?, assigneeId?, visibility? }`

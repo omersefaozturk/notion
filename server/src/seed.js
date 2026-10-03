@@ -3,15 +3,19 @@ import bcrypt from 'bcryptjs';
 import { pathToFileURL } from 'node:url';
 import { openDb, transaction } from './db.js';
 import { generateInviteCode } from './lib/household.js';
-import { today, addDays, startOfWeek, startOfMonth, normalizePeriodStart, periodEnd, nowIso } from './lib/dates.js';
+import {
+  today, addDays, startOfWeek, startOfMonth, normalizePeriodStart, periodEnd, nowIso, zonedToUtc, DEFAULT_TZ,
+} from './lib/dates.js';
 
 const uid = () => crypto.randomUUID();
 const block = (type, text = '', extra = {}) => ({ id: uid(), type, text, checked: false, children: [], ...extra });
 
-/** Local wall-clock time on a date → ISO string. */
+/**
+ * Wall-clock time on a date in the household time zone (APP_TIMEZONE, default
+ * Europe/Istanbul) → UTC ISO string. Independent of the server's own TZ.
+ */
 function at(date, hh, mm = 0) {
-  const [y, m, d] = date.split('-').map(Number);
-  return new Date(y, m - 1, d, hh, mm).toISOString();
+  return zonedToUtc(date, hh, mm, DEFAULT_TZ).toISOString();
 }
 
 export function seed(db) {

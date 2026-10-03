@@ -23,6 +23,15 @@ import type {
 export * from './types';
 export { ApiError, getToken, setToken, setUnauthorizedHandler } from './client';
 
+/** The browser's IANA time zone, sent so the server can interpret date ranges as local days. */
+export function browserTimeZone(): string | undefined {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 export const authApi = {
   register: (body: {
     name: string;
@@ -45,10 +54,10 @@ export const householdApi = {
 };
 
 export const eventsApi = {
-  list: (params: { from: string; to: string; scope: Scope }) => http.get<CalendarEvent[]>('/events', params),
+  list: (params: { from: string; to: string; scope: Scope }) => http.get<CalendarEvent[]>('/events', { ...params, tz: browserTimeZone() }),
   get: (id: number) => http.get<CalendarEvent>(`/events/${id}`),
-  create: (body: EventInput) => http.post<CalendarEvent>('/events', body),
-  update: (id: number, body: Partial<EventInput>) => http.patch<CalendarEvent>(`/events/${id}`, body),
+  create: (body: EventInput) => http.post<CalendarEvent>('/events', { ...body, tz: browserTimeZone() }),
+  update: (id: number, body: Partial<EventInput>) => http.patch<CalendarEvent>(`/events/${id}`, { ...body, tz: browserTimeZone() }),
   remove: (id: number) => http.del(`/events/${id}`),
 };
 
@@ -80,9 +89,9 @@ export const pagesApi = {
 };
 
 export const calendarApi = {
-  get: (params: { from: string; to: string; scope: Scope }) => http.get<CalendarData>('/calendar', params),
+  get: (params: { from: string; to: string; scope: Scope }) => http.get<CalendarData>('/calendar', { ...params, tz: browserTimeZone() }),
 };
 
 export const dashboardApi = {
-  get: (params: { date: string; scope: Scope }) => http.get<DashboardData>('/dashboard', params),
+  get: (params: { date: string; scope: Scope }) => http.get<DashboardData>('/dashboard', { ...params, tz: browserTimeZone() }),
 };
