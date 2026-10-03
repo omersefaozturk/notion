@@ -24,7 +24,7 @@ export function mapTask(r) {
 }
 
 /** filters: scope, status, dueFrom/dueTo (inclusive dates), extraSql/extraParams (additional condition). */
-export function listTasks(db, user, { scope = 'merged', status, dueFrom, dueTo, extraSql, extraParams = [] } = {}) {
+export async function listTasks(db, user, { scope = 'merged', status, dueFrom, dueTo, extraSql, extraParams = [] } = {}) {
   const sc = scopeClause(user, scope);
   const where = [sc.sql];
   const params = [...sc.params];
@@ -44,30 +44,27 @@ export function listTasks(db, user, { scope = 'merged', status, dueFrom, dueTo, 
     where.push(extraSql);
     params.push(...extraParams);
   }
-  const rows = db
-    .prepare(`${SELECT} WHERE ${where.join(' AND ')} ORDER BY ${STATUS_ORDER}, t.position, t.id`)
-    .all(...params);
+  const rows = await db.many(`${SELECT} WHERE ${where.join(' AND ')} ORDER BY ${STATUS_ORDER}, t.position, t.id`, params);
   return rows.map(mapTask);
 }
 
-export function getTaskRow(db, user, id) {
+export async function getTaskRow(db, user, id) {
   const v = visibleClause(user);
-  return orNotFound(db.prepare(`${SELECT} WHERE t.id = ? AND ${v.sql}`).get(id, ...v.params), 'Görev bulunamadı');
+  return orNotFound(await db.one(`${SELECT} WHERE t.id = ? AND ${v.sql}`, [id, ...v.params]), 'Görev bulunamadı');
 }
 
-export function taskCounts(db, user, scope = 'merged') {
+export async function taskCounts(db, user, scope = 'merged') {
   const sc = scopeClause(user, scope);
   const counts = { todo: 0, doing: 0, done: 0 };
-  for (const r of db.prepare(`SELECT t.status, COUNT(*) AS n FROM tasks t WHERE ${sc.sql} GROUP BY t.status`).all(...sc.params)) {
+  const rows = await db.many(`SELECT t.status, COUNT(*)::int AS n FROM tasks t WHERE ${sc.sql} GROUP BY t.status`, sc.params);
+  for (const r of rows) {
     counts[r.status] = r.n;
   }
   return counts;
 }
 
 /** Position for appending at the end of a status column in the household. */
-export function nextPosition(db, householdId, status) {
-  const r = db
-    .prepare('SELECT MAX(position) AS m FROM tasks WHERE household_id = ? AND status = ?')
-    .get(householdId, status);
+export async function nextPosition(db, householdId, status) {
+  const r = await db.one('SELECT MAX(position) AS m FROM tasks WHERE household_id = ? AND status = ?', [householdId, status]);
   return r.m == null ? 1024 : Math.floor(r.m) + 1024;
 }

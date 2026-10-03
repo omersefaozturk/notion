@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { setup, couple, register } from './helpers.js';
 
 async function fixture() {
-  const ctx = setup();
+  const ctx = await setup();
   const { api } = ctx;
   const { omer, es } = await couple(api);
   const mk = (who, body) => api.post('/api/events').set('Authorization', who.auth).send(body);

@@ -3,14 +3,14 @@ import assert from 'node:assert/strict';
 import { setup, register, couple } from './helpers.js';
 
 test('health', async () => {
-  const { api } = setup();
+  const { api } = await setup();
   const res = await api.get('/api/health');
   assert.equal(res.status, 200);
   assert.deepEqual(res.body, { ok: true });
 });
 
 test('register creates a household, login and me work', async () => {
-  const { api } = setup();
+  const { api } = await setup();
   const reg = await register(api, { name: 'ömer', email: 'Omer@Test.com' });
   assert.ok(reg.token);
   assert.equal(reg.user.initial, 'Ö');
@@ -35,7 +35,7 @@ test('register creates a household, login and me work', async () => {
 });
 
 test('unauthenticated requests get 401 with Turkish error', async () => {
-  const { api } = setup();
+  const { api } = await setup();
   const res = await api.get('/api/tasks');
   assert.equal(res.status, 401);
   assert.ok(res.body.error);
@@ -44,7 +44,7 @@ test('unauthenticated requests get 401 with Turkish error', async () => {
 });
 
 test('validation errors are 400 with Turkish message', async () => {
-  const { api } = setup();
+  const { api } = await setup();
   const res = await api.post('/api/auth/register').send({ name: 'A', email: 'bad', password: '123456' });
   assert.equal(res.status, 400);
   assert.equal(res.body.error, 'Geçerli bir e-posta adresi girin');
@@ -58,7 +58,7 @@ test('validation errors are 400 with Turkish message', async () => {
 });
 
 test('join household via invite code; invalid code rejected; members get distinct colors', async () => {
-  const { api } = setup();
+  const { api } = await setup();
   const { omer, es, inviteCode } = await couple(api);
   assert.equal(es.user.householdId, omer.user.householdId);
   assert.notEqual(es.user.color, omer.user.color);
@@ -80,7 +80,7 @@ test('join household via invite code; invalid code rejected; members get distinc
 });
 
 test('PATCH /auth/me updates profile and password', async () => {
-  const { api } = setup();
+  const { api } = await setup();
   const u = await register(api, { name: 'Ömer', email: 'o@o.com' });
   const res = await api.patch('/api/auth/me').set('Authorization', u.auth)
     .send({ name: 'Ömer S', initial: 'ş', color: '#123456', password: 'yenisifre' });

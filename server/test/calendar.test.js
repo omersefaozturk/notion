@@ -19,7 +19,7 @@ async function populate(api, omer, es) {
 }
 
 test('calendar aggregates events, tasks, goals and plans in range', async () => {
-  const { api } = setup();
+  const { api } = await setup();
   const { omer, es } = await couple(api);
   await populate(api, omer, es);
 
@@ -43,7 +43,7 @@ test('calendar aggregates events, tasks, goals and plans in range', async () => 
 });
 
 test('dashboard groups today / week / month and counts tasks', async () => {
-  const { api } = setup();
+  const { api } = await setup();
   const { omer, es } = await couple(api);
   await populate(api, omer, es);
   const post = (who, path, body) => api.post(path).set('Authorization', who.auth).send(body);
@@ -74,10 +74,10 @@ test('dashboard groups today / week / month and counts tasks', async () => {
 });
 
 test('seed populates both users with current data', async () => {
-  const { db, api } = setup();
+  const { db, api } = await setup();
   const { seed } = await import('../src/seed.js');
-  seed(db);
-  seed(db); // idempotent
+  await seed(db);
+  await seed(db); // idempotent
   const login = await api.post('/api/auth/login').send({ email: 'omer@example.com', password: '123456' });
   assert.equal(login.status, 200);
   assert.equal(login.body.user.initial, 'Ö');

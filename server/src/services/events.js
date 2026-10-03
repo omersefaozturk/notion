@@ -70,13 +70,13 @@ export function mapEvent(r) {
  * by instant, so an all-day event shows on its date in any time zone and a timed event
  * spanning several days matches each of them.
  */
-export function listEvents(db, user, { scope = 'merged', from, to, tz = DEFAULT_TZ } = {}) {
+export async function listEvents(db, user, { scope = 'merged', from, to, tz = DEFAULT_TZ } = {}) {
   const sc = scopeClause(user, scope);
   const where = [sc.sql];
   const params = [...sc.params];
 
-  const allDay = ['t.all_day = 1'];
-  const timed = ['t.all_day = 0'];
+  const allDay = ['t.all_day'];
+  const timed = ['NOT t.all_day'];
   const allDayParams = [];
   const timedParams = [];
   if (to) {
@@ -103,24 +103,22 @@ export function listEvents(db, user, { scope = 'merged', from, to, tz = DEFAULT_
   where.push(`((${allDay.join(' AND ')}) OR (${timed.join(' AND ')}))`);
   params.push(...allDayParams, ...timedParams);
 
-  const rows = db
-    .prepare(`${SELECT} WHERE ${where.join(' AND ')} ORDER BY t.start, t.id`)
-    .all(...params);
+  const rows = await db.many(`${SELECT} WHERE ${where.join(' AND ')} ORDER BY t.start, t.id`, params);
   return rows.map(mapEvent);
 }
 
-export function getEventRow(db, user, id) {
+export async function getEventRow(db, user, id) {
   const v = visibleClause(user);
   return orNotFound(
-    db.prepare(`${SELECT} WHERE t.id = ? AND ${v.sql}`).get(id, ...v.params),
+    await db.one(`${SELECT} WHERE t.id = ? AND ${v.sql}`, [id, ...v.params]),
     'Etkinlik bulunamadı',
   );
 }
 
 /** Rewrite legacy rows (mixed formats) into the normalised storage format. */
-export function migrateEventTimes(db, tz = DEFAULT_TZ) {
-  const rows = db.prepare('SELECT id, start, "end", all_day FROM events').all();
-  const upd = db.prepare('UPDATE events SET start = ?, "end" = ? WHERE id = ?');
+export async function migrateEventTimes(db, tz = DEFAULT_TZ) {
+  const rows = await db.many('SELECT id, start, "end", all_day FROM events');
+  let changed = 0;
   for (const r of rows) {
     let n;
     try {
@@ -128,6 +126,10 @@ export function migrateEventTimes(db, tz = DEFAULT_TZ) {
     } catch {
       n = normalizeEventTimes({ start: r.start, end: r.start, allDay: !!r.all_day }, tz);
     }
-    if (n.start !== r.start || n.end !== r.end) upd.run(n.start, n.end, r.id);
+    if (n.start !== r.start || n.end !== r.end) {
+      await db.query('UPDATE events SET start = ?, "end" = ? WHERE id = ?', [n.start, n.end, r.id]);
+      changed++;
+    }
   }
+  return changed;
 }

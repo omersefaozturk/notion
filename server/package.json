@@ -5,22 +5,25 @@
   "type": "module",
   "main": "src/index.js",
   "scripts": {
-    "dev": "node --disable-warning=ExperimentalWarning --watch src/index.js",
-    "start": "node --disable-warning=ExperimentalWarning src/index.js",
-    "seed": "node --disable-warning=ExperimentalWarning src/seed.js",
-    "test": "node --disable-warning=ExperimentalWarning --test"
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js",
+    "seed": "node src/seed.js",
+    "db:migrate": "node src/migrate.js",
+    "test": "node --test"
   },
   "engines": {
-    "node": ">=22.5"
+    "node": ">=22"
   },
   "devDependencies": {
     "supertest": "^7.3.1"
   },
   "dependencies": {
+    "@electric-sql/pglite": "^0.5.8",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
+    "postgres": "^3.4.9",
     "zod": "^4.6.5"
   }
 }

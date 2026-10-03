@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { setup, couple } from './helpers.js';
 
 test('pages: tree, hasChildren, breadcrumbs, content round-trip', async () => {
-  const { api } = setup();
+  const { api } = await setup();
   const { omer, es } = await couple(api);
   const mk = (who, body) => api.post('/api/pages').set('Authorization', who.auth).send(body);
   const root = (await mk(omer, { title: 'Ev', icon: '🏠' })).body;
@@ -55,7 +55,7 @@ test('pages: tree, hasChildren, breadcrumbs, content round-trip', async () => {
 });
 
 test('pages: delete cascades to child pages', async () => {
-  const { api } = setup();
+  const { api } = await setup();
   const { omer } = await couple(api);
   const mk = (body) => api.post('/api/pages').set('Authorization', omer.auth).send(body);
   const a = (await mk({ title: 'A' })).body;
@@ -74,7 +74,7 @@ test('pages: delete cascades to child pages', async () => {
 });
 
 test('pages: plans with period normalisation and filters', async () => {
-  const { api } = setup();
+  const { api } = await setup();
   const { omer, es } = await couple(api);
   const mk = (who, body) => api.post('/api/pages').set('Authorization', who.auth).send(body);
   const wk = (await mk(omer, { title: 'Hafta', period: 'weekly', periodStart: '2026-10-01' })).body;
@@ -95,7 +95,7 @@ test('pages: plans with period normalisation and filters', async () => {
 });
 
 test('page content keeps toggle collapsed state and nested list children', async () => {
-  const { api } = setup();
+  const { api } = await setup();
   const { omer } = await couple(api);
   const content = [
     { id: 'a', type: 'toggle', text: 'Aç/kapa', collapsed: false, children: [{ id: 'b', type: 'paragraph', text: 'iç' }] },

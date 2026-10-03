@@ -4,7 +4,6 @@ import { z, parse, color } from '../lib/validate.js';
 import { badRequest, conflict, unauthorized } from '../lib/errors.js';
 import { signToken, userFromRow, requireAuth } from '../auth.js';
 import { generateInviteCode, getHousehold, pickColor, toInitial } from '../lib/household.js';
-import { transaction } from '../db.js';
 import { nowIso } from '../lib/dates.js';
 import { buildUpdate } from '../lib/access.js';
 
@@ -38,71 +37,70 @@ const updateMeSchema = z.object({
 export default function authRoutes(db) {
   const r = Router();
 
-  r.post('/register', (req, res) => {
+  r.post('/register', async (req, res) => {
     const data = parse(registerSchema, req.body);
-    if (db.prepare('SELECT 1 FROM users WHERE email = ?').get(data.email)) {
+    if (await db.one('SELECT 1 FROM users WHERE lower(email) = lower(?)', [data.email])) {
       throw conflict('Bu e-posta adresi zaten kayıtlı');
     }
     let householdId = null;
     if (data.inviteCode) {
-      const h = db.prepare('SELECT id FROM households WHERE invite_code = ?').get(data.inviteCode);
+      const h = await db.one('SELECT id FROM households WHERE invite_code = ?', [data.inviteCode]);
       if (!h) throw badRequest('Davet kodu geçersiz');
       householdId = h.id;
     }
     const now = nowIso();
-    const hash = bcrypt.hashSync(data.password, 10);
-    const userId = transaction(db, () => {
+    const hash = await bcrypt.hash(data.password, 10);
+    const row = await db.tx(async (t) => {
       if (householdId == null) {
-        householdId = Number(
-          db
-            .prepare('INSERT INTO households (name, invite_code, created_at) VALUES (?, ?, ?)')
-            .run(`${data.name} ailesi`, generateInviteCode(db), now).lastInsertRowid,
-        );
-      }
-      return Number(
-        db
-          .prepare(
-            `INSERT INTO users (household_id, name, email, password_hash, initial, color, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?)`,
-          )
-          .run(
-            householdId,
-            data.name,
-            data.email,
-            hash,
-            toInitial(data.initial || data.name),
-            data.color || pickColor(db, householdId),
+        householdId = (
+          await t.one('INSERT INTO households (name, invite_code, created_at) VALUES (?, ?, ?) RETURNING id', [
+            `${data.name} ailesi`,
+            await generateInviteCode(t),
             now,
-          ).lastInsertRowid,
+          ])
+        ).id;
+      }
+      return t.one(
+        `INSERT INTO users (household_id, name, email, password_hash, initial, color, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING *`,
+        [
+          householdId,
+          data.name,
+          data.email,
+          hash,
+          toInitial(data.initial || data.name),
+          data.color || (await pickColor(t, householdId)),
+          now,
+        ],
       );
     });
-    const user = userFromRow(db.prepare('SELECT * FROM users WHERE id = ?').get(userId));
+    const user = userFromRow(row);
     res.status(201).json({ token: signToken(user.id), user });
   });
 
-  r.post('/login', (req, res) => {
+  r.post('/login', async (req, res) => {
     const data = parse(loginSchema, req.body);
-    const row = db.prepare('SELECT * FROM users WHERE email = ?').get(data.email);
-    if (!row || !bcrypt.compareSync(data.password, row.password_hash)) {
+    const row = await db.one('SELECT * FROM users WHERE lower(email) = lower(?)', [data.email]);
+    if (!row || !(await bcrypt.compare(data.password, row.password_hash))) {
       throw unauthorized('E-posta veya şifre hatalı');
     }
     res.json({ token: signToken(row.id), user: userFromRow(row) });
   });
 
-  r.get('/me', requireAuth(db), (req, res) => {
-    res.json({ user: req.user, household: getHousehold(db, req.user.householdId) });
+  r.get('/me', requireAuth(db), async (req, res) => {
+    res.json({ user: req.user, household: await getHousehold(db, req.user.householdId) });
   });
 
-  r.patch('/me', requireAuth(db), (req, res) => {
+  r.patch('/me', requireAuth(db), async (req, res) => {
     const data = parse(updateMeSchema, req.body);
     const upd = buildUpdate('users', req.user.id, {
       name: data.name,
       initial: data.initial === undefined ? undefined : toInitial(data.initial),
       color: data.color,
-      password_hash: data.password === undefined ? undefined : bcrypt.hashSync(data.password, 10),
+      password_hash: data.password === undefined ? undefined : await bcrypt.hash(data.password, 10),
     });
-    if (upd) db.prepare(upd.sql).run(...upd.params);
-    res.json({ user: userFromRow(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) });
+    if (upd) await db.query(upd.sql, upd.params);
+    res.json({ user: userFromRow(await db.one('SELECT * FROM users WHERE id = ?', [req.user.id])) });
   });
 
   return r;

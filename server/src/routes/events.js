@@ -35,32 +35,29 @@ const updateSchema = z.object({
 export default function eventRoutes(db) {
   const r = Router();
 
-  r.get('/', (req, res) => {
-    res.json(listEvents(db, req.user, parse(listSchema, req.query)));
+  r.get('/', async (req, res) => {
+    res.json(await listEvents(db, req.user, parse(listSchema, req.query)));
   });
 
-  r.post('/', (req, res) => {
+  r.post('/', async (req, res) => {
     const d = parse(createSchema, req.body);
     const { start, end } = normalizeEventTimes({ start: d.start, end: d.end, allDay: d.allDay }, d.tz);
     const now = nowIso();
-    const id = Number(
-      db
-        .prepare(
-          `INSERT INTO events (household_id, owner_id, title, description, start, "end", all_day, location, color,
-             visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        )
-        .run(req.user.householdId, req.user.id, d.title, d.description, start, end, d.allDay ? 1 : 0, d.location,
-          d.color ?? null, d.visibility, now, now).lastInsertRowid,
+    const { id } = await db.one(
+      `INSERT INTO events (household_id, owner_id, title, description, start, "end", all_day, location, color,
+         visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id`,
+      [req.user.householdId, req.user.id, d.title, d.description, start, end, d.allDay, d.location,
+        d.color ?? null, d.visibility, now, now],
     );
-    res.status(201).json(mapEvent(getEventRow(db, req.user, id)));
+    res.status(201).json(mapEvent(await getEventRow(db, req.user, id)));
   });
 
-  r.get('/:id', (req, res) => {
-    res.json(mapEvent(getEventRow(db, req.user, parseId(req.params.id))));
+  r.get('/:id', async (req, res) => {
+    res.json(mapEvent(await getEventRow(db, req.user, parseId(req.params.id))));
   });
 
-  r.patch('/:id', (req, res) => {
-    const row = getEventRow(db, req.user, parseId(req.params.id));
+  r.patch('/:id', async (req, res) => {
+    const row = await getEventRow(db, req.user, parseId(req.params.id));
     assertCanEdit(req.user, row);
     const d = parse(updateSchema, req.body);
     const allDay = d.allDay ?? !!row.all_day;
@@ -79,20 +76,20 @@ export default function eventRoutes(db) {
       description: d.description,
       start: start !== row.start ? start : undefined,
       end: end !== row.end ? end : undefined,
-      all_day: d.allDay === undefined ? undefined : d.allDay ? 1 : 0,
+      all_day: d.allDay,
       location: d.location,
       color: d.color,
       visibility: d.visibility,
       updated_at: nowIso(),
     });
-    db.prepare(upd.sql).run(...upd.params);
-    res.json(mapEvent(getEventRow(db, req.user, row.id)));
+    await db.query(upd.sql, upd.params);
+    res.json(mapEvent(await getEventRow(db, req.user, row.id)));
   });
 
-  r.delete('/:id', (req, res) => {
-    const row = getEventRow(db, req.user, parseId(req.params.id));
+  r.delete('/:id', async (req, res) => {
+    const row = await getEventRow(db, req.user, parseId(req.params.id));
     assertOwner(req.user, row);
-    db.prepare('DELETE FROM events WHERE id = ?').run(row.id);
+    await db.query('DELETE FROM events WHERE id = ?', [row.id]);
     res.json({ ok: true });
   });
 

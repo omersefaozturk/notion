@@ -15,7 +15,7 @@ import dashboardRoutes from './routes/dashboard.js';
 
 /**
  * Build the Express app.
- * @param {{ db: import('node:sqlite').DatabaseSync, staticDir?: string }} opts
+ * @param {{ db: ReturnType<typeof import('./db.js').createDb>, staticDir?: string }} opts
  */
 export function createApp({ db, staticDir } = {}) {
   if (!db) throw new Error('createApp requires a db');
@@ -51,6 +51,8 @@ export function createApp({ db, staticDir } = {}) {
     if (err instanceof HttpError) return res.status(err.status).json({ error: err.message });
     if (err?.type === 'entity.parse.failed') return res.status(400).json({ error: 'Geçersiz JSON gövdesi' });
     if (err?.type === 'entity.too.large') return res.status(413).json({ error: 'İstek gövdesi çok büyük' });
+    // unique violation (e.g. two simultaneous registrations with the same e-mail)
+    if (err?.code === '23505') return res.status(409).json({ error: 'Bu kayıt zaten mevcut' });
     console.error(err);
     res.status(500).json({ error: 'Sunucu hatası' });
   });

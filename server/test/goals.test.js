@@ -15,7 +15,7 @@ test('date helpers: Monday week start and period ends', () => {
 });
 
 test('goals: period normalisation, periodEnd, filters', async () => {
-  const { api } = setup();
+  const { api } = await setup();
   const { omer } = await couple(api);
   const mk = (body) => api.post('/api/goals').set('Authorization', omer.auth).send(body);
   const w = (await mk({ title: 'Haftalık', period: 'weekly', periodStart: '2026-10-03' })).body;
@@ -45,7 +45,7 @@ test('goals: period normalisation, periodEnd, filters', async () => {
 });
 
 test('goals: partner may toggle done/progress on shared goals only', async () => {
-  const { api } = setup();
+  const { api } = await setup();
   const { omer, es } = await couple(api);
   const g = (await api.post('/api/goals').set('Authorization', omer.auth)
     .send({ title: 'Ortak hedef', period: 'daily', periodStart: '2026-10-03' })).body;

@@ -6,9 +6,14 @@ import path from 'node:path';
 // touches the development database and can run while `npm run dev` is up.
 const API_PORT = 3101;
 const WEB_PORT = 5180;
-const dbPath = path.resolve('e2e/.data/e2e.db');
-fs.mkdirSync(path.dirname(dbPath), { recursive: true });
-for (const f of [dbPath, `${dbPath}-wal`, `${dbPath}-shm`]) fs.rmSync(f, { force: true });
+// Local PGlite database directory (real Postgres in WASM), recreated on every run.
+// Only the main process wipes it: workers load this config too, and must not delete
+// the files from under the running API server.
+const dataDir = path.resolve('e2e/.data/pglite');
+if (!process.env.TEST_WORKER_INDEX) {
+  fs.rmSync(dataDir, { recursive: true, force: true });
+  fs.mkdirSync(dataDir, { recursive: true });
+}
 
 // Use the pre-installed Chromium when present (no `playwright install` needed).
 const preinstalled = '/opt/pw-browsers/chromium';
@@ -36,7 +41,8 @@ export default defineConfig({
     {
       command: 'npm run seed -w server && npm run start -w server',
       url: `http://localhost:${API_PORT}/api/health`,
-      env: { DB_PATH: dbPath, PORT: String(API_PORT), APP_TIMEZONE: 'Europe/Istanbul' },
+      // DATABASE_URL is blanked so the suite never touches a real (e.g. Supabase) database.
+      env: { PGLITE_DIR: dataDir, DATABASE_URL: '', PORT: String(API_PORT), APP_TIMEZONE: 'Europe/Istanbul' },
       reuseExistingServer: false,
       timeout: 60_000,
     },

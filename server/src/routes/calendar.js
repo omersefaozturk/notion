@@ -9,23 +9,24 @@ import { listPages } from '../services/pages.js';
 
 const schema = z.object({ scope, tz, from: dateStr.optional(), to: dateStr.optional() });
 
-export function calendarData(db, user, { scope: sc, from, to, tz: tzName }) {
-  return {
-    events: listEvents(db, user, { scope: sc, from, to, tz: tzName }),
-    tasks: listTasks(db, user, { scope: sc, dueFrom: from, dueTo: to }),
-    goals: listGoals(db, user, { scope: sc, overlapFrom: from, overlapTo: to }),
-    plans: listPages(db, user, { scope: sc, overlapFrom: from, overlapTo: to }),
-  };
+export async function calendarData(db, user, { scope: sc, from, to, tz: tzName }) {
+  const [events, tasks, goals, plans] = await Promise.all([
+    listEvents(db, user, { scope: sc, from, to, tz: tzName }),
+    listTasks(db, user, { scope: sc, dueFrom: from, dueTo: to }),
+    listGoals(db, user, { scope: sc, overlapFrom: from, overlapTo: to }),
+    listPages(db, user, { scope: sc, overlapFrom: from, overlapTo: to }),
+  ]);
+  return { events, tasks, goals, plans };
 }
 
 export default function calendarRoutes(db) {
   const r = Router();
-  r.get('/', (req, res) => {
+  r.get('/', async (req, res) => {
     const q = parse(schema, req.query);
     const from = q.from ?? startOfMonth(today(q.tz));
     const to = q.to ?? endOfMonth(from);
     if (to < from) throw badRequest('Bitiş tarihi başlangıçtan önce olamaz');
-    res.json(calendarData(db, req.user, { scope: q.scope, from, to, tz: q.tz }));
+    res.json(await calendarData(db, req.user, { scope: q.scope, from, to, tz: q.tz }));
   });
   return r;
 }

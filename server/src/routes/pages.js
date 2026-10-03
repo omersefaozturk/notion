@@ -43,51 +43,48 @@ const updateSchema = z.object({
 export default function pageRoutes(db) {
   const r = Router();
 
-  function checkParent(user, id) {
+  async function checkParent(user, id) {
     if (id == null) return;
     const v = visibleClause(user);
-    if (!db.prepare(`SELECT 1 FROM pages t WHERE t.id = ? AND ${v.sql}`).get(id, ...v.params)) {
+    if (!(await db.one(`SELECT 1 FROM pages t WHERE t.id = ? AND ${v.sql}`, [id, ...v.params]))) {
       throw badRequest('Üst sayfa bulunamadı');
     }
   }
 
-  r.get('/', (req, res) => {
-    res.json(listPages(db, req.user, parse(listSchema, req.query)));
+  r.get('/', async (req, res) => {
+    res.json(await listPages(db, req.user, parse(listSchema, req.query)));
   });
 
-  r.post('/', (req, res) => {
+  r.post('/', async (req, res) => {
     const d = parse(createSchema, req.body);
-    checkParent(req.user, d.parentId);
+    await checkParent(req.user, d.parentId);
     if (!d.period && d.periodStart) throw badRequest('Dönem başlangıcı için dönem seçilmelidir');
     const start = d.period ? normalizePeriodStart(d.period, d.periodStart ?? today()) : null;
     const end = d.period ? periodEnd(d.period, start) : null;
     const now = nowIso();
     const parent = d.parentId ?? null;
-    const id = Number(
-      db
-        .prepare(
-          `INSERT INTO pages (household_id, owner_id, parent_id, title, icon, content, period, period_start, period_end,
-             visibility, position, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        )
-        .run(req.user.householdId, req.user.id, parent, d.title, d.icon, JSON.stringify(d.content), d.period ?? null,
-          start, end, d.visibility, nextPagePosition(db, req.user.householdId, parent), now, now).lastInsertRowid,
+    const { id } = await db.one(
+      `INSERT INTO pages (household_id, owner_id, parent_id, title, icon, content, period, period_start, period_end,
+         visibility, position, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id`,
+      [req.user.householdId, req.user.id, parent, d.title, d.icon, d.content, d.period ?? null,
+        start, end, d.visibility, await nextPagePosition(db, req.user.householdId, parent), now, now],
     );
-    res.status(201).json(mapPage(db, req.user, getPageRow(db, req.user, id)));
+    res.status(201).json(await mapPage(db, req.user, await getPageRow(db, req.user, id)));
   });
 
-  r.get('/:id', (req, res) => {
-    res.json(mapPage(db, req.user, getPageRow(db, req.user, parseId(req.params.id))));
+  r.get('/:id', async (req, res) => {
+    res.json(await mapPage(db, req.user, await getPageRow(db, req.user, parseId(req.params.id))));
   });
 
-  r.patch('/:id', (req, res) => {
-    const row = getPageRow(db, req.user, parseId(req.params.id));
+  r.patch('/:id', async (req, res) => {
+    const row = await getPageRow(db, req.user, parseId(req.params.id));
     assertCanEdit(req.user, row);
     const d = parse(updateSchema, req.body);
     let parent;
     if (d.parentId !== undefined && d.parentId !== row.parent_id) {
       if (d.parentId !== null) {
-        checkParent(req.user, d.parentId);
-        if (isSelfOrDescendant(db, row.id, d.parentId)) throw badRequest('Sayfa kendi alt sayfasının altına taşınamaz');
+        await checkParent(req.user, d.parentId);
+        if (await isSelfOrDescendant(db, row.id, d.parentId)) throw badRequest('Sayfa kendi alt sayfasının altına taşınamaz');
       }
       parent = d.parentId;
     }
@@ -110,23 +107,23 @@ export default function pageRoutes(db) {
       title: d.title,
       icon: d.icon,
       parent_id: parent,
-      content: d.content === undefined ? undefined : JSON.stringify(d.content),
+      content: d.content,
       period: p,
       period_start: start,
       period_end: end,
       visibility: d.visibility,
       position:
-        d.position ?? (parent !== undefined ? nextPagePosition(db, row.household_id, parent) : undefined),
+        d.position ?? (parent !== undefined ? await nextPagePosition(db, row.household_id, parent) : undefined),
       updated_at: nowIso(),
     });
-    db.prepare(upd.sql).run(...upd.params);
-    res.json(mapPage(db, req.user, getPageRow(db, req.user, row.id)));
+    await db.query(upd.sql, upd.params);
+    res.json(await mapPage(db, req.user, await getPageRow(db, req.user, row.id)));
   });
 
-  r.delete('/:id', (req, res) => {
-    const row = getPageRow(db, req.user, parseId(req.params.id));
+  r.delete('/:id', async (req, res) => {
+    const row = await getPageRow(db, req.user, parseId(req.params.id));
     assertOwner(req.user, row);
-    db.prepare('DELETE FROM pages WHERE id = ?').run(row.id); // children cascade via FK
+    await db.query('DELETE FROM pages WHERE id = ?', [row.id]); // children cascade via FK
     res.json({ ok: true });
   });
 

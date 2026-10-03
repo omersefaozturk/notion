@@ -50,33 +50,30 @@ function reconcile(progressIn, doneIn, current = { progress: 0, done: false }) {
 export default function goalRoutes(db) {
   const r = Router();
 
-  r.get('/', (req, res) => {
-    res.json(listGoals(db, req.user, parse(listSchema, req.query)));
+  r.get('/', async (req, res) => {
+    res.json(await listGoals(db, req.user, parse(listSchema, req.query)));
   });
 
-  r.post('/', (req, res) => {
+  r.post('/', async (req, res) => {
     const d = parse(createSchema, req.body);
     const start = normalizePeriodStart(d.period, d.periodStart ?? today());
     const pd = reconcile(d.progress, d.done);
     const now = nowIso();
-    const id = Number(
-      db
-        .prepare(
-          `INSERT INTO goals (household_id, owner_id, title, description, period, period_start, period_end, progress,
-             done, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        )
-        .run(req.user.householdId, req.user.id, d.title, d.description, d.period, start, periodEnd(d.period, start),
-          pd.progress, pd.done ? 1 : 0, d.visibility, now, now).lastInsertRowid,
+    const { id } = await db.one(
+      `INSERT INTO goals (household_id, owner_id, title, description, period, period_start, period_end, progress,
+         done, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id`,
+      [req.user.householdId, req.user.id, d.title, d.description, d.period, start, periodEnd(d.period, start),
+        pd.progress, !!pd.done, d.visibility, now, now],
     );
-    res.status(201).json(mapGoal(getGoalRow(db, req.user, id)));
+    res.status(201).json(mapGoal(await getGoalRow(db, req.user, id)));
   });
 
-  r.get('/:id', (req, res) => {
-    res.json(mapGoal(getGoalRow(db, req.user, parseId(req.params.id))));
+  r.get('/:id', async (req, res) => {
+    res.json(mapGoal(await getGoalRow(db, req.user, parseId(req.params.id))));
   });
 
-  r.patch('/:id', (req, res) => {
-    const row = getGoalRow(db, req.user, parseId(req.params.id));
+  r.patch('/:id', async (req, res) => {
+    const row = await getGoalRow(db, req.user, parseId(req.params.id));
     const d = parse(updateSchema, req.body);
     assertCanEdit(req.user, row, d, MEMBER_KEYS, {
       title: row.title,
@@ -101,18 +98,18 @@ export default function goalRoutes(db) {
       period_start: start,
       period_end: end,
       progress: pd.progress,
-      done: pd.done === undefined ? undefined : pd.done ? 1 : 0,
+      done: pd.done === undefined ? undefined : !!pd.done,
       visibility: d.visibility,
       updated_at: nowIso(),
     });
-    db.prepare(upd.sql).run(...upd.params);
-    res.json(mapGoal(getGoalRow(db, req.user, row.id)));
+    await db.query(upd.sql, upd.params);
+    res.json(mapGoal(await getGoalRow(db, req.user, row.id)));
   });
 
-  r.delete('/:id', (req, res) => {
-    const row = getGoalRow(db, req.user, parseId(req.params.id));
+  r.delete('/:id', async (req, res) => {
+    const row = await getGoalRow(db, req.user, parseId(req.params.id));
     assertOwner(req.user, row);
-    db.prepare('DELETE FROM goals WHERE id = ?').run(row.id);
+    await db.query('DELETE FROM goals WHERE id = ?', [row.id]);
     res.json({ ok: true });
   });
 

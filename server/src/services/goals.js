@@ -23,7 +23,7 @@ export function mapGoal(r) {
 /**
  * filters: scope, period, from/to (periodStart in range) or overlapFrom/overlapTo (period overlaps range).
  */
-export function listGoals(db, user, { scope = 'merged', period, from, to, overlapFrom, overlapTo } = {}) {
+export async function listGoals(db, user, { scope = 'merged', period, from, to, overlapFrom, overlapTo } = {}) {
   const sc = scopeClause(user, scope);
   const where = [sc.sql];
   const params = [...sc.params];
@@ -47,13 +47,11 @@ export function listGoals(db, user, { scope = 'merged', period, from, to, overla
     where.push('t.period_start <= ?');
     params.push(overlapTo);
   }
-  const rows = db
-    .prepare(`${SELECT} WHERE ${where.join(' AND ')} ORDER BY t.period_start, ${PERIOD_ORDER}, t.id`)
-    .all(...params);
+  const rows = await db.many(`${SELECT} WHERE ${where.join(' AND ')} ORDER BY t.period_start, ${PERIOD_ORDER}, t.id`, params);
   return rows.map(mapGoal);
 }
 
-export function getGoalRow(db, user, id) {
+export async function getGoalRow(db, user, id) {
   const v = visibleClause(user);
-  return orNotFound(db.prepare(`${SELECT} WHERE t.id = ? AND ${v.sql}`).get(id, ...v.params), 'Hedef bulunamadı');
+  return orNotFound(await db.one(`${SELECT} WHERE t.id = ? AND ${v.sql}`, [id, ...v.params]), 'Hedef bulunamadı');
 }

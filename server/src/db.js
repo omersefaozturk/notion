@@ -1,125 +1,214 @@
-import { DatabaseSync } from 'node:sqlite';
+// Small async database layer over PostgreSQL.
+//
+//   DATABASE_URL set   → postgres.js against that server (e.g. Supabase). Prepared
+//                         statements are disabled and the pool is tiny so it works
+//                         behind Supabase's transaction pooler (port 6543) and in
+//                         serverless functions.
+//   DATABASE_URL unset → PGlite (real Postgres compiled to WASM), stored in
+//                         server/data/pglite (or PGLITE_DIR), or in memory for tests.
+//
+// Both expose the same interface:
+//   db.query(sql, params) → rows      db.one(sql, params) → first row | null
+//   db.many(sql, params)  → rows      db.exec(sql)        → multi-statement, no params
+//   db.tx(async (t) => …)  → runs fn in a transaction; `t` has query/one/many/exec
+//   db.ready()            → connects and makes sure the schema exists (memoised)
+//   db.close()
+//
+// SQL is written with `?` placeholders; they are rewritten to $1, $2, … here so
+// query fragments (see lib/access.js) can be composed freely.
+
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { migrateEventTimes } from './services/events.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-export const DEFAULT_DB_PATH = path.resolve(__dirname, '../data/app.db');
+export const SCHEMA_PATH = path.resolve(__dirname, '../sql/schema.sql');
+export const DEFAULT_PGLITE_DIR = path.resolve(__dirname, '../data/pglite');
 
-const SCHEMA = `
-CREATE TABLE IF NOT EXISTS households (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT NOT NULL,
-  invite_code TEXT NOT NULL UNIQUE,
-  created_at TEXT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS users (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  household_id INTEGER NOT NULL REFERENCES households(id) ON DELETE CASCADE,
-  name TEXT NOT NULL,
-  email TEXT NOT NULL UNIQUE COLLATE NOCASE,
-  password_hash TEXT NOT NULL,
-  initial TEXT NOT NULL,
-  color TEXT NOT NULL,
-  created_at TEXT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS events (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  household_id INTEGER NOT NULL REFERENCES households(id) ON DELETE CASCADE,
-  owner_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  title TEXT NOT NULL,
-  description TEXT NOT NULL DEFAULT '',
-  start TEXT NOT NULL,
-  "end" TEXT NOT NULL,
-  all_day INTEGER NOT NULL DEFAULT 0,
-  location TEXT NOT NULL DEFAULT '',
-  color TEXT,
-  visibility TEXT NOT NULL DEFAULT 'shared' CHECK (visibility IN ('shared','private')),
-  created_at TEXT NOT NULL,
-  updated_at TEXT NOT NULL
-);
-CREATE INDEX IF NOT EXISTS idx_events_household_start ON events(household_id, start);
-
-CREATE TABLE IF NOT EXISTS tasks (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  household_id INTEGER NOT NULL REFERENCES households(id) ON DELETE CASCADE,
-  owner_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  assignee_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
-  title TEXT NOT NULL,
-  description TEXT NOT NULL DEFAULT '',
-  status TEXT NOT NULL DEFAULT 'todo' CHECK (status IN ('todo','doing','done')),
-  priority TEXT NOT NULL DEFAULT 'medium' CHECK (priority IN ('low','medium','high')),
-  due_date TEXT,
-  position REAL NOT NULL DEFAULT 0,
-  visibility TEXT NOT NULL DEFAULT 'shared' CHECK (visibility IN ('shared','private')),
-  created_at TEXT NOT NULL,
-  updated_at TEXT NOT NULL,
-  completed_at TEXT
-);
-CREATE INDEX IF NOT EXISTS idx_tasks_household ON tasks(household_id, status, position);
-
-CREATE TABLE IF NOT EXISTS goals (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  household_id INTEGER NOT NULL REFERENCES households(id) ON DELETE CASCADE,
-  owner_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  title TEXT NOT NULL,
-  description TEXT NOT NULL DEFAULT '',
-  period TEXT NOT NULL CHECK (period IN ('daily','weekly','monthly')),
-  period_start TEXT NOT NULL,
-  period_end TEXT NOT NULL,
-  progress INTEGER NOT NULL DEFAULT 0 CHECK (progress BETWEEN 0 AND 100),
-  done INTEGER NOT NULL DEFAULT 0,
-  visibility TEXT NOT NULL DEFAULT 'shared' CHECK (visibility IN ('shared','private')),
-  created_at TEXT NOT NULL,
-  updated_at TEXT NOT NULL
-);
-CREATE INDEX IF NOT EXISTS idx_goals_household ON goals(household_id, period, period_start);
-
-CREATE TABLE IF NOT EXISTS pages (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  household_id INTEGER NOT NULL REFERENCES households(id) ON DELETE CASCADE,
-  owner_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  parent_id INTEGER REFERENCES pages(id) ON DELETE CASCADE,
-  title TEXT NOT NULL DEFAULT '',
-  icon TEXT NOT NULL DEFAULT '',
-  content TEXT NOT NULL DEFAULT '[]',
-  period TEXT CHECK (period IS NULL OR period IN ('daily','weekly','monthly')),
-  period_start TEXT,
-  period_end TEXT,
-  visibility TEXT NOT NULL DEFAULT 'shared' CHECK (visibility IN ('shared','private')),
-  position REAL NOT NULL DEFAULT 0,
-  created_at TEXT NOT NULL,
-  updated_at TEXT NOT NULL
-);
-CREATE INDEX IF NOT EXISTS idx_pages_household ON pages(household_id, parent_id, position);
-CREATE INDEX IF NOT EXISTS idx_pages_period ON pages(household_id, period, period_start);
-`;
-
-/** Open (and migrate) a database. Pass ':memory:' for tests. */
-export function openDb(dbPath = process.env.DB_PATH || DEFAULT_DB_PATH) {
-  if (dbPath !== ':memory:') {
-    fs.mkdirSync(path.dirname(path.resolve(dbPath)), { recursive: true });
-  }
-  const db = new DatabaseSync(dbPath);
-  db.exec('PRAGMA foreign_keys = ON;');
-  if (dbPath !== ':memory:') db.exec('PRAGMA journal_mode = WAL;');
-  db.exec(SCHEMA);
-  migrateEventTimes(db);
-  return db;
+let schemaCache;
+export function schemaSql() {
+  schemaCache ??= fs.readFileSync(SCHEMA_PATH, 'utf8');
+  return schemaCache;
 }
 
-/** Run fn inside a transaction (synchronous). */
-export function transaction(db, fn) {
-  db.exec('BEGIN');
-  try {
-    const result = fn();
-    db.exec('COMMIT');
-    return result;
-  } catch (err) {
-    db.exec('ROLLBACK');
-    throw err;
+/** Tables the schema creates (used for the cheap "is the schema there?" check). */
+export function schemaTables(sql = schemaSql()) {
+  return [...sql.matchAll(/CREATE TABLE IF NOT EXISTS\s+"?(\w+)"?/gi)].map((m) => m[1]);
+}
+
+/** Rewrite `?` placeholders (outside quotes) to `$n`. */
+export function toPositional(sql) {
+  let out = '';
+  let n = 0;
+  let quote = null;
+  for (let i = 0; i < sql.length; i++) {
+    const ch = sql[i];
+    if (quote) {
+      if (ch === quote) quote = null;
+    } else if (ch === "'" || ch === '"') {
+      quote = ch;
+    } else if (ch === '?') {
+      out += `$${++n}`;
+      continue;
+    }
+    out += ch;
   }
+  return out;
+}
+
+/** Wrap a driver-level `run(text, params)` / `runExec(text)` pair into the public API. */
+function wrap(run, runExec) {
+  const query = (sql, params = []) => run(toPositional(sql), params);
+  return {
+    query,
+    many: query,
+    one: async (sql, params) => (await query(sql, params))[0] ?? null,
+    exec: (sql) => runExec(sql),
+  };
+}
+
+function isLocalUrl(url) {
+  try {
+    const host = new URL(url).hostname;
+    return host === 'localhost' || host === '127.0.0.1' || host === '::1' || host === '';
+  } catch {
+    return false;
+  }
+}
+
+async function openPostgres(url) {
+  const { default: postgres } = await import('postgres');
+  const sslmode = (() => {
+    try {
+      return new URL(url).searchParams.get('sslmode');
+    } catch {
+      return null;
+    }
+  })();
+  const ssl = sslmode === 'disable' || (!sslmode && isLocalUrl(url)) ? false : 'require';
+  const sql = postgres(url, {
+    prepare: false, // required by Supabase's transaction pooler (PgBouncer, port 6543)
+    max: Number(process.env.PG_POOL_MAX) || 2,
+    idle_timeout: 20,
+    connect_timeout: 15,
+    ssl,
+    onnotice: () => {},
+    connection: { application_name: 'ortak-plan' },
+  });
+  const forSql = (s) =>
+    wrap(
+      (text, params) => s.unsafe(text, params),
+      (text) => s.unsafe(text),
+    );
+  return {
+    kind: 'postgres',
+    api: forSql(sql),
+    tx: (fn) => sql.begin((t) => fn(forSql(t))),
+    close: () => sql.end({ timeout: 5 }),
+  };
+}
+
+async function openPglite(dataDir) {
+  const { PGlite } = await import('@electric-sql/pglite');
+  if (dataDir) fs.mkdirSync(dataDir, { recursive: true });
+  const pg = await PGlite.create(dataDir || undefined);
+  const forPg = (p) =>
+    wrap(
+      async (text, params) => (await p.query(text, params)).rows,
+      async (text) => {
+        await p.exec(text);
+      },
+    );
+  return {
+    kind: 'pglite',
+    api: forPg(pg),
+    tx: (fn) => pg.transaction((t) => fn(forPg(t))),
+    close: () => pg.close(),
+  };
+}
+
+/** Create the schema if any of its tables is missing (one cheap query when it exists). */
+export async function ensureSchema(db) {
+  const tables = schemaTables();
+  const row = await db.one(
+    `SELECT count(*)::int AS n FROM pg_catalog.pg_tables
+      WHERE schemaname = current_schema() AND tablename IN (${tables.map(() => '?').join(', ')})`,
+    tables,
+  );
+  if (row.n === tables.length) return false;
+  await applySchema(db);
+  return true;
+}
+
+/** Apply schema.sql unconditionally (idempotent). Serialised with an advisory lock. */
+export async function applySchema(db) {
+  await db.tx(async (t) => {
+    await t.query('SELECT pg_advisory_xact_lock(?)', [727274]);
+    await t.exec(schemaSql());
+  });
+}
+
+/**
+ * Create a database handle. Connection happens lazily on first use (or ready()).
+ * @param {{ url?: string, dataDir?: string, memory?: boolean, ensure?: boolean }} [opts]
+ */
+export function createDb(opts = {}) {
+  const url = opts.url ?? process.env.DATABASE_URL;
+  const memory = opts.memory ?? false;
+  const dataDir = memory ? null : opts.dataDir ?? process.env.PGLITE_DIR ?? DEFAULT_PGLITE_DIR;
+  const ensure = opts.ensure ?? true;
+
+  let driver;
+  let readyPromise;
+  let isReady = false;
+
+  const db = {
+    get kind() {
+      return url ? 'postgres' : 'pglite';
+    },
+    ready() {
+      readyPromise ??= (async () => {
+        if (!url && process.env.VERCEL) {
+          // the serverless file system is read-only/ephemeral: a real database is required
+          throw new Error('DATABASE_URL tanımlı değil (Vercel → Settings → Environment Variables)');
+        }
+        driver = url ? await openPostgres(url) : await openPglite(dataDir);
+        if (ensure) await ensureSchema({ ...driver.api, tx: driver.tx });
+        isReady = true;
+      })().catch((err) => {
+        readyPromise = undefined; // retry on the next request (e.g. transient network error)
+        const d = driver;
+        driver = undefined;
+        d?.close().catch(() => {});
+        throw err;
+      });
+      return readyPromise;
+    },
+    async query(sql, params) {
+      if (!isReady) await db.ready();
+      return driver.api.query(sql, params);
+    },
+    async many(sql, params) {
+      return db.query(sql, params);
+    },
+    async one(sql, params) {
+      return (await db.query(sql, params))[0] ?? null;
+    },
+    async exec(sql) {
+      if (!isReady) await db.ready();
+      return driver.api.exec(sql);
+    },
+    async tx(fn) {
+      if (!isReady) await db.ready();
+      return driver.tx(fn);
+    },
+    async close() {
+      const d = driver;
+      driver = undefined;
+      readyPromise = undefined;
+      isReady = false;
+      if (d) await d.close();
+    },
+  };
+  return db;
 }

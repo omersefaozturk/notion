@@ -14,7 +14,7 @@ test('zonedToUtc / dateInTz handle offsets and DST', () => {
 });
 
 test('event times are normalised on write', async () => {
-  const { api } = setup();
+  const { api } = await setup();
   const { omer } = await couple(api);
   const post = (body) => api.post('/api/events').set('Authorization', omer.auth).send(body);
 
@@ -56,7 +56,7 @@ async function titlesOn(api, who, date, tz) {
 }
 
 test('all-day events show on their date in every time zone', async () => {
-  const { api } = setup();
+  const { api } = await setup();
   const { omer, es } = await couple(api);
   await api.post('/api/events').set('Authorization', es.auth).send({ title: 'Piknik', start: '2026-10-11', allDay: true });
   for (const tz of ['Europe/Istanbul', 'UTC', 'America/Los_Angeles', 'Pacific/Auckland']) {
@@ -67,7 +67,7 @@ test('all-day events show on their date in every time zone', async () => {
 });
 
 test('timed events are matched by instant in the requested time zone, on every day they span', async () => {
-  const { api } = setup();
+  const { api } = await setup();
   const { omer } = await couple(api);
   const post = (body) => api.post('/api/events').set('Authorization', omer.auth).send(body);
   // 00:30–01:30 on the 10th in Istanbul == 21:30–22:30 on the 9th in UTC
@@ -98,7 +98,7 @@ test('timed events are matched by instant in the requested time zone, on every d
 });
 
 test('dashboard today uses the requested time zone', async () => {
-  const { api } = setup();
+  const { api } = await setup();
   const { omer } = await couple(api);
   await api.post('/api/events').set('Authorization', omer.auth)
     .send({ title: 'Gece yarısı', start: '2026-10-09T21:30:00.000Z', end: '2026-10-09T22:30:00.000Z' });
@@ -109,17 +109,19 @@ test('dashboard today uses the requested time zone', async () => {
 });
 
 test('legacy mixed-format rows are migrated', async () => {
-  const { db, api } = setup();
+  const { db, api } = await setup();
   const { omer } = await couple(api);
-  const ins = db.prepare(
-    `INSERT INTO events (household_id, owner_id, title, start, "end", all_day, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, '', '')`,
-  );
+  const ins = (...params) =>
+    db.query(
+      `INSERT INTO events (household_id, owner_id, title, start, "end", all_day, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, '', '')`,
+      params,
+    );
   const hid = omer.user.householdId;
-  ins.run(hid, omer.user.id, 'Eski tüm gün', '2026-10-10T21:00:00.000Z', '2026-10-10T21:00:00.000Z', 1);
-  ins.run(hid, omer.user.id, 'Eski saatli', '2026-10-10T09:00:00+03:00', '2026-10-10T10:00:00+03:00', 0);
-  migrateEventTimes(db, 'Europe/Istanbul');
-  const rows = db.prepare('SELECT title, start, "end" FROM events ORDER BY id').all();
+  await ins(hid, omer.user.id, 'Eski tüm gün', '2026-10-10T21:00:00.000Z', '2026-10-10T21:00:00.000Z', true);
+  await ins(hid, omer.user.id, 'Eski saatli', '2026-10-10T09:00:00+03:00', '2026-10-10T10:00:00+03:00', false);
+  assert.equal(await migrateEventTimes(db, 'Europe/Istanbul'), 2);
+  const rows = await db.many('SELECT title, start, "end" FROM events ORDER BY id');
   assert.deepEqual(rows.map((r) => [r.title, r.start, r.end]), [
     ['Eski tüm gün', '2026-10-11', '2026-10-11'],
     ['Eski saatli', '2026-10-10T06:00:00.000Z', '2026-10-10T07:00:00.000Z'],
@@ -127,13 +129,13 @@ test('legacy mixed-format rows are migrated', async () => {
 });
 
 test('seed times are sensible wall-clock times in Europe/Istanbul', async () => {
-  const { db } = setup();
+  const { db } = await setup();
   const { seed } = await import('../src/seed.js');
-  seed(db);
-  const row = db.prepare("SELECT start FROM events WHERE title = 'Yoga dersi'").get();
+  await seed(db);
+  const row = await db.one("SELECT start FROM events WHERE title = 'Yoga dersi'");
   const hhmm = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Istanbul', hour: '2-digit', minute: '2-digit' })
     .format(new Date(row.start));
   assert.equal(hhmm, '09:00');
-  const allDay = db.prepare("SELECT start, \"end\" FROM events WHERE title = 'Piknik'").get();
+  const allDay = await db.one(`SELECT start, "end" FROM events WHERE title = 'Piknik'`);
   assert.match(allDay.start, /^\d{4}-\d{2}-\d{2}$/);
 });

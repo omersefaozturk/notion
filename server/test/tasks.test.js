@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { setup, couple } from './helpers.js';
 
 test('tasks: create appends to column, list ordered by status then position', async () => {
-  const { api } = setup();
+  const { api } = await setup();
   const { omer, es } = await couple(api);
   const mk = (who, body) => api.post('/api/tasks').set('Authorization', who.auth).send(body);
   const a = (await mk(omer, { title: 'A' })).body;
@@ -33,7 +33,7 @@ test('tasks: create appends to column, list ordered by status then position', as
 });
 
 test('tasks: move sets/clears completedAt and reorders', async () => {
-  const { api } = setup();
+  const { api } = await setup();
   const { omer } = await couple(api);
   const mk = (title) => api.post('/api/tasks').set('Authorization', omer.auth).send({ title });
   const a = (await mk('A')).body;
@@ -61,7 +61,7 @@ test('tasks: move sets/clears completedAt and reorders', async () => {
 });
 
 test('tasks: partner may move a shared task but not edit other fields; private is invisible', async () => {
-  const { api } = setup();
+  const { api } = await setup();
   const { omer, es } = await couple(api);
   const shared = (await api.post('/api/tasks').set('Authorization', omer.auth).send({ title: 'Ortak' })).body;
   const priv = (await api.post('/api/tasks').set('Authorization', omer.auth).send({ title: 'Özel', visibility: 'private' })).body;

@@ -42,9 +42,9 @@ const moveSchema = z.object({ status: taskStatus, position: position.optional() 
 /** Fields a household member may change on someone else's shared task. */
 const MEMBER_KEYS = ['status', 'position'];
 
-function checkAssignee(db, user, id) {
+async function checkAssignee(db, user, id) {
   if (id == null) return;
-  const ok = db.prepare('SELECT 1 FROM users WHERE id = ? AND household_id = ?').get(id, user.householdId);
+  const ok = await db.one('SELECT 1 FROM users WHERE id = ? AND household_id = ?', [id, user.householdId]);
   if (!ok) throw badRequest('Atanan kişi bu hanenin üyesi değil');
 }
 
@@ -56,33 +56,31 @@ function completedAtFor(row, newStatus) {
 export default function taskRoutes(db) {
   const r = Router();
 
-  r.get('/', (req, res) => {
-    res.json(listTasks(db, req.user, parse(listSchema, req.query)));
+  r.get('/', async (req, res) => {
+    res.json(await listTasks(db, req.user, parse(listSchema, req.query)));
   });
 
-  r.post('/', (req, res) => {
+  r.post('/', async (req, res) => {
     const d = parse(createSchema, req.body);
-    checkAssignee(db, req.user, d.assigneeId);
+    await checkAssignee(db, req.user, d.assigneeId);
     const now = nowIso();
-    const id = Number(
-      db
-        .prepare(
-          `INSERT INTO tasks (household_id, owner_id, assignee_id, title, description, status, priority, due_date,
-             position, visibility, created_at, updated_at, completed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        )
-        .run(req.user.householdId, req.user.id, d.assigneeId ?? null, d.title, d.description, d.status, d.priority,
-          d.dueDate ?? null, nextPosition(db, req.user.householdId, d.status), d.visibility, now, now,
-          d.status === 'done' ? now : null).lastInsertRowid,
+    const { id } = await db.one(
+      `INSERT INTO tasks (household_id, owner_id, assignee_id, title, description, status, priority, due_date,
+         position, visibility, created_at, updated_at, completed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       RETURNING id`,
+      [req.user.householdId, req.user.id, d.assigneeId ?? null, d.title, d.description, d.status, d.priority,
+        d.dueDate ?? null, await nextPosition(db, req.user.householdId, d.status), d.visibility, now, now,
+        d.status === 'done' ? now : null],
     );
-    res.status(201).json(mapTask(getTaskRow(db, req.user, id)));
+    res.status(201).json(mapTask(await getTaskRow(db, req.user, id)));
   });
 
-  r.get('/:id', (req, res) => {
-    res.json(mapTask(getTaskRow(db, req.user, parseId(req.params.id))));
+  r.get('/:id', async (req, res) => {
+    res.json(mapTask(await getTaskRow(db, req.user, parseId(req.params.id))));
   });
 
-  r.patch('/:id', (req, res) => {
-    const row = getTaskRow(db, req.user, parseId(req.params.id));
+  r.patch('/:id', async (req, res) => {
+    const row = await getTaskRow(db, req.user, parseId(req.params.id));
     const d = parse(updateSchema, req.body);
     assertCanEdit(req.user, row, d, MEMBER_KEYS, {
       title: row.title,
@@ -92,10 +90,10 @@ export default function taskRoutes(db) {
       assigneeId: row.assignee_id,
       visibility: row.visibility,
     });
-    if (d.assigneeId !== undefined) checkAssignee(db, req.user, d.assigneeId);
+    if (d.assigneeId !== undefined) await checkAssignee(db, req.user, d.assigneeId);
     let pos = d.position;
     if (pos === undefined && d.status !== undefined && d.status !== row.status) {
-      pos = nextPosition(db, row.household_id, d.status);
+      pos = await nextPosition(db, row.household_id, d.status);
     }
     const upd = buildUpdate('tasks', row.id, {
       title: d.title,
@@ -109,29 +107,29 @@ export default function taskRoutes(db) {
       completed_at: completedAtFor(row, d.status),
       updated_at: nowIso(),
     });
-    db.prepare(upd.sql).run(...upd.params);
-    res.json(mapTask(getTaskRow(db, req.user, row.id)));
+    await db.query(upd.sql, upd.params);
+    res.json(mapTask(await getTaskRow(db, req.user, row.id)));
   });
 
-  r.post('/:id/move', (req, res) => {
-    const row = getTaskRow(db, req.user, parseId(req.params.id));
+  r.post('/:id/move', async (req, res) => {
+    const row = await getTaskRow(db, req.user, parseId(req.params.id));
     const d = parse(moveSchema, req.body);
     assertCanEdit(req.user, row, d, MEMBER_KEYS);
-    const pos = d.position ?? (d.status === row.status ? row.position : nextPosition(db, row.household_id, d.status));
+    const pos = d.position ?? (d.status === row.status ? row.position : await nextPosition(db, row.household_id, d.status));
     const upd = buildUpdate('tasks', row.id, {
       status: d.status,
       position: pos,
       completed_at: completedAtFor(row, d.status),
       updated_at: nowIso(),
     });
-    db.prepare(upd.sql).run(...upd.params);
-    res.json(mapTask(getTaskRow(db, req.user, row.id)));
+    await db.query(upd.sql, upd.params);
+    res.json(mapTask(await getTaskRow(db, req.user, row.id)));
   });
 
-  r.delete('/:id', (req, res) => {
-    const row = getTaskRow(db, req.user, parseId(req.params.id));
+  r.delete('/:id', async (req, res) => {
+    const row = await getTaskRow(db, req.user, parseId(req.params.id));
     assertOwner(req.user, row);
-    db.prepare('DELETE FROM tasks WHERE id = ?').run(row.id);
+    await db.query('DELETE FROM tasks WHERE id = ?', [row.id]);
     res.json({ ok: true });
   });
 
