@@ -166,7 +166,7 @@ A "plan" is a page with `period` + `periodStart` set. The Plans screen lists the
 
 ### Dashboard
 - `GET /api/dashboard?date=DATE&scope=` → items relevant to "today / this week / this month":
-  `{ date, today: { events, tasks, goals, plans }, week: { goals, plans, tasks }, month: { goals, plans }, taskCounts: { todo, doing, done } }`
+  `{ date, today: { events, tasks, goals, plans }, week: { events, goals, plans, tasks }, month: { goals, plans }, taskCounts: { todo, doing, done } }`
 
 ### Health
 - `GET /api/health` → `{ ok: true }`

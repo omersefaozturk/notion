@@ -33,6 +33,7 @@ export default function dashboardRoutes(db) {
         plans: listPages(db, user, { scope: sc, period: 'daily', from: date, to: date }),
       },
       week: {
+        events: listEvents(db, user, { scope: sc, from: weekStart, to: weekEnd, tz: q.tz }),
         goals: listGoals(db, user, { scope: sc, period: 'weekly', from: weekStart, to: weekStart }),
         plans: listPages(db, user, { scope: sc, period: 'weekly', from: weekStart, to: weekStart }),
         tasks: listTasks(db, user, { scope: sc, dueFrom: weekStart, dueTo: weekEnd }),

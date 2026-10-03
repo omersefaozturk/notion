@@ -185,7 +185,7 @@ export interface CalendarData {
 export interface DashboardData {
   date: string;
   today: { events: CalendarEvent[]; tasks: Task[]; goals: Goal[]; plans: PageSummary[] };
-  week: { goals: Goal[]; plans: PageSummary[]; tasks: Task[] };
+  week: { events: CalendarEvent[]; goals: Goal[]; plans: PageSummary[]; tasks: Task[] };
   month: { goals: Goal[]; plans: PageSummary[] };
   taskCounts: { todo: number; doing: number; done: number };
 }

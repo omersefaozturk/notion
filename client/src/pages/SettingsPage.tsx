@@ -175,7 +175,7 @@ function HouseholdCard() {
       <div className="mt-6">
         <div className="mb-1 text-xs font-medium text-neutral-600">Davet kodu</div>
         <div className="flex flex-wrap items-center gap-2">
-          <code className="rounded-md border border-neutral-200 bg-neutral-50 px-3 py-1.5 font-mono text-base tracking-widest text-neutral-900">
+          <code data-testid="invite-code" className="rounded-md border border-neutral-200 bg-neutral-50 px-3 py-1.5 font-mono text-base tracking-widest text-neutral-900">
             {household.inviteCode}
           </code>
           <Button size="sm" onClick={copy}>

@@ -64,7 +64,7 @@ function TaskCard({ task, onOpen, overlay }: { task: Task; onOpen?: () => void; 
     <div
       onClick={onOpen}
       className={cx(
-        'cursor-grab rounded-lg border border-neutral-200 bg-white p-2.5 text-sm shadow-sm transition-shadow hover:shadow active:cursor-grabbing',
+        'cursor-grab select-none rounded-lg border border-neutral-200 bg-white p-2.5 text-sm shadow-sm transition-shadow hover:shadow active:cursor-grabbing',
         overlay && 'rotate-1 shadow-lg ring-1 ring-neutral-300',
       )}
     >
@@ -98,6 +98,7 @@ function SortableTask({ task, onOpen }: { task: Task; onOpen: () => void }) {
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
       className={cx(isDragging && 'opacity-40')}
+      data-testid="task-card"
       {...attributes}
       {...listeners}
     >
@@ -173,7 +174,7 @@ function Column({ status, tasks, onOpen, onAdded }: { status: TaskStatus; tasks:
   const { setNodeRef, isOver } = useDroppable({ id: `col-${status}` });
   const st = COLUMN_STYLE[status];
   return (
-    <div className={cx('flex w-full min-w-[260px] flex-col rounded-xl p-2 md:w-auto', st.bg, isOver && 'ring-2 ring-blue-200')}>
+    <div data-testid={`column-${status}`} className={cx('flex w-full min-w-[260px] flex-col rounded-xl p-2 md:w-auto', st.bg, isOver && 'ring-2 ring-blue-200')}>
       <div className="mb-2 flex items-center gap-2 px-1">
         <span className={cx('h-2 w-2 rounded-full', st.dot)} />
         <h2 className="text-sm font-semibold text-neutral-700">{STATUS_LABELS[status]}</h2>

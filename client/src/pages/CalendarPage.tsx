@@ -22,7 +22,8 @@ import { Modal } from '../components/Modal';
 import { OwnerBadge } from '../components/OwnerBadge';
 import { TaskModal } from '../components/TaskModal';
 import { Button, Empty, ErrorBox, PrivateTag, SegmentedControl, Spinner } from '../components/ui';
-import { useScope } from '../context/ScopeContext';
+import { useAuth } from '../context/AuthContext';
+import { SCOPE_LABELS, useScope } from '../context/ScopeContext';
 import { capitalize, eventOnDay, fmt, periodLabel, timeOf, toDateStr, WEEK_OPTS } from '../lib/dates';
 import { useAsync } from '../lib/useAsync';
 import { cx } from '../lib/util';
@@ -30,7 +31,22 @@ import { cx } from '../lib/util';
 type View = 'month' | 'week' | 'day';
 const VIEW_KEY = 'ortakplan.calendarView';
 const HOUR_PX = 48;
-const MAX_CELL_ITEMS = 3;
+const MAX_CELL_ITEMS = 4;
+const MAX_COMPACT_ITEMS = 6;
+
+/** True below Tailwind's `sm` breakpoint (phones). */
+function useIsNarrow(): boolean {
+  const query = '(max-width: 639px)';
+  const [narrow, setNarrow] = useState(() => typeof window !== 'undefined' && window.matchMedia?.(query).matches);
+  useEffect(() => {
+    const mq = window.matchMedia?.(query);
+    if (!mq) return;
+    const on = () => setNarrow(mq.matches);
+    mq.addEventListener('change', on);
+    return () => mq.removeEventListener('change', on);
+  }, []);
+  return !!narrow;
+}
 
 type DayItem =
   | { kind: 'event'; key: string; event: CalendarEvent }
@@ -95,6 +111,27 @@ function ItemChip({ item, h, showTime = true }: { item: DayItem; h: Handlers; sh
   }
 }
 
+/** Phone-size month cell item: just the owner's letter, framed by item kind. */
+function CompactItem({ item }: { item: DayItem }) {
+  const owner =
+    item.kind === 'event' ? item.event.owner : item.kind === 'task' ? item.task.owner : item.kind === 'goal' ? item.goal.owner : item.plan.owner;
+  const title =
+    item.kind === 'event' ? item.event.title : item.kind === 'task' ? item.task.title : item.kind === 'goal' ? item.goal.title : item.plan.title;
+  const frame =
+    item.kind === 'event'
+      ? ''
+      : item.kind === 'task'
+        ? 'outline-dashed outline-1 outline-offset-1 outline-amber-500'
+        : item.kind === 'goal'
+          ? 'outline outline-1 outline-offset-1 outline-emerald-500'
+          : 'outline outline-1 outline-offset-1 outline-violet-500';
+  return (
+    <span title={`${owner.name}: ${title}`} className={cx('inline-flex rounded-full', frame)}>
+      <OwnerBadge owner={owner} size="sm" />
+    </span>
+  );
+}
+
 /* ------------------------------ Month view ------------------------------ */
 
 function MonthView({
@@ -103,12 +140,16 @@ function MonthView({
   h,
   onCreate,
   onMore,
+  onOpenDay,
+  compact,
 }: {
   cursor: Date;
   data: CalendarData | null;
   h: Handlers;
   onCreate: (d: EventDefaults) => void;
   onMore: (day: Date) => void;
+  onOpenDay: (day: Date) => void;
+  compact: boolean;
 }) {
   const { from, to } = rangeFor('month', cursor);
   const days = eachDayOfInterval({ start: from, end: to });
@@ -125,36 +166,55 @@ function MonthView({
       <div className="grid grid-cols-7">
         {days.map((day, i) => {
           const items = itemsForDay(data, day, { timed: true });
-          const visible = items.slice(0, MAX_CELL_ITEMS);
+          const visible = items.slice(0, compact ? MAX_COMPACT_ITEMS : MAX_CELL_ITEMS);
           const hidden = items.length - visible.length;
           const inMonth = isSameMonth(day, cursor);
+          // On phones a tap opens the day's agenda (with an add button); on larger screens it adds an event.
+          const activate = () => (compact ? onMore(day) : onCreate({ date: toDateStr(day), allDay: true }));
           return (
             <div
               key={day.toISOString()}
               role="button"
               tabIndex={0}
-              onClick={() => onCreate({ date: toDateStr(day), allDay: true })}
+              data-date={toDateStr(day)}
+              aria-label={capitalize(fmt(day, 'd MMMM EEEE'))}
+              onClick={activate}
               onKeyDown={(e) => {
-                if (e.key === 'Enter') onCreate({ date: toDateStr(day), allDay: true });
+                if (e.key === 'Enter') activate();
               }}
               className={cx(
-                'group min-h-[96px] min-w-0 overflow-hidden cursor-pointer border-neutral-100 p-1 transition-colors hover:bg-neutral-50 sm:min-h-[120px]',
+                'group min-h-[72px] min-w-0 overflow-hidden cursor-pointer border-neutral-100 p-1 transition-colors hover:bg-neutral-50 sm:min-h-[120px]',
                 i % 7 !== 6 && 'border-r',
                 i < days.length - 7 && 'border-b',
                 !inMonth && 'bg-neutral-50/60',
               )}
             >
               <div className="mb-0.5 flex items-center justify-between px-0.5">
-                <span
+                <button
+                  type="button"
+                  title="Gün görünümünde aç"
+                  aria-label={`${fmt(day, 'd MMMM')} gününü aç`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onOpenDay(day);
+                  }}
                   className={cx(
-                    'flex h-6 min-w-6 items-center justify-center rounded-full px-1 text-xs',
+                    'flex h-6 min-w-6 items-center justify-center rounded-full px-1 text-xs hover:ring-1 hover:ring-neutral-300',
                     isToday(day) ? 'bg-red-500 font-semibold text-white' : inMonth ? 'text-neutral-700' : 'text-neutral-300',
                   )}
                 >
                   {fmt(day, 'd')}
-                </span>
+                </button>
                 <span className="hidden text-xs text-neutral-300 group-hover:inline">+</span>
               </div>
+              {compact ? (
+                <div className="flex flex-wrap gap-1 px-0.5">
+                  {visible.map((it) => (
+                    <CompactItem key={it.key} item={it} />
+                  ))}
+                  {hidden > 0 && <span className="text-[10px] leading-4 text-neutral-500">+{hidden}</span>}
+                </div>
+              ) : (
               <div className="space-y-0.5">
                 {visible.map((it) => (
                   <ItemChip key={it.key} item={it} h={h} />
@@ -172,6 +232,7 @@ function MonthView({
                   </button>
                 )}
               </div>
+              )}
             </div>
           );
         })}
@@ -433,8 +494,29 @@ function PeriodPanel({ data, view, cursor, h }: { data: CalendarData | null; vie
 
 /* --------------------------------- Page --------------------------------- */
 
+/** Who is who: the household members' letters, plus the active scope. */
+function MemberLegend() {
+  const { household } = useAuth();
+  const { scope } = useScope();
+  if (!household) return null;
+  return (
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-neutral-500" data-testid="member-legend">
+      {household.members.map((m) => (
+        <span key={m.id} className="inline-flex items-center gap-1">
+          <OwnerBadge owner={m} size="sm" /> {m.name}
+        </span>
+      ))}
+      <span className="rounded bg-neutral-100 px-1.5 py-0.5 text-[11px] text-neutral-600">
+        Görünüm: {SCOPE_LABELS[scope]}
+        {scope === 'merged' ? ' (hepimiz)' : scope === 'mine' ? ' (yalnızca ben)' : ' (eşimin paylaştıkları)'}
+      </span>
+    </div>
+  );
+}
+
 export function CalendarPage() {
   const { scope } = useScope();
+  const narrow = useIsNarrow();
   const [view, setViewState] = useState<View>(readView);
   const [cursor, setCursor] = useState<Date>(() => new Date());
   const setView = (v: View) => {
@@ -507,6 +589,9 @@ export function CalendarPage() {
           </Button>
         </div>
       </div>
+      <div className="-mt-2 mb-3">
+        <MemberLegend />
+      </div>
       {error && (
         <div className="mb-3">
           <ErrorBox message={error} onRetry={reload} />
@@ -515,7 +600,13 @@ export function CalendarPage() {
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_300px]">
         <div className="min-w-0 overflow-x-auto">
           <div className={cx(view === 'week' && 'min-w-[640px]')}>
-            {view === 'month' && <MonthView cursor={cursor} data={data} h={h} onCreate={onCreate} onMore={setMoreDay} />}
+            {view === 'month' && <MonthView cursor={cursor} data={data} h={h} onCreate={onCreate} onMore={setMoreDay}
+                onOpenDay={(d) => {
+                  setCursor(d);
+                  setView('day');
+                }}
+                compact={narrow}
+              />}
             {view === 'week' && (
               <TimeGridView days={eachDayOfInterval({ start: from, end: to })} data={data} h={h} onCreate={onCreate} />
             )}
@@ -553,6 +644,7 @@ export function CalendarPage() {
           }
         >
           <div className="space-y-1">
+            {itemsForDay(data, moreDay, { timed: true }).length === 0 && <Empty>Bu gün için kayıt yok.</Empty>}
             {itemsForDay(data, moreDay, { timed: true }).map((it) => (
               <div key={it.key} onClickCapture={() => setMoreDay(null)}>
                 <ItemChip item={it} h={h} />

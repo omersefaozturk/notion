@@ -34,7 +34,7 @@ function GoalCard({ goal, canEdit, onChange, onOpen }: { goal: Goal; canEdit: bo
     onChange({ progress });
   };
   return (
-    <div className="rounded-xl border border-neutral-200 bg-white p-3">
+    <div className="rounded-xl border border-neutral-200 bg-white p-3" data-testid="goal-card">
       <div className="flex items-start gap-2">
         <Checkbox
           className="mt-0.5"

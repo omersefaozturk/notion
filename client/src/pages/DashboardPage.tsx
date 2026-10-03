@@ -9,12 +9,13 @@ import { TaskModal } from '../components/TaskModal';
 import { Button, Empty, ErrorBox, Loading } from '../components/ui';
 import { useUser } from '../context/AuthContext';
 import { useScope } from '../context/ScopeContext';
-import { capitalize, fmt, toDateStr } from '../lib/dates';
+import { addDays, eachDayOfInterval, endOfWeek, startOfDay } from 'date-fns';
+import { capitalize, eventOnDay, fmt, toDateStr, WEEK_OPTS } from '../lib/dates';
 import { useAsync } from '../lib/useAsync';
 
 function Section({ title, children, action }: { title: string; children: ReactNode; action?: ReactNode }) {
   return (
-    <section className="rounded-xl border border-neutral-200 bg-white p-4">
+    <section aria-label={title} className="rounded-xl border border-neutral-200 bg-white p-4">
       <div className="mb-2 flex items-center justify-between">
         <h2 className="text-sm font-semibold text-neutral-800">{title}</h2>
         {action}
@@ -78,6 +79,25 @@ export function DashboardPage() {
               ) : (
                 data.today.events.map((e) => <EventRow key={e.id} event={e} onClick={() => setEventModal({ open: true, event: e })} />)
               )}
+            </Section>
+            <Section title="Bu haftanın etkinlikleri">
+              {(() => {
+                const from = startOfDay(addDays(new Date(), 1));
+                const to = endOfWeek(new Date(), WEEK_OPTS);
+                const days = from <= to ? eachDayOfInterval({ start: from, end: to }) : [];
+                const groups = days
+                  .map((d) => ({ d, events: (data.week.events ?? []).filter((e) => eventOnDay(e, d)) }))
+                  .filter((g) => g.events.length > 0);
+                if (groups.length === 0) return <Empty>Bu hafta için başka etkinlik yok.</Empty>;
+                return groups.map((g) => (
+                  <div key={g.d.toISOString()} className="mb-1">
+                    <div className="px-2 pt-1 text-[11px] font-medium uppercase tracking-wide text-neutral-400">{capitalize(fmt(g.d, 'd MMMM EEEE'))}</div>
+                    {g.events.map((e) => (
+                      <EventRow key={e.id} event={e} onClick={() => setEventModal({ open: true, event: e })} />
+                    ))}
+                  </div>
+                ));
+              })()}
             </Section>
             <Section title="Bugünün görevleri" action={<Link to="/board" className="text-xs text-neutral-400 hover:text-neutral-700">Pano →</Link>}>
               {data.today.tasks.length === 0 ? (
