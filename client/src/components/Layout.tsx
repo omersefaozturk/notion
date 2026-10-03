@@ -3,6 +3,7 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import type { Scope } from '../api';
 import { useAuth, useUser } from '../context/AuthContext';
 import { SCOPE_LABELS, useScope } from '../context/ScopeContext';
+import { useTheme } from '../lib/theme';
 import { cx } from '../lib/util';
 import { OwnerBadge } from './OwnerBadge';
 import { PageTree } from './PageTree';
@@ -66,6 +67,7 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
 export function Layout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { scope, setScope } = useScope();
+  const [theme, toggleTheme] = useTheme();
   const location = useLocation();
 
   useEffect(() => {
@@ -103,6 +105,15 @@ export function Layout() {
           </button>
           <span className="text-sm font-semibold md:hidden">Ortak Plan</span>
           <div className="ml-auto flex items-center gap-2">
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label={theme === 'dark' ? 'Aydınlık moda geç' : 'Karanlık moda geç'}
+              title={theme === 'dark' ? 'Aydınlık mod' : 'Karanlık mod'}
+              className="rounded p-1.5 text-sm text-neutral-500 hover:bg-neutral-100"
+            >
+              {theme === 'dark' ? '☀️' : '🌙'}
+            </button>
             <span className="hidden text-xs text-neutral-400 sm:inline">Görünüm:</span>
             <SegmentedControl<Scope>
               size="sm"

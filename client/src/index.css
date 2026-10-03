@@ -16,3 +16,71 @@ body {
   content: attr(data-placeholder);
   @apply pointer-events-none text-neutral-300;
 }
+
+/* ------------------------------------------------------------------------- */
+/* Dark mode (html.dark). The UI uses a small neutral palette, so the colour  */
+/* utilities are remapped here instead of adding dark: variants everywhere.   */
+/* ------------------------------------------------------------------------- */
+html.dark {
+  color-scheme: dark;
+}
+.dark body { background-color: #191919; color: #e6e6e6; }
+.dark .bg-white { background-color: #191919; }
+.dark .bg-white\/90 { background-color: rgb(25 25 25 / 0.9); }
+.dark .bg-neutral-50 { background-color: #202020; }
+.dark .bg-neutral-50\/60 { background-color: rgb(32 32 32 / 0.6); }
+.dark .bg-neutral-100 { background-color: #2a2a2a; }
+.dark .bg-neutral-200\/70 { background-color: rgb(55 55 55 / 0.7); }
+.dark .bg-neutral-900 { background-color: #3a3a3a; }
+.dark .bg-red-50 { background-color: rgb(239 68 68 / 0.12); }
+.dark .bg-green-50,
+.dark .bg-green-50\/50 { background-color: rgb(34 197 94 / 0.1); }
+.dark .bg-blue-50,
+.dark .bg-blue-50\/50 { background-color: rgb(59 130 246 / 0.1); }
+.dark .bg-amber-50,
+.dark .bg-amber-50\/60 { background-color: rgb(245 158 11 / 0.12); }
+.dark .bg-emerald-50 { background-color: rgb(16 185 129 / 0.12); }
+.dark .bg-violet-50 { background-color: rgb(139 92 246 / 0.12); }
+.dark .bg-amber-100 { background-color: rgb(245 158 11 / 0.2); }
+.dark .bg-red-100 { background-color: rgb(239 68 68 / 0.2); }
+.dark .bg-blue-100 { background-color: rgb(59 130 246 / 0.2); }
+
+.dark .hover\:bg-neutral-50:hover,
+.dark .hover\:bg-neutral-100:hover,
+.dark .hover\:bg-neutral-200:hover,
+.dark .hover\:bg-neutral-200\/50:hover,
+.dark .hover\:bg-neutral-200\/60:hover { background-color: #2c2c2c; }
+.dark .hover\:bg-neutral-300\/60:hover { background-color: #363636; }
+.dark .hover\:bg-neutral-700:hover { background-color: #4a4a4a; }
+.dark .hover\:bg-blue-50\/60:hover,
+.dark .focus\:bg-blue-50:focus { background-color: rgb(59 130 246 / 0.12); }
+.dark .hover\:bg-red-50:hover { background-color: rgb(239 68 68 / 0.15); }
+.dark .hover\:bg-amber-100:hover,
+.dark .hover\:bg-emerald-100:hover,
+.dark .hover\:bg-violet-100:hover { filter: brightness(1.2); }
+
+.dark .text-neutral-900,
+.dark .hover\:text-neutral-900:hover { color: #ececec; }
+.dark .text-neutral-800,
+.dark .hover\:text-neutral-800:hover { color: #dedede; }
+.dark .text-neutral-700,
+.dark .hover\:text-neutral-700:hover { color: #cbcbcb; }
+.dark .text-neutral-600,
+.dark .hover\:text-neutral-600:hover { color: #ababab; }
+.dark .text-neutral-500 { color: #929292; }
+.dark .text-neutral-400 { color: #7a7a7a; }
+.dark .text-neutral-300 { color: #5c5c5c; }
+.dark .placeholder\:text-neutral-300::placeholder { color: #5a5a5a; }
+.dark .placeholder\:text-neutral-400::placeholder { color: #6a6a6a; }
+
+.dark .border-neutral-100 { border-color: #262626; }
+.dark .border-neutral-200 { border-color: #303030; }
+.dark .border-neutral-300,
+.dark .hover\:border-neutral-300:hover { border-color: #3d3d3d; }
+.dark .border-neutral-800 { border-color: #bdbdbd; }
+.dark .divide-neutral-100 > * + * { border-color: #262626; }
+.dark .ring-neutral-300,
+.dark .ring-neutral-400 { --tw-ring-color: #444; }
+.dark hr { border-color: #303030; }
+.dark input[type='date'],
+.dark input[type='time'] { color-scheme: dark; }
