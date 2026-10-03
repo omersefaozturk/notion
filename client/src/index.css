@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-white text-neutral-900 antialiased;
+}
+
+.editable:empty::before {
+  content: attr(data-placeholder);
+  @apply pointer-events-none text-neutral-300;
+}
