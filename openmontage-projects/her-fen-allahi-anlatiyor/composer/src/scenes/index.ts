@@ -1,0 +1,14 @@
+export { TitleScene } from "./Title";
+export { SciencesScene } from "./Sciences";
+export { PharmacyScene } from "./Pharmacy";
+export { DosageScene } from "./Dosage";
+export { AppleScene } from "./Apple";
+export { BodyScene } from "./Body";
+export { ChemistScene } from "./Chemist";
+export { FruitsScene } from "./Fruits";
+export { SoilScene } from "./Soil";
+export { TasteScene } from "./Taste";
+export { CityScene } from "./City";
+export { SunScene } from "./Sun";
+export { StarsScene } from "./Stars";
+export { ClosingScene } from "./Closing";

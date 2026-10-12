@@ -1,0 +1,7 @@
+# generated audio + intermediate frames (rebuild with `make all`)
+audio/*.wav
+build/stills*/
+build/contact*.png
+build/concat.txt
+composer/public/mix.wav
+composer/node_modules/

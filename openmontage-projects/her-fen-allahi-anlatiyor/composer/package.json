@@ -1,0 +1,19 @@
+{
+  "name": "her-fen-allahi-anlatiyor",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "studio": "remotion studio",
+    "render": "remotion render src/index.ts Main ../renders/final.mp4"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.401",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.401"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.12",
+    "typescript": "5.6.3"
+  }
+}

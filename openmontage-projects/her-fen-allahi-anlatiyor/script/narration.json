@@ -1,0 +1,162 @@
+{
+  "project": "her-fen-allahi-anlatiyor",
+  "title": "HER FEN ALLAH'I ANLATIYOR",
+  "language": "tr",
+  "aspect": "9:16",
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "source": "Kullanıcının verdiği 'Her Fen Allah'ı Anlatıyor' metninin kısa-form (Reels/Shorts) uyarlaması",
+  "segments": [
+    {
+      "id": "s01",
+      "scene": "title",
+      "text": "Her fen, Allah'ı anlatıyor.",
+      "captions": [
+        "Her fen,",
+        "Allah'ı anlatıyor."
+      ]
+    },
+    {
+      "id": "s02",
+      "scene": "sciences",
+      "text": "Kimya maddenin yapısını, tıp insan vücudunu, astronomi yıldızları inceler.",
+      "captions": [
+        "Kimya maddenin yapısını,",
+        "tıp insan vücudunu,",
+        "astronomi yıldızları inceler."
+      ]
+    },
+    {
+      "id": "s03",
+      "scene": "pharmacy",
+      "text": "Bir eczaneyi düşünelim. Oradaki her ilaç çok hassas ölçülerle hazırlanmıştır.",
+      "captions": [
+        "Bir eczaneyi düşünelim.",
+        "Her ilaç hassas ölçülerle",
+        "hazırlanmıştır."
+      ]
+    },
+    {
+      "id": "s04",
+      "scene": "dosage",
+      "text": "Sıfır virgül bir gram şundan, sıfır virgül üç gram bundan. Ölçü bozulsa, ilaç; ilaç olmaktan çıkar.",
+      "captions": [
+        "0,1 gram şundan,",
+        "0,3 gram bundan...",
+        "Ölçü bozulursa",
+        "ilaç, ilaç olmaktan çıkar."
+      ]
+    },
+    {
+      "id": "s05",
+      "scene": "apple",
+      "text": "Kâinattaki her canlı ise daha hassas ölçülerle yaratılmış. Elmanın içi biraz değişse, elma, elma olmaktan çıkar.",
+      "captions": [
+        "Kâinattaki her canlı",
+        "çok daha hassas ölçüde.",
+        "Elmanın içi değişse,",
+        "elma, elma olmaktan çıkar."
+      ]
+    },
+    {
+      "id": "s06",
+      "scene": "body",
+      "text": "İnsan vücudu da hassas bir dengede. Kandaki şeker artınca şeker hastalığı, demir eksilince kansızlık çıkar.",
+      "captions": [
+        "İnsan vücudu da",
+        "hassas bir dengede.",
+        "Şeker artarsa hastalık,",
+        "demir eksilirse kansızlık."
+      ]
+    },
+    {
+      "id": "s07",
+      "scene": "chemist",
+      "text": "İlaçtaki ölçüyü ayarlayan bir kimyager varsa, bu kâinattaki ölçüyü koyan bir yaratıcı vardır.",
+      "captions": [
+        "İlacın ölçüsünü ayarlayan",
+        "bir kimyager varsa,",
+        "kâinatın ölçüsünü koyan",
+        "bir Yaratıcı vardır."
+      ]
+    },
+    {
+      "id": "s08",
+      "scene": "fruits",
+      "text": "Meyvelere bakalım. Her birinin rengi, tadı, kokusu farklı. Onları farklı kılan toprak mı?",
+      "captions": [
+        "Her meyvenin rengi,",
+        "tadı, kokusu farklı.",
+        "Onları farklı kılan",
+        "toprak mı?"
+      ]
+    },
+    {
+      "id": "s09",
+      "scene": "soil",
+      "text": "Basit bir iğne için bile fabrika, makine, işçi gerekir. Toprağın altında ise fabrika da yok, işçi de.",
+      "captions": [
+        "Basit bir iğne için bile",
+        "fabrika, makine, işçi gerekir.",
+        "Toprağın altında",
+        "fabrika yok."
+      ]
+    },
+    {
+      "id": "s10",
+      "scene": "taste",
+      "text": "Toprak limon gibi ekşi, kayısı gibi tatlı, biber gibi acı da değil. Toprak hâl diliyle der: Bunları yapan ben değilim.",
+      "captions": [
+        "Toprak ne ekşi, ne tatlı,",
+        "ne de acıdır.",
+        "Toprak der ki:",
+        "«Bunları yapan ben değilim.»"
+      ]
+    },
+    {
+      "id": "s11",
+      "scene": "city",
+      "text": "Milyonlarca lambası hiç sönmeyen bir şehir düşünün. Böyle bir eser, maharetli bir ustayı gösterir.",
+      "captions": [
+        "Milyonlarca lambası",
+        "hiç sönmeyen bir şehir...",
+        "Böyle bir eser,",
+        "maharetli bir ustayı gösterir."
+      ]
+    },
+    {
+      "id": "s12",
+      "scene": "sun",
+      "text": "Güneş de yaratıldığı günden beri yanıyor. Ne gazyağı, ne kömür, ne odun. Enerjisi hiç bitmiyor.",
+      "captions": [
+        "Güneş, ilk günden beri",
+        "yanıyor.",
+        "Ne gazyağı, ne kömür,",
+        "ne odun. Enerjisi bitmiyor."
+      ]
+    },
+    {
+      "id": "s13",
+      "scene": "stars",
+      "text": "Güneşi ve yıldızları yakıtsız yandıran, söndürmeyen, birbirine çarptırmayan bir yaratıcı vardır: Yüce Allah.",
+      "captions": [
+        "Yıldızları yakıtsız yandıran,",
+        "söndürmeyen,",
+        "çarptırmayan bir Yaratıcı var:",
+        "O, Yüce Allah'tır."
+      ]
+    },
+    {
+      "id": "s14",
+      "scene": "closing",
+      "text": "Bütün fenler, kâinattaki mükemmel düzeni ve hassas ölçüyü gösterir. Her fenne bu gözle bakan, Allah'ın varlığını ve birliğini görür.",
+      "captions": [
+        "Bütün fenler",
+        "mükemmel bir düzeni gösterir.",
+        "Her fenne bu gözle bakan,",
+        "Allah'ın varlığını görür."
+      ]
+    }
+  ]
+}

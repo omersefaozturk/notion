@@ -1,0 +1,398 @@
+{
+  "project": "her-fen-allahi-anlatiyor",
+  "title": "HER FEN ALLAH'I ANLATIYOR",
+  "voice_backend": "espeak",
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "duration_seconds": 94.99,
+  "narration_sample_rate": 48000,
+  "segments": [
+    {
+      "id": "s01",
+      "scene": "title",
+      "text": "Her fen, Allah'ı anlatıyor.",
+      "start": 0.6,
+      "duration": 1.921,
+      "captions": [
+        {
+          "text": "Her fen,",
+          "start": 0.6,
+          "duration": 0.591
+        },
+        {
+          "text": "Allah'ı anlatıyor.",
+          "start": 1.191,
+          "duration": 1.33
+        }
+      ]
+    },
+    {
+      "id": "s02",
+      "scene": "sciences",
+      "text": "Kimya maddenin yapısını, tıp insan vücudunu, astronomi yıldızları inceler.",
+      "start": 2.841,
+      "duration": 4.698,
+      "captions": [
+        {
+          "text": "Kimya maddenin yapısını,",
+          "start": 2.841,
+          "duration": 1.566
+        },
+        {
+          "text": "tıp insan vücudunu,",
+          "start": 4.407,
+          "duration": 1.24
+        },
+        {
+          "text": "astronomi yıldızları inceler.",
+          "start": 5.646,
+          "duration": 1.892
+        }
+      ]
+    },
+    {
+      "id": "s03",
+      "scene": "pharmacy",
+      "text": "Bir eczaneyi düşünelim. Oradaki her ilaç çok hassas ölçülerle hazırlanmıştır.",
+      "start": 7.858,
+      "duration": 5.194,
+      "captions": [
+        {
+          "text": "Bir eczaneyi düşünelim.",
+          "start": 7.858,
+          "duration": 1.896
+        },
+        {
+          "text": "Her ilaç hassas ölçülerle",
+          "start": 9.754,
+          "duration": 2.061
+        },
+        {
+          "text": "hazırlanmıştır.",
+          "start": 11.816,
+          "duration": 1.237
+        }
+      ]
+    },
+    {
+      "id": "s04",
+      "scene": "dosage",
+      "text": "Sıfır virgül bir gram şundan, sıfır virgül üç gram bundan. Ölçü bozulsa, ilaç; ilaç olmaktan çıkar.",
+      "start": 13.372,
+      "duration": 7.168,
+      "captions": [
+        {
+          "text": "0,1 gram şundan,",
+          "start": 13.372,
+          "duration": 1.55
+        },
+        {
+          "text": "0,3 gram bundan...",
+          "start": 14.922,
+          "duration": 1.744
+        },
+        {
+          "text": "Ölçü bozulursa",
+          "start": 16.666,
+          "duration": 1.356
+        },
+        {
+          "text": "ilaç, ilaç olmaktan çıkar.",
+          "start": 18.022,
+          "duration": 2.519
+        }
+      ]
+    },
+    {
+      "id": "s05",
+      "scene": "apple",
+      "text": "Kâinattaki her canlı ise daha hassas ölçülerle yaratılmış. Elmanın içi biraz değişse, elma, elma olmaktan çıkar.",
+      "start": 20.861,
+      "duration": 7.418,
+      "captions": [
+        {
+          "text": "Kâinattaki her canlı",
+          "start": 20.861,
+          "duration": 1.667
+        },
+        {
+          "text": "çok daha hassas ölçüde.",
+          "start": 22.527,
+          "duration": 1.917
+        },
+        {
+          "text": "Elmanın içi değişse,",
+          "start": 24.444,
+          "duration": 1.667
+        },
+        {
+          "text": "elma, elma olmaktan çıkar.",
+          "start": 26.111,
+          "duration": 2.167
+        }
+      ]
+    },
+    {
+      "id": "s06",
+      "scene": "body",
+      "text": "İnsan vücudu da hassas bir dengede. Kandaki şeker artınca şeker hastalığı, demir eksilince kansızlık çıkar.",
+      "start": 28.598,
+      "duration": 7.146,
+      "captions": [
+        {
+          "text": "İnsan vücudu da",
+          "start": 28.598,
+          "duration": 1.292
+        },
+        {
+          "text": "hassas bir dengede.",
+          "start": 29.89,
+          "duration": 1.636
+        },
+        {
+          "text": "Şeker artarsa hastalık,",
+          "start": 31.526,
+          "duration": 1.98
+        },
+        {
+          "text": "demir eksilirse kansızlık.",
+          "start": 33.506,
+          "duration": 2.239
+        }
+      ]
+    },
+    {
+      "id": "s07",
+      "scene": "chemist",
+      "text": "İlaçtaki ölçüyü ayarlayan bir kimyager varsa, bu kâinattaki ölçüyü koyan bir yaratıcı vardır.",
+      "start": 36.064,
+      "duration": 5.895,
+      "captions": [
+        {
+          "text": "İlacın ölçüsünü ayarlayan",
+          "start": 36.064,
+          "duration": 1.694
+        },
+        {
+          "text": "bir kimyager varsa,",
+          "start": 37.758,
+          "duration": 1.287
+        },
+        {
+          "text": "kâinatın ölçüsünü koyan",
+          "start": 39.046,
+          "duration": 1.558
+        },
+        {
+          "text": "bir Yaratıcı vardır.",
+          "start": 40.604,
+          "duration": 1.355
+        }
+      ]
+    },
+    {
+      "id": "s08",
+      "scene": "fruits",
+      "text": "Meyvelere bakalım. Her birinin rengi, tadı, kokusu farklı. Onları farklı kılan toprak mı?",
+      "start": 42.279,
+      "duration": 6.412,
+      "captions": [
+        {
+          "text": "Her meyvenin rengi,",
+          "start": 42.279,
+          "duration": 1.792
+        },
+        {
+          "text": "tadı, kokusu farklı.",
+          "start": 44.071,
+          "duration": 1.886
+        },
+        {
+          "text": "Onları farklı kılan",
+          "start": 45.957,
+          "duration": 1.792
+        },
+        {
+          "text": "toprak mı?",
+          "start": 47.749,
+          "duration": 0.943
+        }
+      ]
+    },
+    {
+      "id": "s09",
+      "scene": "soil",
+      "text": "Basit bir iğne için bile fabrika, makine, işçi gerekir. Toprağın altında ise fabrika da yok, işçi de.",
+      "start": 49.012,
+      "duration": 6.886,
+      "captions": [
+        {
+          "text": "Basit bir iğne için bile",
+          "start": 49.012,
+          "duration": 2.015
+        },
+        {
+          "text": "fabrika, makine, işçi gerekir.",
+          "start": 51.027,
+          "duration": 2.519
+        },
+        {
+          "text": "Toprağın altında",
+          "start": 53.546,
+          "duration": 1.344
+        },
+        {
+          "text": "fabrika yok.",
+          "start": 54.89,
+          "duration": 1.008
+        }
+      ]
+    },
+    {
+      "id": "s10",
+      "scene": "taste",
+      "text": "Toprak limon gibi ekşi, kayısı gibi tatlı, biber gibi acı da değil. Toprak hâl diliyle der: Bunları yapan ben değilim.",
+      "start": 56.218,
+      "duration": 7.811,
+      "captions": [
+        {
+          "text": "Toprak ne ekşi, ne tatlı,",
+          "start": 56.218,
+          "duration": 2.441
+        },
+        {
+          "text": "ne de acıdır.",
+          "start": 58.658,
+          "duration": 1.269
+        },
+        {
+          "text": "Toprak der ki:",
+          "start": 59.928,
+          "duration": 1.367
+        },
+        {
+          "text": "«Bunları yapan ben değilim.»",
+          "start": 61.295,
+          "duration": 2.734
+        }
+      ]
+    },
+    {
+      "id": "s11",
+      "scene": "city",
+      "text": "Milyonlarca lambası hiç sönmeyen bir şehir düşünün. Böyle bir eser, maharetli bir ustayı gösterir.",
+      "start": 64.348,
+      "duration": 6.305,
+      "captions": [
+        {
+          "text": "Milyonlarca lambası",
+          "start": 64.348,
+          "duration": 1.346
+        },
+        {
+          "text": "hiç sönmeyen bir şehir...",
+          "start": 65.695,
+          "duration": 1.771
+        },
+        {
+          "text": "Böyle bir eser,",
+          "start": 67.466,
+          "duration": 1.063
+        },
+        {
+          "text": "maharetli bir ustayı gösterir.",
+          "start": 68.528,
+          "duration": 2.125
+        }
+      ]
+    },
+    {
+      "id": "s12",
+      "scene": "sun",
+      "text": "Güneş de yaratıldığı günden beri yanıyor. Ne gazyağı, ne kömür, ne odun. Enerjisi hiç bitmiyor.",
+      "start": 70.974,
+      "duration": 6.433,
+      "captions": [
+        {
+          "text": "Güneş, ilk günden beri",
+          "start": 70.974,
+          "duration": 1.815
+        },
+        {
+          "text": "yanıyor.",
+          "start": 72.788,
+          "duration": 0.66
+        },
+        {
+          "text": "Ne gazyağı, ne kömür,",
+          "start": 73.448,
+          "duration": 1.732
+        },
+        {
+          "text": "ne odun. Enerjisi bitmiyor.",
+          "start": 75.18,
+          "duration": 2.227
+        }
+      ]
+    },
+    {
+      "id": "s13",
+      "scene": "stars",
+      "text": "Güneşi ve yıldızları yakıtsız yandıran, söndürmeyen, birbirine çarptırmayan bir yaratıcı vardır: Yüce Allah.",
+      "start": 77.727,
+      "duration": 7.035,
+      "captions": [
+        {
+          "text": "Yıldızları yakıtsız yandıran,",
+          "start": 77.727,
+          "duration": 2.292
+        },
+        {
+          "text": "söndürmeyen,",
+          "start": 80.019,
+          "duration": 0.949
+        },
+        {
+          "text": "çarptırmayan bir Yaratıcı var:",
+          "start": 80.968,
+          "duration": 2.371
+        },
+        {
+          "text": "O, Yüce Allah'tır.",
+          "start": 83.339,
+          "duration": 1.423
+        }
+      ]
+    },
+    {
+      "id": "s14",
+      "scene": "closing",
+      "text": "Bütün fenler, kâinattaki mükemmel düzeni ve hassas ölçüyü gösterir. Her fenne bu gözle bakan, Allah'ın varlığını ve birliğini görür.",
+      "start": 85.082,
+      "duration": 8.708,
+      "captions": [
+        {
+          "text": "Bütün fenler",
+          "start": 85.082,
+          "duration": 1.148
+        },
+        {
+          "text": "mükemmel bir düzeni gösterir.",
+          "start": 86.23,
+          "duration": 2.775
+        },
+        {
+          "text": "Her fenne bu gözle bakan,",
+          "start": 89.005,
+          "duration": 2.392
+        },
+        {
+          "text": "Allah'ın varlığını görür.",
+          "start": 91.398,
+          "duration": 2.392
+        }
+      ]
+    }
+  ]
+}
