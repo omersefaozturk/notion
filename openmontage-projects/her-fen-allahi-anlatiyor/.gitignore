@@ -2,6 +2,8 @@
 audio/*.wav
 build/stills*/
 build/contact*.png
+build/verify/
+build/verify_sheet.png
 build/concat.txt
 composer/public/mix.wav
 composer/node_modules/
