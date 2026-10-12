@@ -1,0 +1,1000 @@
+{
+  "s01": [
+    {
+      "text": "her",
+      "start": 0.0,
+      "end": 0.2
+    },
+    {
+      "text": "fen,",
+      "start": 0.2,
+      "end": 0.64
+    },
+    {
+      "text": "allah'ı",
+      "start": 0.64,
+      "end": 1.0
+    },
+    {
+      "text": "anlatıyor.",
+      "start": 1.0,
+      "end": 1.6
+    }
+  ],
+  "s02": [
+    {
+      "text": "kimya",
+      "start": 0.0,
+      "end": 0.32
+    },
+    {
+      "text": "maddenin",
+      "start": 0.32,
+      "end": 0.76
+    },
+    {
+      "text": "yapısını,",
+      "start": 0.76,
+      "end": 1.4
+    },
+    {
+      "text": "tıp",
+      "start": 1.4,
+      "end": 1.64
+    },
+    {
+      "text": "insan",
+      "start": 1.64,
+      "end": 1.96
+    },
+    {
+      "text": "vücudunu,",
+      "start": 1.96,
+      "end": 2.6
+    },
+    {
+      "text": "astronomi",
+      "start": 2.6,
+      "end": 3.12
+    },
+    {
+      "text": "yıldızları",
+      "start": 3.12,
+      "end": 3.64
+    },
+    {
+      "text": "inceler.",
+      "start": 3.64,
+      "end": 4.2
+    }
+  ],
+  "s03": [
+    {
+      "text": "bir",
+      "start": 0.0,
+      "end": 0.16
+    },
+    {
+      "text": "eczaneyi",
+      "start": 0.16,
+      "end": 0.68
+    },
+    {
+      "text": "düşünelim.",
+      "start": 0.68,
+      "end": 1.44
+    },
+    {
+      "text": "oradaki",
+      "start": 1.44,
+      "end": 1.84
+    },
+    {
+      "text": "her",
+      "start": 1.84,
+      "end": 2.04
+    },
+    {
+      "text": "ilaç",
+      "start": 2.04,
+      "end": 2.32
+    },
+    {
+      "text": "çok",
+      "start": 2.32,
+      "end": 2.52
+    },
+    {
+      "text": "hassas",
+      "start": 2.52,
+      "end": 2.92
+    },
+    {
+      "text": "ölçülerle",
+      "start": 2.92,
+      "end": 3.44
+    },
+    {
+      "text": "hazırlanmıştır.",
+      "start": 3.44,
+      "end": 4.36
+    }
+  ],
+  "s04": [
+    {
+      "text": "sıfır",
+      "start": 0.0,
+      "end": 0.32
+    },
+    {
+      "text": "virgül",
+      "start": 0.32,
+      "end": 0.64
+    },
+    {
+      "text": "bir",
+      "start": 0.64,
+      "end": 0.76
+    },
+    {
+      "text": "gram",
+      "start": 0.76,
+      "end": 1.04
+    },
+    {
+      "text": "şundan,",
+      "start": 1.04,
+      "end": 1.56
+    },
+    {
+      "text": "sıfır",
+      "start": 1.56,
+      "end": 1.88
+    },
+    {
+      "text": "virgül",
+      "start": 1.88,
+      "end": 2.24
+    },
+    {
+      "text": "üç",
+      "start": 2.24,
+      "end": 2.4
+    },
+    {
+      "text": "gram",
+      "start": 2.4,
+      "end": 2.68
+    },
+    {
+      "text": "bundan.",
+      "start": 2.68,
+      "end": 3.28
+    },
+    {
+      "text": "ölçü",
+      "start": 3.28,
+      "end": 3.56
+    },
+    {
+      "text": "bozulsa,",
+      "start": 3.56,
+      "end": 4.16
+    },
+    {
+      "text": "ilaç;",
+      "start": 4.16,
+      "end": 4.64
+    },
+    {
+      "text": "ilaç",
+      "start": 4.64,
+      "end": 4.92
+    },
+    {
+      "text": "olmaktan",
+      "start": 4.92,
+      "end": 5.4
+    },
+    {
+      "text": "çıkar.",
+      "start": 5.4,
+      "end": 5.84
+    }
+  ],
+  "s05": [
+    {
+      "text": "kainattaki",
+      "start": 0.0,
+      "end": 0.64
+    },
+    {
+      "text": "her",
+      "start": 0.64,
+      "end": 0.84
+    },
+    {
+      "text": "canlı",
+      "start": 0.84,
+      "end": 1.16
+    },
+    {
+      "text": "ise",
+      "start": 1.16,
+      "end": 1.4
+    },
+    {
+      "text": "daha",
+      "start": 1.4,
+      "end": 1.64
+    },
+    {
+      "text": "hassas",
+      "start": 1.64,
+      "end": 2.04
+    },
+    {
+      "text": "ölçülerle",
+      "start": 2.04,
+      "end": 2.56
+    },
+    {
+      "text": "yaratılmış.",
+      "start": 2.56,
+      "end": 3.4
+    },
+    {
+      "text": "elmanın",
+      "start": 3.4,
+      "end": 3.8
+    },
+    {
+      "text": "içi",
+      "start": 3.8,
+      "end": 4.0
+    },
+    {
+      "text": "biraz",
+      "start": 4.0,
+      "end": 4.32
+    },
+    {
+      "text": "değişse,",
+      "start": 4.32,
+      "end": 4.96
+    },
+    {
+      "text": "elma,",
+      "start": 4.96,
+      "end": 5.4
+    },
+    {
+      "text": "elma",
+      "start": 5.4,
+      "end": 5.68
+    },
+    {
+      "text": "olmaktan",
+      "start": 5.68,
+      "end": 6.16
+    },
+    {
+      "text": "çıkar.",
+      "start": 6.16,
+      "end": 6.6
+    }
+  ],
+  "s06": [
+    {
+      "text": "insan",
+      "start": 0.0,
+      "end": 0.32
+    },
+    {
+      "text": "vücudu",
+      "start": 0.32,
+      "end": 0.68
+    },
+    {
+      "text": "da",
+      "start": 0.68,
+      "end": 0.8
+    },
+    {
+      "text": "hassas",
+      "start": 0.8,
+      "end": 1.2
+    },
+    {
+      "text": "bir",
+      "start": 1.2,
+      "end": 1.32
+    },
+    {
+      "text": "dengede.",
+      "start": 1.32,
+      "end": 2.04
+    },
+    {
+      "text": "kandaki",
+      "start": 2.04,
+      "end": 2.48
+    },
+    {
+      "text": "şeker",
+      "start": 2.48,
+      "end": 2.84
+    },
+    {
+      "text": "artınca",
+      "start": 2.84,
+      "end": 3.28
+    },
+    {
+      "text": "şeker",
+      "start": 3.28,
+      "end": 3.6
+    },
+    {
+      "text": "hastalığı,",
+      "start": 3.6,
+      "end": 4.28
+    },
+    {
+      "text": "demir",
+      "start": 4.28,
+      "end": 4.56
+    },
+    {
+      "text": "eksilince",
+      "start": 4.56,
+      "end": 5.08
+    },
+    {
+      "text": "kansızlık",
+      "start": 5.08,
+      "end": 5.6
+    },
+    {
+      "text": "çıkar.",
+      "start": 5.6,
+      "end": 6.04
+    }
+  ],
+  "s07": [
+    {
+      "text": "ilaçtaki",
+      "start": 0.0,
+      "end": 0.56
+    },
+    {
+      "text": "ölçüyü",
+      "start": 0.56,
+      "end": 0.92
+    },
+    {
+      "text": "ayarlayan",
+      "start": 0.92,
+      "end": 1.4
+    },
+    {
+      "text": "bir",
+      "start": 1.4,
+      "end": 1.56
+    },
+    {
+      "text": "kimyager",
+      "start": 1.56,
+      "end": 2.08
+    },
+    {
+      "text": "varsa,",
+      "start": 2.08,
+      "end": 2.68
+    },
+    {
+      "text": "bu",
+      "start": 2.68,
+      "end": 2.8
+    },
+    {
+      "text": "kainattaki",
+      "start": 2.8,
+      "end": 3.52
+    },
+    {
+      "text": "ölçüyü",
+      "start": 3.52,
+      "end": 3.88
+    },
+    {
+      "text": "koyan",
+      "start": 3.88,
+      "end": 4.2
+    },
+    {
+      "text": "bir",
+      "start": 4.2,
+      "end": 4.32
+    },
+    {
+      "text": "yaratıcı",
+      "start": 4.32,
+      "end": 4.76
+    },
+    {
+      "text": "vardır.",
+      "start": 4.76,
+      "end": 5.24
+    }
+  ],
+  "s08": [
+    {
+      "text": "meyvelere",
+      "start": 0.0,
+      "end": 0.48
+    },
+    {
+      "text": "bakalım.",
+      "start": 0.48,
+      "end": 1.08
+    },
+    {
+      "text": "her",
+      "start": 1.08,
+      "end": 1.28
+    },
+    {
+      "text": "birinin",
+      "start": 1.28,
+      "end": 1.64
+    },
+    {
+      "text": "rengi,",
+      "start": 1.64,
+      "end": 2.08
+    },
+    {
+      "text": "tadı,",
+      "start": 2.08,
+      "end": 2.48
+    },
+    {
+      "text": "kokusu",
+      "start": 2.48,
+      "end": 2.84
+    },
+    {
+      "text": "farklı.",
+      "start": 2.84,
+      "end": 3.52
+    },
+    {
+      "text": "onları",
+      "start": 3.52,
+      "end": 3.84
+    },
+    {
+      "text": "farklı",
+      "start": 3.84,
+      "end": 4.2
+    },
+    {
+      "text": "kılan",
+      "start": 4.2,
+      "end": 4.48
+    },
+    {
+      "text": "toprak",
+      "start": 4.48,
+      "end": 4.92
+    },
+    {
+      "text": "mı?",
+      "start": 4.92,
+      "end": 5.16
+    }
+  ],
+  "s09": [
+    {
+      "text": "basit",
+      "start": 0.0,
+      "end": 0.32
+    },
+    {
+      "text": "bir",
+      "start": 0.32,
+      "end": 0.48
+    },
+    {
+      "text": "iğne",
+      "start": 0.48,
+      "end": 0.72
+    },
+    {
+      "text": "için",
+      "start": 0.72,
+      "end": 0.96
+    },
+    {
+      "text": "bile",
+      "start": 0.96,
+      "end": 1.2
+    },
+    {
+      "text": "fabrika,",
+      "start": 1.2,
+      "end": 1.8
+    },
+    {
+      "text": "makine,",
+      "start": 1.8,
+      "end": 2.32
+    },
+    {
+      "text": "işçi",
+      "start": 2.32,
+      "end": 2.6
+    },
+    {
+      "text": "gerekir.",
+      "start": 2.6,
+      "end": 3.28
+    },
+    {
+      "text": "toprağın",
+      "start": 3.28,
+      "end": 3.76
+    },
+    {
+      "text": "altında",
+      "start": 3.76,
+      "end": 4.16
+    },
+    {
+      "text": "ise",
+      "start": 4.16,
+      "end": 4.44
+    },
+    {
+      "text": "fabrika",
+      "start": 4.44,
+      "end": 4.88
+    },
+    {
+      "text": "da",
+      "start": 4.88,
+      "end": 5.0
+    },
+    {
+      "text": "yok,",
+      "start": 5.0,
+      "end": 5.36
+    },
+    {
+      "text": "işçi",
+      "start": 5.36,
+      "end": 5.64
+    },
+    {
+      "text": "de.",
+      "start": 5.64,
+      "end": 5.88
+    }
+  ],
+  "s10": [
+    {
+      "text": "toprak",
+      "start": 0.0,
+      "end": 0.44
+    },
+    {
+      "text": "limon",
+      "start": 0.44,
+      "end": 0.76
+    },
+    {
+      "text": "gibi",
+      "start": 0.76,
+      "end": 1.0
+    },
+    {
+      "text": "ekşi,",
+      "start": 1.0,
+      "end": 1.52
+    },
+    {
+      "text": "kayısı",
+      "start": 1.52,
+      "end": 1.88
+    },
+    {
+      "text": "gibi",
+      "start": 1.88,
+      "end": 2.08
+    },
+    {
+      "text": "tatlı,",
+      "start": 2.08,
+      "end": 2.6
+    },
+    {
+      "text": "biber",
+      "start": 2.6,
+      "end": 2.92
+    },
+    {
+      "text": "gibi",
+      "start": 2.92,
+      "end": 3.16
+    },
+    {
+      "text": "acı",
+      "start": 3.16,
+      "end": 3.36
+    },
+    {
+      "text": "da",
+      "start": 3.36,
+      "end": 3.48
+    },
+    {
+      "text": "değil.",
+      "start": 3.48,
+      "end": 4.0
+    },
+    {
+      "text": "toprak",
+      "start": 4.0,
+      "end": 4.4
+    },
+    {
+      "text": "hal",
+      "start": 4.4,
+      "end": 4.64
+    },
+    {
+      "text": "diliyle",
+      "start": 4.64,
+      "end": 5.04
+    },
+    {
+      "text": "der:",
+      "start": 5.04,
+      "end": 5.48
+    },
+    {
+      "text": "bunları",
+      "start": 5.48,
+      "end": 5.8
+    },
+    {
+      "text": "yapan",
+      "start": 5.8,
+      "end": 6.16
+    },
+    {
+      "text": "ben",
+      "start": 6.16,
+      "end": 6.36
+    },
+    {
+      "text": "değilim.",
+      "start": 6.36,
+      "end": 6.8
+    }
+  ],
+  "s11": [
+    {
+      "text": "milyonlarca",
+      "start": 0.0,
+      "end": 0.64
+    },
+    {
+      "text": "lambası",
+      "start": 0.64,
+      "end": 1.08
+    },
+    {
+      "text": "hiç",
+      "start": 1.08,
+      "end": 1.28
+    },
+    {
+      "text": "sönmeyen",
+      "start": 1.28,
+      "end": 1.72
+    },
+    {
+      "text": "bir",
+      "start": 1.72,
+      "end": 1.84
+    },
+    {
+      "text": "şehir",
+      "start": 1.84,
+      "end": 2.12
+    },
+    {
+      "text": "düşünün.",
+      "start": 2.12,
+      "end": 2.84
+    },
+    {
+      "text": "böyle",
+      "start": 2.84,
+      "end": 3.12
+    },
+    {
+      "text": "bir",
+      "start": 3.12,
+      "end": 3.28
+    },
+    {
+      "text": "eser,",
+      "start": 3.28,
+      "end": 3.8
+    },
+    {
+      "text": "maharetli",
+      "start": 3.8,
+      "end": 4.28
+    },
+    {
+      "text": "bir",
+      "start": 4.28,
+      "end": 4.44
+    },
+    {
+      "text": "ustayı",
+      "start": 4.44,
+      "end": 4.76
+    },
+    {
+      "text": "gösterir.",
+      "start": 4.76,
+      "end": 5.4
+    }
+  ],
+  "s12": [
+    {
+      "text": "güneş",
+      "start": 0.0,
+      "end": 0.32
+    },
+    {
+      "text": "de",
+      "start": 0.32,
+      "end": 0.44
+    },
+    {
+      "text": "yaratıldığı",
+      "start": 0.44,
+      "end": 1.04
+    },
+    {
+      "text": "günden",
+      "start": 1.04,
+      "end": 1.4
+    },
+    {
+      "text": "beri",
+      "start": 1.4,
+      "end": 1.6
+    },
+    {
+      "text": "yanıyor.",
+      "start": 1.6,
+      "end": 2.2
+    },
+    {
+      "text": "ne",
+      "start": 2.2,
+      "end": 2.32
+    },
+    {
+      "text": "gazyağı,",
+      "start": 2.32,
+      "end": 2.92
+    },
+    {
+      "text": "ne",
+      "start": 2.92,
+      "end": 3.04
+    },
+    {
+      "text": "kömür,",
+      "start": 3.04,
+      "end": 3.48
+    },
+    {
+      "text": "ne",
+      "start": 3.48,
+      "end": 3.64
+    },
+    {
+      "text": "odun.",
+      "start": 3.64,
+      "end": 4.12
+    },
+    {
+      "text": "enerjisi",
+      "start": 4.12,
+      "end": 4.64
+    },
+    {
+      "text": "hiç",
+      "start": 4.64,
+      "end": 4.84
+    },
+    {
+      "text": "bitmiyor.",
+      "start": 4.84,
+      "end": 5.4
+    }
+  ],
+  "s13": [
+    {
+      "text": "güneşi",
+      "start": 0.0,
+      "end": 0.36
+    },
+    {
+      "text": "ve",
+      "start": 0.36,
+      "end": 0.48
+    },
+    {
+      "text": "yıldızları",
+      "start": 0.48,
+      "end": 1.0
+    },
+    {
+      "text": "yakıtsız",
+      "start": 1.0,
+      "end": 1.48
+    },
+    {
+      "text": "yandıran,",
+      "start": 1.48,
+      "end": 2.08
+    },
+    {
+      "text": "söndürmeyen,",
+      "start": 2.08,
+      "end": 2.84
+    },
+    {
+      "text": "birbirine",
+      "start": 2.84,
+      "end": 3.24
+    },
+    {
+      "text": "çarptırmayan",
+      "start": 3.24,
+      "end": 3.88
+    },
+    {
+      "text": "bir",
+      "start": 3.88,
+      "end": 4.0
+    },
+    {
+      "text": "yaratıcı",
+      "start": 4.0,
+      "end": 4.44
+    },
+    {
+      "text": "vardır:",
+      "start": 4.44,
+      "end": 5.04
+    },
+    {
+      "text": "yüce",
+      "start": 5.04,
+      "end": 5.32
+    },
+    {
+      "text": "allah.",
+      "start": 5.32,
+      "end": 5.76
+    }
+  ],
+  "s14": [
+    {
+      "text": "bütün",
+      "start": 0.0,
+      "end": 0.28
+    },
+    {
+      "text": "fenler,",
+      "start": 0.28,
+      "end": 0.8
+    },
+    {
+      "text": "kainattaki",
+      "start": 0.8,
+      "end": 1.44
+    },
+    {
+      "text": "mükemmel",
+      "start": 1.44,
+      "end": 1.96
+    },
+    {
+      "text": "düzeni",
+      "start": 1.96,
+      "end": 2.32
+    },
+    {
+      "text": "ve",
+      "start": 2.32,
+      "end": 2.44
+    },
+    {
+      "text": "hassas",
+      "start": 2.44,
+      "end": 2.84
+    },
+    {
+      "text": "ölçüyü",
+      "start": 2.84,
+      "end": 3.2
+    },
+    {
+      "text": "gösterir.",
+      "start": 3.2,
+      "end": 4.0
+    },
+    {
+      "text": "her",
+      "start": 4.0,
+      "end": 4.2
+    },
+    {
+      "text": "fenne",
+      "start": 4.2,
+      "end": 4.52
+    },
+    {
+      "text": "bu",
+      "start": 4.52,
+      "end": 4.64
+    },
+    {
+      "text": "gözle",
+      "start": 4.64,
+      "end": 4.96
+    },
+    {
+      "text": "bakan,",
+      "start": 4.96,
+      "end": 5.48
+    },
+    {
+      "text": "allah'ın",
+      "start": 5.48,
+      "end": 5.88
+    },
+    {
+      "text": "varlığını",
+      "start": 5.88,
+      "end": 6.36
+    },
+    {
+      "text": "ve",
+      "start": 6.36,
+      "end": 6.48
+    },
+    {
+      "text": "birliğini",
+      "start": 6.48,
+      "end": 6.88
+    },
+    {
+      "text": "görür.",
+      "start": 6.88,
+      "end": 7.28
+    }
+  ]
+}

@@ -348,17 +348,27 @@ def main() -> int:
     lines.append(f"file '{tail}'")
     concat_list.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
-    # Voice chain: de-rumble, presence lift, de-harsh, gentle compression, room.
-    chain = (
-        "highpass=f=85,"
-        "equalizer=f=220:t=q:w=1.0:g=-2,"
-        "equalizer=f=1800:t=q:w=1.4:g=3,"
-        "equalizer=f=3600:t=q:w=1.6:g=-3,"
-        "acompressor=threshold=-18dB:ratio=3:attack=12:release=180:makeup=2,"
-        "aecho=0.86:0.9:38:0.12,"
-        f"aresample={TARGET_SR},"
-        "loudnorm=I=-17:TP=-1.5:LRA=11"
-    )
+    # Voice chain. A formant synth needs the presence lift, the de-harsh and a
+    # little room to sit in a mix; a neural voice already has all three, so it
+    # only gets de-rumble and gentle levelling.
+    if backend == "espeak":
+        chain = (
+            "highpass=f=85,"
+            "equalizer=f=220:t=q:w=1.0:g=-2,"
+            "equalizer=f=1800:t=q:w=1.4:g=3,"
+            "equalizer=f=3600:t=q:w=1.6:g=-3,"
+            "acompressor=threshold=-18dB:ratio=3:attack=12:release=180:makeup=2,"
+            "aecho=0.86:0.9:38:0.12,"
+            f"aresample={TARGET_SR},"
+            "loudnorm=I=-17:TP=-1.5:LRA=11"
+        )
+    else:
+        chain = (
+            "highpass=f=70,"
+            "acompressor=threshold=-20dB:ratio=2.4:attack=18:release=240:makeup=1.5,"
+            f"aresample={TARGET_SR},"
+            "loudnorm=I=-17:TP=-1.5:LRA=11"
+        )
     narration = AUDIO / "narration.wav"
     subprocess.run(
         ["ffmpeg", "-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", str(concat_list),

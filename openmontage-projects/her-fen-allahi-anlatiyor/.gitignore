@@ -8,3 +8,4 @@ build/concat.txt
 composer/public/mix.wav
 composer/node_modules/
 .venv/
+models/
