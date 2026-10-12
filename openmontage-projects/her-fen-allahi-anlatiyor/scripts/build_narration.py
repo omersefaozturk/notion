@@ -2,14 +2,21 @@
 """Build the Turkish narration track + caption timeline for the project.
 
 Voice backends, in order of preference:
-  1. google   - Google Cloud Text-to-Speech (needs GOOGLE_API_KEY; natural voice)
-  2. elevenlabs - ElevenLabs (needs ELEVENLABS_API_KEY and network access to
+  1. ema      - EMA Lightning (github.com/canberk7/ema-lightning): a Turkish TTS
+                model that runs locally, no API key. `pip install ema-lightning`.
+                It fetches ~34 MB of weights from Hugging Face on first use, so
+                either huggingface.co must be reachable or the three files
+                (config.json, ema.pt, decoder.pt) must sit in a directory named
+                by EMA_WEIGHTS_DIR. Gives real word-level timings, which the
+                caption boundaries are snapped to.
+  2. google   - Google Cloud Text-to-Speech (needs GOOGLE_API_KEY; natural voice)
+  3. elevenlabs - ElevenLabs (needs ELEVENLABS_API_KEY and network access to
                   api.elevenlabs.io, which the default cloud policy blocks)
-  3. espeak   - espeak-ng via the `espeakng-loader` wheel: free, offline, no key.
-                Robotic but fully intelligible Turkish. This is the default.
+  4. espeak   - espeak-ng via the `espeakng-loader` wheel: free, offline, no key.
+                Robotic but fully intelligible Turkish. The fallback.
 
 Usage:
-    python scripts/build_narration.py [--voice espeak|google|elevenlabs] [--rate 170]
+    python scripts/build_narration.py [--voice ema|espeak|google|elevenlabs] [--rate 170]
 
 Outputs:
     audio/seg_<id>.wav      per-segment speech
@@ -101,6 +108,60 @@ def synth_espeak(segments, rate: int) -> int:
     return voice.sample_rate
 
 
+
+# --------------------------------------------------------------------------- #
+# EMA Lightning (local Turkish TTS, no API key)
+# --------------------------------------------------------------------------- #
+def ema_available() -> bool:
+    try:
+        import ema_lightning  # noqa: F401
+    except Exception:
+        return False
+    return True
+
+
+def synth_ema(segments, speed: float, seed: int | None):
+    """Synthesize with EMA Lightning; returns (sample_rate, word timings per segment).
+
+    EMA_WEIGHTS_DIR lets the model load from local files instead of the Hub, for
+    sandboxes where huggingface.co is not reachable.
+    """
+    # The Xet transfer path needs extra hosts; the classic CDN keeps the
+    # allow-list down to huggingface.co + cdn-lfs*.huggingface.co.
+    os.environ.setdefault("HF_HUB_DISABLE_XET", "1")
+
+    local = os.environ.get("EMA_WEIGHTS_DIR")
+    if local:
+        import ema_lightning.api as ema_api
+
+        root = Path(local)
+        missing = [f for f in ("config.json", "ema.pt", "decoder.pt") if not (root / f).is_file()]
+        if missing:
+            raise SystemExit(f"EMA_WEIGHTS_DIR={root} is missing: {', '.join(missing)}")
+        ema_api.hf_hub_download = lambda repo, filename, *a, **k: str(root / filename)
+
+    from ema_lightning import EMA
+
+    try:
+        tts = EMA()
+    except Exception as exc:  # the weights could not be fetched
+        raise SystemExit(
+            "EMA could not load its weights: "
+            f"{exc}\n"
+            "Either allow huggingface.co (and cdn-lfs.huggingface.co) in the environment's "
+            "network policy, or download config.json, ema.pt and decoder.pt from "
+            "https://huggingface.co/canberkkkkkk/ema-lightning and point EMA_WEIGHTS_DIR at them."
+        ) from exc
+    words: dict[str, list[dict]] = {}
+    sr = 0
+    for seg in segments:
+        speech = tts.say(seg["text"], speed=speed, seed=seed, path=str(AUDIO / f"seg_{seg['id']}.wav"))
+        sr = speech.sample_rate
+        words[seg["id"]] = [{"text": w.text, "start": w.start, "end": w.end} for w in speech.words]
+    (BUILD / "words.json").write_text(json.dumps(words, ensure_ascii=False, indent=2), encoding="utf-8")
+    return sr, words
+
+
 # --------------------------------------------------------------------------- #
 # Google Cloud TTS (natural Turkish; needs GOOGLE_API_KEY)
 # --------------------------------------------------------------------------- #
@@ -167,24 +228,46 @@ def wav_duration(path: Path) -> float:
         return w.getnframes() / w.getframerate()
 
 
-def caption_timings(seg: dict, start: float, duration: float) -> list[dict]:
-    """Spread a segment's caption chunks over its audio, weighted by length."""
+def caption_timings(seg: dict, start: float, duration: float, words: list[dict] | None = None) -> list[dict]:
+    """Spread a segment's caption chunks over its audio, weighted by length.
+
+    With word timings from the TTS backend, each boundary is snapped to the
+    nearest spoken word start so captions flip on a word, not mid-syllable.
+    """
     chunks = seg.get("captions") or [seg["text"]]
     weights = [max(len(c), 6) for c in chunks]
     total = sum(weights)
-    out, cursor = [], start
-    for chunk, weight in zip(chunks, weights):
-        span = duration * weight / total
-        out.append({"text": chunk, "start": round(cursor, 3), "duration": round(span, 3)})
-        cursor += span
-    return out
+
+    edges, cursor = [0.0], 0.0
+    for weight in weights:
+        cursor += duration * weight / total
+        edges.append(cursor)
+
+    if words:
+        starts = [w["start"] for w in words]
+        for i in range(1, len(edges) - 1):
+            edges[i] = min(starts, key=lambda s: abs(s - edges[i]))
+        for i in range(1, len(edges)):            # keep them ordered and non-empty
+            edges[i] = max(edges[i], edges[i - 1] + 0.25)
+        edges[-1] = duration
+
+    return [
+        {
+            "text": chunk,
+            "start": round(start + edges[i], 3),
+            "duration": round(max(edges[i + 1] - edges[i], 0.25), 3),
+        }
+        for i, chunk in enumerate(chunks)
+    ]
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--voice", default=os.environ.get("NARRATION_VOICE", "auto"),
-                    choices=["auto", "espeak", "google", "elevenlabs"])
+                    choices=["auto", "ema", "espeak", "google", "elevenlabs"])
     ap.add_argument("--rate", type=int, default=170, help="espeak words per minute")
+    ap.add_argument("--ema-speed", type=float, default=1.0, help="EMA speaking speed")
+    ap.add_argument("--ema-seed", type=int, default=7, help="EMA seed (same seed = same audio)")
     ap.add_argument("--google-voice", default="tr-TR-Chirp3-HD-Alnilam")
     ap.add_argument("--google-rate", type=float, default=1.0)
     ap.add_argument("--elevenlabs-voice", default="onwK4e9ZLuTAKqWW03F9")
@@ -197,7 +280,9 @@ def main() -> int:
 
     backend = args.voice
     if backend == "auto":
-        if os.environ.get("GOOGLE_API_KEY"):
+        if ema_available():
+            backend = "ema"
+        elif os.environ.get("GOOGLE_API_KEY"):
             backend = "google"
         elif os.environ.get("ELEVENLABS_API_KEY"):
             backend = "elevenlabs"
@@ -205,7 +290,10 @@ def main() -> int:
             backend = "espeak"
 
     print(f"[narration] backend={backend} segments={len(segments)}")
-    if backend == "espeak":
+    words: dict[str, list[dict]] = {}
+    if backend == "ema":
+        sr, words = synth_ema(segments, args.ema_speed, args.ema_seed)
+    elif backend == "espeak":
         sr = synth_espeak(segments, args.rate)
     elif backend == "google":
         sr = synth_google(segments, args.google_voice, args.google_rate)
@@ -225,7 +313,7 @@ def main() -> int:
                 "text": seg["text"],
                 "start": round(cursor, 3),
                 "duration": round(dur, 3),
-                "captions": caption_timings(seg, cursor, dur),
+                "captions": caption_timings(seg, cursor, dur, words.get(seg["id"])),
             }
         )
         parts.append(path)

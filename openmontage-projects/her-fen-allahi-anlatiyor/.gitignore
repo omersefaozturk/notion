@@ -7,3 +7,4 @@ build/verify_sheet.png
 build/concat.txt
 composer/public/mix.wav
 composer/node_modules/
+.venv/

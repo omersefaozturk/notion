@@ -27,8 +27,36 @@ make all       # seslendirme -> müzik -> video
 
 ## Seslendirme sağlayıcısı
 
-Varsayılan ses **espeak-ng** (çevrimdışı, anahtarsız, `espeakng-loader` wheel'i ile
-gelir). Anlaşılır ama sentetiktir. Daha doğal bir Türkçe anlatıcı için:
+Tercih sırası: **EMA Lightning → Google → ElevenLabs → espeak-ng**.
+
+### EMA Lightning (önerilen, anahtarsız, yerel)
+
+[canberk7/ema-lightning](https://github.com/canberk7/ema-lightning) — 8,6M
+parametreli Türkçe TTS, tamamen yerel çalışır, API anahtarı istemez ve kelime
+bazında zamanlama döndürür (altyazı sınırları bu kelime başlangıçlarına
+hizalanır).
+
+```bash
+.venv/bin/pip install ema-lightning
+.venv/bin/python scripts/build_narration.py --voice ema --ema-speed 1.0
+.venv/bin/python scripts/build_music.py && bash scripts/render.sh
+```
+
+Ağırlıklar (~34 MB) ilk kullanımda Hugging Face'ten iner. Bu bulut ortamında
+`huggingface.co` ağ politikasıyla kapalı olduğundan iki seçenek var:
+
+1. Ortam ayarlarında *Network access → Allowed domains* listesine
+   `huggingface.co` ve `cdn-lfs.huggingface.co` eklenir. (Betik
+   `HF_HUB_DISABLE_XET=1` ayarladığı için Xet host'larına gerek kalmaz.)
+2. `config.json`, `ema.pt`, `decoder.pt` dosyaları
+   [model kartından](https://huggingface.co/canberkkkkkk/ema-lightning) indirilip
+   bir klasöre konur ve `EMA_WEIGHTS_DIR=/yol/klasor` ile çalıştırılır — bu durumda
+   hiç ağ gerekmez.
+
+### Diğer sağlayıcılar
+
+Varsayılan yedek ses **espeak-ng** (çevrimdışı, anahtarsız, `espeakng-loader`
+wheel'i ile gelir). Anlaşılır ama sentetiktir. Bulut sağlayıcılar için:
 
 ```bash
 # Google Cloud TTS (bu ortamdan erişilebilir)
