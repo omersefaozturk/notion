@@ -5,3 +5,4 @@ build/*_sheet.png
 build/concat.txt
 composer/public/mix.wav
 composer/node_modules
+composer/public/shots/
