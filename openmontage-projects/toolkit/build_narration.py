@@ -16,7 +16,7 @@ Voice backends, in order of preference:
                 Robotic but fully intelligible Turkish. The fallback.
 
 Usage:
-    python scripts/build_narration.py [--voice ema|espeak|google|elevenlabs] [--rate 170]
+    python ../toolkit/build_narration.py --project <dir> [--voice ema|espeak|google|elevenlabs] [--rate 170]
 
 Outputs:
     audio/seg_<id>.wav      per-segment speech
@@ -36,10 +36,19 @@ import sys
 import wave
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path.cwd()          # set from --project in main()
 SCRIPT = ROOT / "script" / "narration.json"
 AUDIO = ROOT / "audio"
 BUILD = ROOT / "build"
+
+
+def set_project(path: Path) -> None:
+    """Point the module at one project directory."""
+    global ROOT, SCRIPT, AUDIO, BUILD
+    ROOT = path.resolve()
+    SCRIPT = ROOT / "script" / "narration.json"
+    AUDIO = ROOT / "audio"
+    BUILD = ROOT / "build"
 
 GAP_SECONDS = 0.32          # silence between segments
 LEAD_IN_SECONDS = 0.6       # silence before the first word
@@ -263,6 +272,7 @@ def caption_timings(seg: dict, start: float, duration: float, words: list[dict] 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
+    ap.add_argument("--project", default=".", type=Path, help="project directory")
     ap.add_argument("--voice", default=os.environ.get("NARRATION_VOICE", "auto"),
                     choices=["auto", "ema", "espeak", "google", "elevenlabs"])
     ap.add_argument("--rate", type=int, default=170, help="espeak words per minute")
@@ -272,6 +282,7 @@ def main() -> int:
     ap.add_argument("--google-rate", type=float, default=1.0)
     ap.add_argument("--elevenlabs-voice", default="onwK4e9ZLuTAKqWW03F9")
     args = ap.parse_args()
+    set_project(args.project)
 
     AUDIO.mkdir(exist_ok=True)
     BUILD.mkdir(exist_ok=True)

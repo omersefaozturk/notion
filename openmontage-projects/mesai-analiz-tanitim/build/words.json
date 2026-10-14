@@ -1,0 +1,1205 @@
+{
+  "s01": [
+    {
+      "text": "mesai",
+      "start": 0.0,
+      "end": 0.4
+    },
+    {
+      "text": "analizi,",
+      "start": 0.4,
+      "end": 1.08
+    },
+    {
+      "text": "bdks",
+      "start": 1.08,
+      "end": 1.4
+    },
+    {
+      "text": "giriş",
+      "start": 1.4,
+      "end": 1.68
+    },
+    {
+      "text": "çıkış",
+      "start": 1.68,
+      "end": 2.0
+    },
+    {
+      "text": "dökümünden",
+      "start": 2.0,
+      "end": 2.6
+    },
+    {
+      "text": "kimin",
+      "start": 2.6,
+      "end": 2.88
+    },
+    {
+      "text": "ne",
+      "start": 2.88,
+      "end": 3.0
+    },
+    {
+      "text": "kadar",
+      "start": 3.0,
+      "end": 3.32
+    },
+    {
+      "text": "fazla,",
+      "start": 3.32,
+      "end": 3.88
+    },
+    {
+      "text": "kimin",
+      "start": 3.88,
+      "end": 4.16
+    },
+    {
+      "text": "ne",
+      "start": 4.16,
+      "end": 4.28
+    },
+    {
+      "text": "kadar",
+      "start": 4.28,
+      "end": 4.56
+    },
+    {
+      "text": "eksik",
+      "start": 4.56,
+      "end": 4.88
+    },
+    {
+      "text": "çalıştığını",
+      "start": 4.88,
+      "end": 5.44
+    },
+    {
+      "text": "çıkarır.",
+      "start": 5.44,
+      "end": 5.96
+    }
+  ],
+  "s02": [
+    {
+      "text": "bdks'den",
+      "start": 0.0,
+      "end": 0.44
+    },
+    {
+      "text": "istediğiniz",
+      "start": 0.44,
+      "end": 1.0
+    },
+    {
+      "text": "tarih",
+      "start": 1.0,
+      "end": 1.36
+    },
+    {
+      "text": "aralığını",
+      "start": 1.36,
+      "end": 1.8
+    },
+    {
+      "text": "seçip",
+      "start": 1.8,
+      "end": 2.16
+    },
+    {
+      "text": "indirdiğiniz",
+      "start": 2.16,
+      "end": 2.8
+    },
+    {
+      "text": "excel",
+      "start": 2.8,
+      "end": 3.16
+    },
+    {
+      "text": "dosyasını",
+      "start": 3.16,
+      "end": 3.68
+    },
+    {
+      "text": "bu",
+      "start": 3.68,
+      "end": 3.8
+    },
+    {
+      "text": "alana",
+      "start": 3.8,
+      "end": 4.08
+    },
+    {
+      "text": "bırakmanız",
+      "start": 4.08,
+      "end": 4.64
+    },
+    {
+      "text": "yeterli.",
+      "start": 4.64,
+      "end": 5.4
+    },
+    {
+      "text": "birden",
+      "start": 5.4,
+      "end": 5.76
+    },
+    {
+      "text": "çok",
+      "start": 5.76,
+      "end": 6.04
+    },
+    {
+      "text": "ay",
+      "start": 6.04,
+      "end": 6.24
+    },
+    {
+      "text": "ve",
+      "start": 6.24,
+      "end": 6.36
+    },
+    {
+      "text": "birden",
+      "start": 6.36,
+      "end": 6.72
+    },
+    {
+      "text": "çok",
+      "start": 6.72,
+      "end": 6.96
+    },
+    {
+      "text": "dosya",
+      "start": 6.96,
+      "end": 7.36
+    },
+    {
+      "text": "aynı",
+      "start": 7.36,
+      "end": 7.6
+    },
+    {
+      "text": "anda",
+      "start": 7.6,
+      "end": 7.84
+    },
+    {
+      "text": "yüklenebilir.",
+      "start": 7.84,
+      "end": 8.6
+    }
+  ],
+  "s03": [
+    {
+      "text": "hiç",
+      "start": 0.0,
+      "end": 0.24
+    },
+    {
+      "text": "veri",
+      "start": 0.24,
+      "end": 0.44
+    },
+    {
+      "text": "yüklemeden",
+      "start": 0.44,
+      "end": 1.04
+    },
+    {
+      "text": "denemek",
+      "start": 1.04,
+      "end": 1.44
+    },
+    {
+      "text": "isterseniz,",
+      "start": 1.44,
+      "end": 2.28
+    },
+    {
+      "text": "örnek",
+      "start": 2.28,
+      "end": 2.6
+    },
+    {
+      "text": "veriyle",
+      "start": 2.6,
+      "end": 3.0
+    },
+    {
+      "text": "göz",
+      "start": 3.0,
+      "end": 3.24
+    },
+    {
+      "text": "at",
+      "start": 3.24,
+      "end": 3.4
+    },
+    {
+      "text": "düğmesi",
+      "start": 3.4,
+      "end": 3.84
+    },
+    {
+      "text": "hazır",
+      "start": 3.84,
+      "end": 4.16
+    },
+    {
+      "text": "bir",
+      "start": 4.16,
+      "end": 4.32
+    },
+    {
+      "text": "ay",
+      "start": 4.32,
+      "end": 4.44
+    },
+    {
+      "text": "açar.",
+      "start": 4.44,
+      "end": 4.92
+    }
+  ],
+  "s04": [
+    {
+      "text": "genel",
+      "start": 0.0,
+      "end": 0.32
+    },
+    {
+      "text": "bakış",
+      "start": 0.32,
+      "end": 0.6
+    },
+    {
+      "text": "açılır.",
+      "start": 0.6,
+      "end": 1.24
+    },
+    {
+      "text": "üstte",
+      "start": 1.24,
+      "end": 1.52
+    },
+    {
+      "text": "takımın",
+      "start": 1.52,
+      "end": 1.92
+    },
+    {
+      "text": "toplam",
+      "start": 1.92,
+      "end": 2.32
+    },
+    {
+      "text": "bakiyesi,",
+      "start": 2.32,
+      "end": 3.04
+    },
+    {
+      "text": "altında",
+      "start": 3.04,
+      "end": 3.44
+    },
+    {
+      "text": "kişi",
+      "start": 3.44,
+      "end": 3.68
+    },
+    {
+      "text": "bazında",
+      "start": 3.68,
+      "end": 4.12
+    },
+    {
+      "text": "fark",
+      "start": 4.12,
+      "end": 4.4
+    },
+    {
+      "text": "ve",
+      "start": 4.4,
+      "end": 4.52
+    },
+    {
+      "text": "haftalık",
+      "start": 4.52,
+      "end": 4.96
+    },
+    {
+      "text": "seyir",
+      "start": 4.96,
+      "end": 5.24
+    },
+    {
+      "text": "vardır.",
+      "start": 5.24,
+      "end": 5.72
+    }
+  ],
+  "s05": [
+    {
+      "text": "büyük",
+      "start": 0.0,
+      "end": 0.28
+    },
+    {
+      "text": "rakam,",
+      "start": 0.28,
+      "end": 0.8
+    },
+    {
+      "text": "seçili",
+      "start": 0.8,
+      "end": 1.16
+    },
+    {
+      "text": "dönemde",
+      "start": 1.16,
+      "end": 1.6
+    },
+    {
+      "text": "beklenen",
+      "start": 1.6,
+      "end": 2.12
+    },
+    {
+      "text": "süreye",
+      "start": 2.12,
+      "end": 2.44
+    },
+    {
+      "text": "göre",
+      "start": 2.44,
+      "end": 2.68
+    },
+    {
+      "text": "toplam",
+      "start": 2.68,
+      "end": 3.08
+    },
+    {
+      "text": "farktır.",
+      "start": 3.08,
+      "end": 3.84
+    },
+    {
+      "text": "yanında",
+      "start": 3.84,
+      "end": 4.24
+    },
+    {
+      "text": "ortalama",
+      "start": 4.24,
+      "end": 4.72
+    },
+    {
+      "text": "giriş",
+      "start": 4.72,
+      "end": 5.0
+    },
+    {
+      "text": "ve",
+      "start": 5.0,
+      "end": 5.12
+    },
+    {
+      "text": "çıkış",
+      "start": 5.12,
+      "end": 5.44
+    },
+    {
+      "text": "saati",
+      "start": 5.44,
+      "end": 5.8
+    },
+    {
+      "text": "ile",
+      "start": 5.8,
+      "end": 6.0
+    },
+    {
+      "text": "masa",
+      "start": 6.0,
+      "end": 6.28
+    },
+    {
+      "text": "başı",
+      "start": 6.28,
+      "end": 6.56
+    },
+    {
+      "text": "oranı",
+      "start": 6.56,
+      "end": 6.84
+    },
+    {
+      "text": "yer",
+      "start": 6.84,
+      "end": 7.0
+    },
+    {
+      "text": "alır.",
+      "start": 7.0,
+      "end": 7.36
+    }
+  ],
+  "s06": [
+    {
+      "text": "göz",
+      "start": 0.0,
+      "end": 0.2
+    },
+    {
+      "text": "atılması",
+      "start": 0.2,
+      "end": 0.68
+    },
+    {
+      "text": "gerekenler",
+      "start": 0.68,
+      "end": 1.28
+    },
+    {
+      "text": "panelinde",
+      "start": 1.28,
+      "end": 1.84
+    },
+    {
+      "text": "eksik",
+      "start": 1.84,
+      "end": 2.16
+    },
+    {
+      "text": "kayıt,",
+      "start": 2.16,
+      "end": 2.6
+    },
+    {
+      "text": "şüpheli",
+      "start": 2.6,
+      "end": 3.0
+    },
+    {
+      "text": "giriş",
+      "start": 3.0,
+      "end": 3.28
+    },
+    {
+      "text": "ve",
+      "start": 3.28,
+      "end": 3.4
+    },
+    {
+      "text": "tatil",
+      "start": 3.4,
+      "end": 3.8
+    },
+    {
+      "text": "mesaisi",
+      "start": 3.8,
+      "end": 4.32
+    },
+    {
+      "text": "gibi",
+      "start": 4.32,
+      "end": 4.52
+    },
+    {
+      "text": "dikkat",
+      "start": 4.52,
+      "end": 4.84
+    },
+    {
+      "text": "isteyen",
+      "start": 4.84,
+      "end": 5.24
+    },
+    {
+      "text": "günler",
+      "start": 5.24,
+      "end": 5.6
+    },
+    {
+      "text": "toplanır.",
+      "start": 5.6,
+      "end": 6.2
+    }
+  ],
+  "s07": [
+    {
+      "text": "üstteki",
+      "start": 0.0,
+      "end": 0.44
+    },
+    {
+      "text": "düğme",
+      "start": 0.44,
+      "end": 0.76
+    },
+    {
+      "text": "tüm",
+      "start": 0.76,
+      "end": 0.96
+    },
+    {
+      "text": "tabloları",
+      "start": 0.96,
+      "end": 1.52
+    },
+    {
+      "text": "iki",
+      "start": 1.52,
+      "end": 1.72
+    },
+    {
+      "text": "ölçüt",
+      "start": 1.72,
+      "end": 2.04
+    },
+    {
+      "text": "arasında",
+      "start": 2.04,
+      "end": 2.48
+    },
+    {
+      "text": "değiştirir.",
+      "start": 2.48,
+      "end": 3.32
+    },
+    {
+      "text": "bulunma,",
+      "start": 3.32,
+      "end": 3.88
+    },
+    {
+      "text": "giriş",
+      "start": 3.88,
+      "end": 4.16
+    },
+    {
+      "text": "ile",
+      "start": 4.16,
+      "end": 4.32
+    },
+    {
+      "text": "çıkış",
+      "start": 4.32,
+      "end": 4.6
+    },
+    {
+      "text": "arasıdır;",
+      "start": 4.6,
+      "end": 5.32
+    },
+    {
+      "text": "net",
+      "start": 5.32,
+      "end": 5.52
+    },
+    {
+      "text": "çalışma",
+      "start": 5.52,
+      "end": 5.96
+    },
+    {
+      "text": "ise",
+      "start": 5.96,
+      "end": 6.24
+    },
+    {
+      "text": "aralar",
+      "start": 6.24,
+      "end": 6.6
+    },
+    {
+      "text": "düşülmüş",
+      "start": 6.6,
+      "end": 7.04
+    },
+    {
+      "text": "halidir.",
+      "start": 7.04,
+      "end": 7.64
+    }
+  ],
+  "s08": [
+    {
+      "text": "bakiye",
+      "start": 0.0,
+      "end": 0.32
+    },
+    {
+      "text": "tablosunda",
+      "start": 0.32,
+      "end": 0.88
+    },
+    {
+      "text": "satırlar",
+      "start": 0.88,
+      "end": 1.36
+    },
+    {
+      "text": "kişi,",
+      "start": 1.36,
+      "end": 1.8
+    },
+    {
+      "text": "sütunlar",
+      "start": 1.8,
+      "end": 2.24
+    },
+    {
+      "text": "haftadır.",
+      "start": 2.24,
+      "end": 2.96
+    },
+    {
+      "text": "yeşil",
+      "start": 2.96,
+      "end": 3.28
+    },
+    {
+      "text": "fazla,",
+      "start": 3.28,
+      "end": 3.76
+    },
+    {
+      "text": "kırmızı",
+      "start": 3.76,
+      "end": 4.16
+    },
+    {
+      "text": "eksik;",
+      "start": 4.16,
+      "end": 4.68
+    },
+    {
+      "text": "en",
+      "start": 4.68,
+      "end": 4.84
+    },
+    {
+      "text": "sağdaki",
+      "start": 4.84,
+      "end": 5.28
+    },
+    {
+      "text": "sütun",
+      "start": 5.28,
+      "end": 5.56
+    },
+    {
+      "text": "dönem",
+      "start": 5.56,
+      "end": 5.84
+    },
+    {
+      "text": "toplamını",
+      "start": 5.84,
+      "end": 6.32
+    },
+    {
+      "text": "verir.",
+      "start": 6.32,
+      "end": 6.84
+    },
+    {
+      "text": "hafta,",
+      "start": 6.84,
+      "end": 7.4
+    },
+    {
+      "text": "ay",
+      "start": 7.4,
+      "end": 7.56
+    },
+    {
+      "text": "veya",
+      "start": 7.56,
+      "end": 7.8
+    },
+    {
+      "text": "dosya",
+      "start": 7.8,
+      "end": 8.12
+    },
+    {
+      "text": "kırılımına",
+      "start": 8.12,
+      "end": 8.6
+    },
+    {
+      "text": "geçebilirsiniz.",
+      "start": 8.6,
+      "end": 9.52
+    }
+  ],
+  "s09": [
+    {
+      "text": "kişi",
+      "start": 0.0,
+      "end": 0.24
+    },
+    {
+      "text": "detayında",
+      "start": 0.24,
+      "end": 0.72
+    },
+    {
+      "text": "bir",
+      "start": 0.72,
+      "end": 0.88
+    },
+    {
+      "text": "isim",
+      "start": 0.88,
+      "end": 1.12
+    },
+    {
+      "text": "seçtiğinizde",
+      "start": 1.12,
+      "end": 1.8
+    },
+    {
+      "text": "o",
+      "start": 1.8,
+      "end": 1.88
+    },
+    {
+      "text": "kişinin",
+      "start": 1.88,
+      "end": 2.28
+    },
+    {
+      "text": "haftalık",
+      "start": 2.28,
+      "end": 2.72
+    },
+    {
+      "text": "dökümü,",
+      "start": 2.72,
+      "end": 3.28
+    },
+    {
+      "text": "tüm",
+      "start": 3.28,
+      "end": 3.48
+    },
+    {
+      "text": "dosyalardaki",
+      "start": 3.48,
+      "end": 4.2
+    },
+    {
+      "text": "toplamı",
+      "start": 4.2,
+      "end": 4.68
+    },
+    {
+      "text": "ve",
+      "start": 4.68,
+      "end": 4.8
+    },
+    {
+      "text": "biriken",
+      "start": 4.8,
+      "end": 5.24
+    },
+    {
+      "text": "bakiye",
+      "start": 5.24,
+      "end": 5.64
+    },
+    {
+      "text": "grafiği",
+      "start": 5.64,
+      "end": 6.04
+    },
+    {
+      "text": "görünür.",
+      "start": 6.04,
+      "end": 6.56
+    }
+  ],
+  "s10": [
+    {
+      "text": "günlük",
+      "start": 0.0,
+      "end": 0.32
+    },
+    {
+      "text": "kayıtlar",
+      "start": 0.32,
+      "end": 0.76
+    },
+    {
+      "text": "her",
+      "start": 0.76,
+      "end": 0.96
+    },
+    {
+      "text": "rakamın",
+      "start": 0.96,
+      "end": 1.36
+    },
+    {
+      "text": "arkasındaki",
+      "start": 1.36,
+      "end": 1.96
+    },
+    {
+      "text": "kanıttır:",
+      "start": 1.96,
+      "end": 2.64
+    },
+    {
+      "text": "giriş,",
+      "start": 2.64,
+      "end": 3.04
+    },
+    {
+      "text": "çıkış,",
+      "start": 3.04,
+      "end": 3.52
+    },
+    {
+      "text": "ara",
+      "start": 3.52,
+      "end": 3.72
+    },
+    {
+      "text": "süresi",
+      "start": 3.72,
+      "end": 4.08
+    },
+    {
+      "text": "ve",
+      "start": 4.08,
+      "end": 4.2
+    },
+    {
+      "text": "fark.",
+      "start": 4.2,
+      "end": 4.76
+    },
+    {
+      "text": "üstteki",
+      "start": 4.76,
+      "end": 5.16
+    },
+    {
+      "text": "filtrelerle",
+      "start": 5.16,
+      "end": 5.84
+    },
+    {
+      "text": "izinli,",
+      "start": 5.84,
+      "end": 6.32
+    },
+    {
+      "text": "eksik",
+      "start": 6.32,
+      "end": 6.68
+    },
+    {
+      "text": "ya",
+      "start": 6.68,
+      "end": 6.8
+    },
+    {
+      "text": "da",
+      "start": 6.8,
+      "end": 6.92
+    },
+    {
+      "text": "şüpheli",
+      "start": 6.92,
+      "end": 7.28
+    },
+    {
+      "text": "günleri",
+      "start": 7.28,
+      "end": 7.64
+    },
+    {
+      "text": "ayırabilirsiniz.",
+      "start": 7.64,
+      "end": 8.56
+    }
+  ],
+  "s11": [
+    {
+      "text": "kurallar",
+      "start": 0.0,
+      "end": 0.48
+    },
+    {
+      "text": "bölümünde",
+      "start": 0.48,
+      "end": 0.96
+    },
+    {
+      "text": "vardiya",
+      "start": 0.96,
+      "end": 1.4
+    },
+    {
+      "text": "saatleri,",
+      "start": 1.4,
+      "end": 2.08
+    },
+    {
+      "text": "günlük",
+      "start": 2.08,
+      "end": 2.4
+    },
+    {
+      "text": "beklenen",
+      "start": 2.4,
+      "end": 2.92
+    },
+    {
+      "text": "süre,",
+      "start": 2.92,
+      "end": 3.4
+    },
+    {
+      "text": "geç",
+      "start": 3.4,
+      "end": 3.64
+    },
+    {
+      "text": "giriş",
+      "start": 3.64,
+      "end": 3.92
+    },
+    {
+      "text": "eşiği",
+      "start": 3.92,
+      "end": 4.24
+    },
+    {
+      "text": "ve",
+      "start": 4.24,
+      "end": 4.36
+    },
+    {
+      "text": "günlük",
+      "start": 4.36,
+      "end": 4.72
+    },
+    {
+      "text": "mola",
+      "start": 4.72,
+      "end": 4.96
+    },
+    {
+      "text": "hakkı",
+      "start": 4.96,
+      "end": 5.28
+    },
+    {
+      "text": "yani",
+      "start": 5.28,
+      "end": 5.6
+    },
+    {
+      "text": "ara",
+      "start": 5.6,
+      "end": 5.8
+    },
+    {
+      "text": "süresi",
+      "start": 5.8,
+      "end": 6.16
+    },
+    {
+      "text": "ayarlanır.",
+      "start": 6.16,
+      "end": 6.8
+    }
+  ],
+  "s12": [
+    {
+      "text": "örnek",
+      "start": 0.0,
+      "end": 0.32
+    },
+    {
+      "text": "olarak",
+      "start": 0.32,
+      "end": 0.68
+    },
+    {
+      "text": "mola",
+      "start": 0.68,
+      "end": 0.92
+    },
+    {
+      "text": "hakkını",
+      "start": 0.92,
+      "end": 1.32
+    },
+    {
+      "text": "yetmiş",
+      "start": 1.32,
+      "end": 1.72
+    },
+    {
+      "text": "beş",
+      "start": 1.72,
+      "end": 1.92
+    },
+    {
+      "text": "dakikadan",
+      "start": 1.92,
+      "end": 2.52
+    },
+    {
+      "text": "kırk",
+      "start": 2.52,
+      "end": 2.76
+    },
+    {
+      "text": "beş",
+      "start": 2.76,
+      "end": 2.96
+    },
+    {
+      "text": "dakikaya",
+      "start": 2.96,
+      "end": 3.44
+    },
+    {
+      "text": "çekelim.",
+      "start": 3.44,
+      "end": 3.92
+    }
+  ],
+  "s13": [
+    {
+      "text": "bütün",
+      "start": 0.0,
+      "end": 0.28
+    },
+    {
+      "text": "sayılar",
+      "start": 0.28,
+      "end": 0.68
+    },
+    {
+      "text": "anında",
+      "start": 0.68,
+      "end": 1.04
+    },
+    {
+      "text": "yeniden",
+      "start": 1.04,
+      "end": 1.4
+    },
+    {
+      "text": "hesaplanır.",
+      "start": 1.4,
+      "end": 2.32
+    },
+    {
+      "text": "ayarlarınız",
+      "start": 2.32,
+      "end": 2.88
+    },
+    {
+      "text": "bu",
+      "start": 2.88,
+      "end": 3.0
+    },
+    {
+      "text": "tarayıcıda",
+      "start": 3.0,
+      "end": 3.52
+    },
+    {
+      "text": "hatırlanır.",
+      "start": 3.52,
+      "end": 4.16
+    }
+  ],
+  "s14": [
+    {
+      "text": "sonucu",
+      "start": 0.0,
+      "end": 0.36
+    },
+    {
+      "text": "tek",
+      "start": 0.36,
+      "end": 0.56
+    },
+    {
+      "text": "tuşla",
+      "start": 0.56,
+      "end": 0.92
+    },
+    {
+      "text": "excel'e",
+      "start": 0.92,
+      "end": 1.32
+    },
+    {
+      "text": "aktarabilirsiniz.",
+      "start": 1.32,
+      "end": 2.44
+    },
+    {
+      "text": "dosyalarınız",
+      "start": 2.44,
+      "end": 3.04
+    },
+    {
+      "text": "tarayıcıdan",
+      "start": 3.04,
+      "end": 3.6
+    },
+    {
+      "text": "dışarı",
+      "start": 3.6,
+      "end": 3.92
+    },
+    {
+      "text": "gönderilmez;",
+      "start": 3.92,
+      "end": 4.72
+    },
+    {
+      "text": "hesaplama",
+      "start": 4.72,
+      "end": 5.24
+    },
+    {
+      "text": "tamamen",
+      "start": 5.24,
+      "end": 5.72
+    },
+    {
+      "text": "kendi",
+      "start": 5.72,
+      "end": 6.0
+    },
+    {
+      "text": "bilgisayarınızda",
+      "start": 6.0,
+      "end": 6.76
+    },
+    {
+      "text": "yapılır.",
+      "start": 6.76,
+      "end": 7.24
+    }
+  ]
+}

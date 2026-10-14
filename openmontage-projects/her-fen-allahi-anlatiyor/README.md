@@ -15,8 +15,8 @@ görseller bu depoda üretilir; dışarıdan stok görsel/ses indirilmez.
 | Aşama | Dosya | Ne yapar |
 |---|---|---|
 | Senaryo | `script/narration.json` | 14 segment: metin + sahne adı + altyazı parçaları |
-| Seslendirme | `scripts/build_narration.py` | TTS → `audio/seg_*.wav`, `audio/narration.wav`, `build/timeline.json` |
-| Müzik | `scripts/build_music.py` | Yerel sentezlenmiş ambient yatak + sidechain ducking → `audio/mix.wav` |
+| Seslendirme | `../toolkit/build_narration.py` | TTS → `audio/seg_*.wav`, `audio/narration.wav`, `build/timeline.json` |
+| Müzik | `../toolkit/build_music.py` | Yerel sentezlenmiş ambient yatak + sidechain ducking → `audio/mix.wav` |
 | Kompozisyon | `composer/src/` | Remotion (React) ile 14 sahne, altyazı katmanı, üst/alt çerçeve |
 | Render | `scripts/render.sh` | `renders/final.mp4` + ffprobe doğrulaması |
 
@@ -38,8 +38,8 @@ hizalanır).
 
 ```bash
 .venv/bin/pip install ema-lightning
-.venv/bin/python scripts/build_narration.py --voice ema --ema-speed 1.0
-.venv/bin/python scripts/build_music.py && bash scripts/render.sh
+.venv/bin/python ../toolkit/build_narration.py --project . --voice ema --ema-speed 1.0
+.venv/bin/python ../toolkit/build_music.py --project . && bash scripts/render.sh
 ```
 
 Ağırlıklar (~34 MB) ilk kullanımda Hugging Face'ten iner. Bu bulut ortamında
@@ -60,12 +60,12 @@ wheel'i ile gelir). Anlaşılır ama sentetiktir. Bulut sağlayıcılar için:
 
 ```bash
 # Google Cloud TTS (bu ortamdan erişilebilir)
-GOOGLE_API_KEY=... .venv/bin/python scripts/build_narration.py --voice google \
+GOOGLE_API_KEY=... .venv/bin/python ../toolkit/build_narration.py --project . --voice google \
   --google-voice tr-TR-Chirp3-HD-Alnilam
-.venv/bin/python scripts/build_music.py && bash scripts/render.sh
+.venv/bin/python ../toolkit/build_music.py --project . && bash scripts/render.sh
 
 # ElevenLabs (anahtar + ağ izni gerekir, aşağıya bakın)
-ELEVENLABS_API_KEY=... .venv/bin/python scripts/build_narration.py --voice elevenlabs
+ELEVENLABS_API_KEY=... .venv/bin/python ../toolkit/build_narration.py --project . --voice elevenlabs
 ```
 
 Segment süreleri yeni sesten yeniden hesaplandığı için altyazılar ve sahne

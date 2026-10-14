@@ -1,0 +1,1682 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BDKS Mesai Analizi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --bg:#F3F5F9; --surface:#FFFFFF; --surface-2:#F8FAFC; --sunken:#EDF1F6;
+  --ink:#0E1A2B; --ink-2:#2E3B4E; --muted:#5D6B7E; --faint:#8C98A9;
+  --line:#E1E6EE; --line-2:#ECF0F5;
+  --accent:#3346D3; --accent-soft:#E9ECFC; --on-accent:#FFFFFF;
+  --plus:#0E9C72; --plus-soft:#E1F4ED; --plus-ink:#05543C;
+  --minus:#D9473A; --minus-soft:#FBE9E7; --minus-ink:#861E15;
+  --warn:#B4770A; --warn-soft:#FAF0D9;
+  --float:0 1px 2px rgba(14,26,43,.06), 0 12px 32px -8px rgba(14,26,43,.18);
+  --r-ctl:8px; --r-panel:14px; --r-hero:20px;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0A101B; --surface:#101928; --surface-2:#142033; --sunken:#0C1422;
+    --ink:#E8EDF5; --ink-2:#C2CBD9; --muted:#8E9BAF; --faint:#67748B;
+    --line:#223049; --line-2:#1A263B;
+    --accent:#8C9AFF; --accent-soft:#1C2448; --on-accent:#0A101B;
+    --plus:#35C79A; --plus-soft:#0F2E27; --plus-ink:#CBF5E7;
+    --minus:#F2786C; --minus-soft:#371B1B; --minus-ink:#FFDAD5;
+    --warn:#E5AE45; --warn-soft:#32260F;
+    --float:0 1px 2px rgba(0,0,0,.5), 0 12px 32px -8px rgba(0,0,0,.6);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0A101B; --surface:#101928; --surface-2:#142033; --sunken:#0C1422;
+  --ink:#E8EDF5; --ink-2:#C2CBD9; --muted:#8E9BAF; --faint:#67748B;
+  --line:#223049; --line-2:#1A263B;
+  --accent:#8C9AFF; --accent-soft:#1C2448; --on-accent:#0A101B;
+  --plus:#35C79A; --plus-soft:#0F2E27; --plus-ink:#CBF5E7;
+  --minus:#F2786C; --minus-soft:#371B1B; --minus-ink:#FFDAD5;
+  --warn:#E5AE45; --warn-soft:#32260F;
+  --float:0 1px 2px rgba(0,0,0,.5), 0 12px 32px -8px rgba(0,0,0,.6);
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%;height:100%}
+body{
+  margin:0;min-height:100%;background:var(--bg);color:var(--ink);
+  font-family:"Geist","Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:14px;line-height:1.5;font-variant-numeric:tabular-nums;
+  -webkit-font-smoothing:antialiased;
+}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+[hidden]{display:none!important}
+.wrap{max-width:1440px;margin:0 auto;padding:0 24px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  position:sticky;top:0;z-index:40;
+  padding-top:env(safe-area-inset-top,0px);
+  background:color-mix(in srgb,var(--bg) 82%,transparent);
+  backdrop-filter:saturate(1.4) blur(12px);-webkit-backdrop-filter:saturate(1.4) blur(12px);
+  border-bottom:1px solid var(--line);
+}
+.tb{display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-height:60px;padding-top:8px;padding-bottom:8px}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto;min-width:0}
+.logo{width:30px;height:30px;border-radius:9px;background:var(--ink);display:grid;place-items:center;flex:none}
+.logo svg{width:18px;height:18px}
+.brand b{font-size:16px;font-weight:650;letter-spacing:-.01em;white-space:nowrap}
+.brand small{display:block;color:var(--muted);font-size:12px;line-height:1.2}
+.btn{
+  display:inline-flex;align-items:center;gap:7px;
+  border:1px solid var(--line);background:var(--surface);color:var(--ink-2);
+  padding:7px 12px;border-radius:var(--r-ctl);font-size:13px;font-weight:500;white-space:nowrap;
+  transition:border-color .12s,background .12s;
+}
+.btn:hover{border-color:var(--faint);color:var(--ink)}
+.btn svg{width:15px;height:15px;flex:none}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.quiet{background:transparent;border-color:transparent;color:var(--muted)}
+.btn.quiet:hover{background:var(--sunken);color:var(--ink)}
+.btn.icon{padding:7px}
+.sel{
+  border:1px solid var(--line);background:var(--surface);border-radius:var(--r-ctl);
+  padding:7px 30px 7px 11px;font-size:13px;font-weight:500;appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238C98A9' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 11px center;
+}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
+.seg button{border:0;background:transparent;padding:5px 11px;border-radius:7px;font-size:13px;font-weight:500;color:var(--muted);white-space:nowrap}
+.seg button:hover{color:var(--ink)}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(14,26,43,.10),0 0 0 1px var(--line)}
+
+.subbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-bottom:10px}
+.nav{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;margin-right:auto}
+.nav::-webkit-scrollbar{display:none}
+.nav button{border:0;background:transparent;padding:7px 12px;border-radius:8px;font-size:13.5px;font-weight:500;color:var(--muted);white-space:nowrap}
+.nav button:hover{color:var(--ink);background:var(--sunken)}
+.nav button.on{color:var(--ink);background:var(--surface);box-shadow:0 0 0 1px var(--line)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:6px;max-width:260px;padding:3px 4px 3px 10px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-size:12px;color:var(--ink-2)}
+.chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip em{font-style:normal;color:var(--faint)}
+.chip button{border:0;background:transparent;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;color:var(--faint);padding:0}
+.chip button:hover{background:var(--minus-soft);color:var(--minus)}
+
+/* ---------- landing ---------- */
+.landing{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:48px;align-items:center;padding-top:64px;padding-bottom:80px}
+.landing h1{font-size:clamp(36px,4.6vw,58px);line-height:1.02;letter-spacing:-.035em;font-weight:650;margin:0 0 18px;max-width:16ch}
+.landing .lede{font-size:16.5px;line-height:1.6;color:var(--muted);max-width:56ch;margin:0 0 28px}
+.drop{
+  border:1.5px dashed var(--faint);border-radius:var(--r-panel);background:var(--surface);
+  padding:26px 24px;display:flex;align-items:center;gap:18px;cursor:pointer;transition:border-color .15s,background .15s;
+}
+.drop:hover{border-color:var(--accent)}
+.drop.hot{border-color:var(--accent);background:var(--accent-soft)}
+.drop .ic{width:46px;height:46px;border-radius:12px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;flex:none}
+.drop .ic svg{width:22px;height:22px}
+.drop b{display:block;font-size:15.5px;font-weight:600}
+.drop span{color:var(--muted);font-size:13px}
+.land-actions{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap}
+.land-actions .fine{color:var(--faint);font-size:12.5px}
+.err{margin-top:14px;padding:11px 14px;border-radius:var(--r-ctl);background:var(--minus-soft);color:var(--minus-ink);font-size:13.5px}
+.preview{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-hero);padding:22px;box-shadow:var(--float)}
+.preview h3{margin:0;font-size:15px;font-weight:600}
+.preview p{margin:2px 0 14px;color:var(--muted);font-size:12.5px}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:40px;padding-top:22px;border-top:1px solid var(--line)}
+.facts b{display:block;font-size:14px;font-weight:600;margin-bottom:3px}
+.facts span{color:var(--muted);font-size:13px;line-height:1.5}
+
+/* ---------- generic ---------- */
+main.app{padding-top:22px;padding-bottom:72px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-panel);padding:18px 20px}
+.panel.flush{padding:0;overflow:hidden}
+.ph{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.ph h2,.ph h3{margin:0;font-size:16px;font-weight:600;letter-spacing:-.01em}
+.ph p{margin:2px 0 0;color:var(--muted);font-size:12.5px;max-width:70ch}
+.flush .ph{padding:16px 20px 0}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.mt{margin-top:16px}
+.split-a{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}
+.split-b{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
+.pos{color:var(--plus)} .neg{color:var(--minus)} .dim{color:var(--faint)}
+.strong{font-weight:600}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:999px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.8}
+.pill.ok{background:var(--plus-soft);color:var(--plus)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.bad{background:var(--minus-soft);color:var(--minus)}
+.pill.neu{background:var(--sunken);color:var(--muted)}
+.empty{padding:40px 20px;text-align:center;color:var(--muted)}
+svg{display:block;max-width:100%;height:auto}
+.axis{stroke:var(--line);stroke-width:1}
+.axis-t{fill:var(--faint);font-size:10.5px;font-family:inherit}
+.lbl{fill:var(--ink-2);font-size:11px;font-family:inherit}
+.search{position:relative}
+.search input{padding:7px 11px 7px 32px;border:1px solid var(--line);border-radius:var(--r-ctl);background:var(--surface);min-width:200px;width:100%;font-size:13px}
+.search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--faint)}
+
+/* ---------- overview ---------- */
+.headline{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px}
+.verdict{background:var(--ink);color:var(--bg);border-radius:var(--r-hero);padding:26px 28px;position:relative;overflow:hidden}
+.verdict .cap{color:color-mix(in srgb,var(--bg) 62%,var(--ink));font-size:13px}
+.verdict .big{font-size:clamp(38px,4.4vw,56px);font-weight:650;letter-spacing:-.035em;line-height:1.05;margin:6px 0 10px}
+.verdict p{margin:0;max-width:58ch;font-size:14.5px;line-height:1.55;color:color-mix(in srgb,var(--bg) 82%,var(--ink))}
+.verdict .split{display:flex;height:8px;border-radius:99px;overflow:hidden;margin-top:20px;background:color-mix(in srgb,var(--bg) 18%,var(--ink))}
+.verdict .split i{display:block;height:100%}
+.verdict .splitlbl{display:flex;justify-content:space-between;font-size:12px;margin-top:7px;color:color-mix(in srgb,var(--bg) 70%,var(--ink))}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r-panel);overflow:hidden}
+.stat{background:var(--surface);padding:15px 18px}
+.stat .k{font-size:12.5px;color:var(--muted)}
+.stat .v{font-size:26px;font-weight:600;letter-spacing:-.02em;line-height:1.2;margin-top:2px}
+.stat .s{font-size:12px;color:var(--faint)}
+[data-tip]{cursor:help}
+
+/* diverging list */
+.dlist{display:grid;gap:2px}
+.drow{display:grid;grid-template-columns:minmax(120px,190px) minmax(0,1fr) 84px;align-items:center;gap:12px;padding:5px 8px;border-radius:8px;border:0;background:transparent;text-align:left;width:100%}
+.drow:hover{background:var(--sunken)}
+.drow .n{font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.drow .t{position:relative;height:14px}
+.drow .t::before{content:"";position:absolute;left:50%;top:-4px;bottom:-4px;width:1px;background:var(--line)}
+.drow .t i{position:absolute;top:2px;height:10px;border-radius:3px}
+.drow .v{font-size:13px;font-weight:600;text-align:right}
+.dscale{display:grid;grid-template-columns:minmax(120px,190px) minmax(0,1fr) 84px;gap:12px;padding:0 8px 8px;color:var(--faint);font-size:11px}
+.dscale div{display:flex;justify-content:space-between}
+
+/* ---------- matrix ---------- */
+.mx-tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:13px}
+th,td{padding:8px 12px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line-2)}
+th.l,td.l{text-align:left}
+thead th{background:var(--surface-2);color:var(--muted);font-weight:500;font-size:12px;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:2}
+thead th.sort{cursor:pointer;user-select:none}
+thead th.sort:hover{color:var(--ink)}
+thead th .ar{font-size:9px;opacity:.6;margin-left:3px}
+tbody tr:hover td{background:var(--surface-2)}
+tbody tr:last-child td{border-bottom:0}
+tfoot td{background:var(--surface-2);font-weight:600;border-top:1px solid var(--line);border-bottom:0}
+td.name button,.linkish{border:0;background:transparent;padding:0;font:inherit;color:inherit;font-weight:500;text-align:left}
+td.name button:hover,.linkish:hover{color:var(--accent)}
+.mx th:first-child,.mx td:first-child{position:sticky;left:0;z-index:1;background:var(--surface);min-width:180px;border-right:1px solid var(--line)}
+.mx thead th:first-child{z-index:3;background:var(--surface-2)}
+.mx tfoot td:first-child{background:var(--surface-2)}
+.mx tbody tr:hover td:first-child{background:var(--surface-2)}
+.mx th.wk{text-align:center;min-width:86px;line-height:1.25}
+.mx th.wk small{display:block;color:var(--faint);font-size:10.5px;font-weight:400}
+.mx td.hc{text-align:center;padding:4px;border-bottom:1px solid var(--line-2)}
+.mx td.hc .c{display:block;border-radius:7px;padding:6px 6px;font-weight:600;font-size:12.5px;cursor:pointer;border:0;width:100%;background:transparent;color:inherit}
+.mx td.hc .c.p{color:var(--plus-ink)}
+.mx td.hc .c.m{color:var(--minus-ink)}
+.mx td.hc .c.z{color:var(--faint);font-weight:500}
+.mx td.hc .c small{display:block;font-weight:400;font-size:10.5px;opacity:.75}
+.mx td.tot{font-weight:650;font-size:13.5px;border-left:1px solid var(--line);min-width:110px}
+.mx td.tot.pos{color:var(--plus-ink)} .mx td.tot.neg{color:var(--minus-ink)}
+.mx tbody tr:hover td.hc{background:var(--surface-2)}
+.ramp{display:flex;align-items:center;gap:10px;color:var(--faint);font-size:11.5px;padding:12px 20px 16px;flex-wrap:wrap}
+.ramp .bar{height:8px;width:220px;border-radius:99px;background:linear-gradient(90deg,var(--minus),color-mix(in srgb,var(--minus) 12%,var(--surface)) 46%,var(--surface) 50%,color-mix(in srgb,var(--plus) 12%,var(--surface)) 54%,var(--plus));border:1px solid var(--line)}
+
+/* ---------- person ---------- */
+.pgrid{display:grid;grid-template-columns:270px minmax(0,1fr);gap:20px;align-items:start}
+.plist{position:sticky;top:130px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-panel);overflow:hidden;max-height:calc(100vh - 150px);display:flex;flex-direction:column}
+.plist .search{padding:10px;border-bottom:1px solid var(--line-2)}
+.plist .items{overflow:auto;padding:6px}
+.pitem{display:block;width:100%;text-align:left;border:0;background:transparent;padding:8px 10px;border-radius:9px}
+.pitem:hover{background:var(--sunken)}
+.pitem.on{background:var(--accent-soft)}
+.pitem .r1{display:flex;justify-content:space-between;gap:10px;font-size:13px;font-weight:500}
+.pitem .r1 span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pitem .r1 b{font-weight:600;font-size:12.5px;flex:none}
+.pitem .mini{display:block;position:relative;height:4px;border-radius:2px;background:var(--line-2);margin-top:6px}
+.pitem .mini i{position:absolute;top:0;height:4px;border-radius:2px}
+.pitem .mini u{position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:var(--faint);opacity:.5}
+.phead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.phead h2{margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em;line-height:1.1}
+.phead .meta{color:var(--muted);font-size:13px;margin-top:4px}
+.pnav{display:flex;gap:6px}
+.pbal{border-radius:var(--r-hero);padding:24px 26px;border:1px solid var(--line);background:var(--surface);position:relative;overflow:hidden}
+.pbal::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--tone,var(--faint))}
+.pbal.p{--tone:var(--plus)} .pbal.m{--tone:var(--minus)}
+.pbal .cap{font-size:13px;color:var(--muted)}
+.pbal .big{font-size:clamp(40px,5vw,62px);font-weight:650;letter-spacing:-.04em;line-height:1.02;margin:6px 0 10px;color:var(--tone,var(--ink))}
+.pbal p{margin:0;font-size:14.5px;line-height:1.55;color:var(--ink-2);max-width:60ch}
+.pbal .alt{display:flex;gap:22px;flex-wrap:wrap;margin-top:18px;padding-top:14px;border-top:1px solid var(--line-2)}
+.pbal .alt div{font-size:12.5px;color:var(--muted)}
+.pbal .alt b{display:block;font-size:17px;color:var(--ink);font-weight:600}
+.wlist{display:grid;gap:4px}
+.wrow{display:grid;grid-template-columns:96px minmax(0,1fr) 70px;gap:10px;align-items:center;font-size:12.5px}
+.wrow .lb{color:var(--ink-2)}
+.wrow .lb small{display:block;color:var(--faint);font-size:11px}
+.wrow .t{position:relative;height:18px;background:var(--surface-2);border-radius:5px}
+.wrow .t::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--line)}
+.wrow .t i{position:absolute;top:3px;height:12px;border-radius:3px}
+.wrow .v{text-align:right;font-weight:600}
+.kgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r-panel);overflow:hidden}
+.kgrid div{background:var(--surface);padding:13px 16px}
+.kgrid .k{font-size:12px;color:var(--muted)}
+.kgrid .v{font-size:20px;font-weight:600;letter-spacing:-.015em}
+.kgrid .s{font-size:11.5px;color:var(--faint)}
+.notes{display:grid;gap:6px;margin-top:16px}
+.notes div{display:flex;gap:9px;align-items:flex-start;font-size:13px;color:var(--ink-2);background:var(--warn-soft);border-radius:9px;padding:9px 12px}
+.notes div::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--warn);margin-top:7px;flex:none}
+.tlwrap{overflow-x:auto}
+.tlwrap svg{min-width:640px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin:0 0 10px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+
+/* ---------- filters / days ---------- */
+.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.count{color:var(--faint);font-size:12.5px}
+
+/* ---------- method ---------- */
+.method h3{margin:0 0 6px;font-size:15px;font-weight:600}
+.method p{margin:0;color:var(--ink-2);font-size:13.5px;line-height:1.6}
+.formula{margin-top:10px;padding:10px 12px;border-radius:9px;background:var(--sunken);font-size:13px;color:var(--ink)}
+
+/* ---------- drawer ---------- */
+.drawer{position:fixed;inset:0;z-index:60;background:rgba(10,16,27,.42);display:flex;justify-content:flex-end}
+.sheet{
+  width:min(420px,100%);height:100%;overflow:auto;background:var(--surface);border-left:1px solid var(--line);box-shadow:var(--float);
+  padding:calc(22px + env(safe-area-inset-top,0px)) 24px calc(28px + env(safe-area-inset-bottom,0px));
+}
+.sheet h2{margin:0;font-size:20px;font-weight:650;letter-spacing:-.02em}
+.sheet .hint{color:var(--muted);font-size:13px;margin:4px 0 20px}
+.fld{margin-bottom:16px}
+.fld label{display:block;font-size:13px;font-weight:500;margin-bottom:5px}
+.fld input,.fld select{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:var(--r-ctl);background:var(--surface-2);font-size:13.5px}
+.fld .note{color:var(--faint);font-size:12px;margin-top:4px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(22px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:13px;z-index:80;box-shadow:var(--float);max-width:calc(100% - 32px)}
+
+@media (max-width:1100px){
+  .headline{grid-template-columns:1fr}
+  .kgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:900px){
+  .landing{grid-template-columns:1fr;padding-top:36px;gap:32px}
+  .g2,.g3,.split-a,.split-b{grid-template-columns:1fr}
+  .pgrid{grid-template-columns:1fr}
+  .plist{position:static;max-height:260px}
+  .facts{grid-template-columns:1fr}
+}
+@media (max-width:620px){
+  .wrap{padding:0 14px}
+  .topbar{position:static}
+  .plist{position:static}
+  .brand small{display:none}
+  .tb .seg button{padding:5px 8px}
+  .drow,.dscale{grid-template-columns:minmax(90px,120px) minmax(0,1fr) 66px;gap:8px}
+  .stat .v{font-size:22px}
+  .verdict,.pbal{padding:20px}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="tb">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--bg)" stroke-width="2.2" stroke-linecap="round"><path d="M4 12h4l2-5 4 10 2-5h4"/></svg>
+        </div>
+        <div><b>Mesai Analizi</b><small id="srcLabel">BDKS giriş–çıkış dökümü</small></div>
+      </div>
+      <select class="sel" id="periodSel" hidden aria-label="Dönem"></select>
+      <div class="seg" id="metricSeg" hidden role="group" aria-label="Bakiye ölçütü">
+        <button data-m="net" class="on" title="Binada geçen süreden aralar düşülmüş hâli. Günlük beklenen 8 sa 45 dk.">Net çalışma</button>
+        <button data-m="pres" title="Giriş ile çıkış arası süre, aralar dahil. Günlük beklenen 10 sa.">Bulunma</button>
+      </div>
+      <input type="file" id="fileIn" accept=".xlsx,.xls,.xlsm,.csv" multiple hidden>
+      <button class="btn" id="addBtn" hidden>
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg>Dosya ekle</button>
+      <button class="btn quiet" id="setBtn" hidden>
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3 6h9M15 6h2M3 14h3M9 14h8"/><circle cx="13.5" cy="6" r="1.8"/><circle cx="7.5" cy="14" r="1.8"/></svg>Kurallar</button>
+      <button class="btn primary" id="expBtn" hidden>
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3v10M6 9l4 4 4-4M4 16h12"/></svg>Excel'e aktar</button>
+      <button class="btn quiet icon" id="themeBtn" aria-label="Açık veya koyu tema">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="10" r="6.5"/><path d="M10 3.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg></button>
+    </div>
+    <div class="subbar" id="subbar" hidden>
+      <nav class="nav" id="nav">
+        <button data-pane="overview" class="on">Genel bakış</button>
+        <button data-pane="matrix">Bakiye tablosu</button>
+        <button data-pane="person">Kişi detayı</button>
+        <button data-pane="days">Günlük kayıtlar</button>
+        <button data-pane="method">Nasıl hesaplanıyor</button>
+      </nav>
+      <div class="chips" id="chips"></div>
+    </div>
+  </div>
+</header>
+
+<section class="wrap landing" id="landing">
+  <div>
+    <h1>Kim ne kadar fazla, kim ne kadar eksik çalıştı?</h1>
+    <p class="lede">BDKS'den indirdiğiniz aylık Excel dökümünü bırakın. Her kişinin haftalık ve aylık fazla/eksik bakiyesi, birden çok dosya yüklerseniz hepsinin toplamı tek tabloda çıkar. Dosya tarayıcınızdan dışarı gönderilmez.</p>
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="Excel dosyası seç">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M7.5 8.5 12 4l4.5 4.5M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3"/></svg></div>
+      <div><b>Excel dosyalarını buraya bırakın</b><span>ya da tıklayıp seçin. Birden çok ay ve birden çok dosya aynı anda yüklenebilir.</span></div>
+    </div>
+    <div class="land-actions">
+      <button class="btn" id="demoBtn">Örnek veriyle göz at</button>
+      <span class="fine">.xlsx, .xls, .csv</span>
+    </div>
+    <div id="landErr"></div>
+    <div class="facts">
+      <div><b>Haftalık ve aylık bakiye</b><span>Her hafta ve her ay için beklenen süreye göre kaç saat fazla ya da eksik.</span></div>
+      <div><b>Dosyalar arası toplam</b><span>Ağustos, Eylül, Ekim dosyalarını birlikte yükleyin; toplam bakiye tek sayıda.</span></div>
+      <div><b>Gün gün kanıt</b><span>Her rakamın arkasındaki giriş, çıkış ve ara süreleri tek tıkla görünür.</span></div>
+    </div>
+  </div>
+  <div class="preview" aria-hidden="true">
+    <h3>Bakiye tablosu böyle görünür</h3>
+    <p>Satırlar kişi, sütunlar hafta. Yeşil fazla, kırmızı eksik.</p>
+    <div id="previewBox"></div>
+  </div>
+</section>
+
+<main class="wrap app" id="app" hidden>
+  <section id="pane-overview"></section>
+  <section id="pane-matrix" hidden></section>
+  <section id="pane-person" hidden></section>
+  <section id="pane-days" hidden></section>
+  <section id="pane-method" hidden></section>
+</main>
+
+<div class="drawer" id="drawer" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="drwT">
+    <h2 id="drwT">Hesaplama kuralları</h2>
+    <p class="hint">Değiştirdiğiniz anda tüm sayılar yeniden hesaplanır. Ayarlar bu tarayıcıda hatırlanır.</p>
+    <div class="row2">
+      <div class="fld"><label for="cfgShiftStart">Vardiya başlangıcı</label><input type="time" id="cfgShiftStart"></div>
+      <div class="fld"><label for="cfgShiftEnd">Vardiya bitişi</label><input type="time" id="cfgShiftEnd"></div>
+    </div>
+    <div class="fld"><label for="cfgTarget">Günlük beklenen bulunma</label><input type="text" id="cfgTarget" inputmode="numeric" placeholder="10:00">
+      <div class="note">Giriş ile çıkış arasında geçmesi beklenen süre (saat:dakika).</div></div>
+    <div class="fld"><label for="cfgBreak">Günlük mola hakkı (dakika)</label><input type="number" id="cfgBreak" min="0" max="300" step="5">
+      <div class="note" id="cfgBreakNote"></div></div>
+    <div class="fld"><label for="cfgLate">Geç giriş eşiği</label><input type="time" id="cfgLate">
+      <div class="note">Bu saatten sonra yapılan giriş geç giriş sayılır.</div></div>
+    <div class="fld"><label for="cfgLeave">Kısmi izinli günler</label>
+      <select id="cfgLeave"><option value="1">İzin süresi beklentiden düşülsün</option><option value="0">Düşülmesin</option></select>
+      <div class="note">2 saat izin alan birinden o gün 8 saat bulunma beklenir.</div></div>
+    <div class="fld"><label for="cfgWeekend">Hafta tatilinde yapılan çalışma</label>
+      <select id="cfgWeekend"><option value="0">Bakiyeye eklenmesin, ayrı gösterilsin</option><option value="1">Fazla çalışma olarak bakiyeye eklensin</option></select></div>
+    <div class="fld"><label for="cfgMin">Anlamlı gün eşiği (dakika)</label><input type="number" id="cfgMin" min="0" max="240" step="5">
+      <div class="note">Bu süreden kısa bulunmalar hatalı kayıt sayılır, bakiyeye katılmaz.</div></div>
+    <div style="display:flex;gap:10px;margin-top:24px">
+      <button class="btn primary" id="cfgClose">Kapat</button>
+      <button class="btn" id="cfgReset">Varsayılanlara dön</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden role="status"></div>
+<script>
+"use strict";
+/* ============================================================
+   Yardımcılar
+   ============================================================ */
+const $ = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+const pad = (n) => String(n).padStart(2, "0");
+const MINUS = "\u2212";
+const norm = (s) => String(s == null ? "" : s).toLocaleLowerCase("tr").replace(/\u00a0/g, " ").replace(/\s+/g, " ").trim();
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+// 3:20 biçimi
+function hm(sec) {
+  if (sec == null || !isFinite(sec)) return "—";
+  const s = Math.round(Math.abs(sec) / 60) * 60;
+  return (sec < 0 && s > 0 ? MINUS : "") + Math.floor(s / 3600) + ":" + pad(Math.floor((s % 3600) / 60));
+}
+// +3:20 biçimi
+function sg(sec) {
+  if (sec == null || !isFinite(sec)) return "—";
+  if (Math.abs(sec) < 30) return "0:00";
+  return (sec < 0 ? MINUS : "+") + hm(Math.abs(sec));
+}
+// 3 sa 20 dk biçimi
+function dur(sec) {
+  if (sec == null || !isFinite(sec)) return "—";
+  const m = Math.round(Math.abs(sec) / 60);
+  const h = Math.floor(m / 60), r = m % 60;
+  if (!h && !r) return "0 dk";
+  return (h ? h + " sa" : "") + (h && r ? " " : "") + (r ? r + " dk" : "");
+}
+function sdur(sec) {
+  if (sec == null || !isFinite(sec)) return "—";
+  if (Math.abs(sec) < 30) return "0 dk";
+  return (sec < 0 ? MINUS : "+") + dur(sec);
+}
+function clock(sec) {
+  if (sec == null || !isFinite(sec)) return "—";
+  let s = Math.round(sec / 60) * 60 % 86400;
+  if (s < 0) s += 86400;
+  return pad(Math.floor(s / 3600)) + ":" + pad(Math.floor((s % 3600) / 60));
+}
+const pct = (x) => (x == null || !isFinite(x) ? "—" : "%" + Math.round(x * 100));
+const mean = (a) => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : null);
+const sum = (a) => a.reduce((x, y) => x + y, 0);
+function median(a) {
+  if (!a.length) return null;
+  const b = a.slice().sort((x, y) => x - y), m = b.length >> 1;
+  return b.length % 2 ? b[m] : (b[m - 1] + b[m]) / 2;
+}
+function stdev(a) {
+  if (a.length < 2) return 0;
+  const m = mean(a);
+  return Math.sqrt(sum(a.map((v) => (v - m) * (v - m))) / (a.length - 1));
+}
+const sgnCls = (v) => (v == null || Math.abs(v) < 30 ? "dim" : v < 0 ? "neg" : "pos");
+
+/* ---------- hücre çözümleme ---------- */
+function toSec(v) {
+  if (v == null || v === "") return null;
+  if (v instanceof Date) return v.getHours() * 3600 + v.getMinutes() * 60 + v.getSeconds();
+  if (typeof v === "number") {
+    if (!isFinite(v)) return null;
+    let f = v;
+    if (f >= 1) f = f - Math.floor(f);
+    return Math.round(f * 86400);
+  }
+  const m = String(v).match(/(\d{1,3}):(\d{2})(?::(\d{2}))?/);
+  if (!m) return null;
+  return +m[1] * 3600 + +m[2] * 60 + (m[3] ? +m[3] : 0);
+}
+const toSec0 = (v) => toSec(v) || 0;
+
+const AYLAR = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
+const AY3 = ["Oca", "Şub", "Mar", "Nis", "May", "Haz", "Tem", "Ağu", "Eyl", "Eki", "Kas", "Ara"];
+const GUNLER = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
+const GUN3 = ["Paz", "Pzt", "Sal", "Çar", "Per", "Cum", "Cmt"];
+
+function toDate(v) {
+  if (v == null || v === "") return null;
+  if (v instanceof Date) return new Date(Date.UTC(v.getFullYear(), v.getMonth(), v.getDate()));
+  if (typeof v === "number") return new Date(Date.UTC(1899, 11, 30) + Math.floor(v) * 86400000);
+  const s = String(v).trim();
+  let m = s.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);
+  if (m) return new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+  m = s.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/);
+  if (m) return new Date(Date.UTC(+m[3], +m[2] - 1, +m[1]));
+  const d = new Date(s);
+  return isNaN(d) ? null : new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+}
+const isoOf = (d) => d.toISOString().slice(0, 10);
+const fromIso = (s) => new Date(s + "T00:00:00Z");
+const addDays = (d, n) => new Date(d.getTime() + n * 86400000);
+
+/* ---------- başlık eşleme ---------- */
+const FIELDS = {
+  name: ["ad soyad", "adı soyadı", "ad-soyad", "personel", "çalışan", "isim"],
+  reg: ["sicil no", "sicil"],
+  status: ["mesai durumu", "durum"],
+  date: ["mesai tarihi", "tarih"],
+  tin: ["giriş saati", "giriş", "ilk giriş"],
+  tout: ["çıkış saati", "çıkış", "son çıkış"],
+  planned: ["planlanan mesai süresi", "planlanan mesai"],
+  inShift: ["yapılan mesai süresi", "yapılan mesai"],
+  net: ["toplam çalışma süresi", "toplam çalışma"],
+  brk: ["ara süre", "mola süresi"],
+  sysShort: ["mola harici eksik mesai", "eksik mesai"],
+  sysOt: ["fazla mesai"],
+  otBrk: ["fazla mesai ara süre"],
+  leave: ["kullanılan izin süresi", "izin süresi"],
+  holiday: ["resmi tatil süresi"],
+  desc: ["mesai açıklama", "açıklama"],
+  leaveType: ["izin türü"],
+  pending: ["bekleyen izin"],
+  org: ["kurum"], unit: ["birim"], team: ["takım"], crew: ["ekip"],
+  role: ["görev"], wtype: ["çalışma türü"], place: ["görev yeri"],
+};
+function mapHeader(row) {
+  const map = {};
+  row.forEach((cell, i) => {
+    const n = norm(cell);
+    if (!n) return;
+    for (const key in FIELDS) {
+      if (map[key] != null) continue;
+      if (FIELDS[key].some((a) => n === a)) { map[key] = i; return; }
+    }
+  });
+  if (map.name == null) {
+    row.forEach((cell, i) => {
+      const n = norm(cell);
+      if (!n) return;
+      for (const key in FIELDS) {
+        if (map[key] != null) continue;
+        if (FIELDS[key].some((a) => n.includes(a))) map[key] = i;
+      }
+    });
+  }
+  return map;
+}
+
+function readWorkbook(buf, fileName) {
+  const wb = XLSX.read(buf, { type: "array", cellDates: false });
+  const out = [];
+  wb.SheetNames.forEach((sn) => {
+    const ws = wb.Sheets[sn];
+    if (!ws) return;
+    const aoa = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: null, blankrows: false });
+    let hIdx = -1, map = null;
+    for (let i = 0; i < Math.min(aoa.length, 15); i++) {
+      const m = mapHeader(aoa[i] || []);
+      if (m.name != null && m.date != null) { hIdx = i; map = m; break; }
+    }
+    if (hIdx < 0) return;
+    for (let i = hIdx + 1; i < aoa.length; i++) {
+      const r = aoa[i] || [];
+      const nm = r[map.name];
+      if (nm == null || String(nm).trim() === "") continue;
+      const d = toDate(r[map.date]);
+      if (!d) continue;
+      const g = (k) => (map[k] == null ? null : r[map[k]]);
+      out.push({
+        file: fileName, name: String(nm).trim(),
+        reg: g("reg") == null ? "" : String(g("reg")).trim(),
+        status: String(g("status") || "").trim(), date: d,
+        tin: toSec(g("tin")), tout: toSec(g("tout")),
+        planned: toSec(g("planned")), net: toSec(g("net")),
+        brk: toSec0(g("brk")), otBrk: toSec0(g("otBrk")),
+        sysShort: toSec0(g("sysShort")), sysOt: toSec0(g("sysOt")),
+        leave: toSec0(g("leave")),
+        leaveType: String(g("leaveType") || "").trim(),
+        pending: String(g("pending") || "").trim(),
+        role: String(g("role") || "").trim(), wtype: String(g("wtype") || "").trim(),
+      });
+    }
+  });
+  return out;
+}
+
+/* ============================================================
+   Gün hesabı
+   ============================================================ */
+const DAY_TYPES = {
+  calisti: { label: "Çalışıldı", cls: "ok" },
+  izinli: { label: "İzinli", cls: "neu" },
+  kayitsiz: { label: "Kayıt yok", cls: "bad" },
+  eksik_kayit: { label: "Eksik kayıt", cls: "warn" },
+  hatali: { label: "Şüpheli kayıt", cls: "warn" },
+  hafta_mesai: { label: "Tatil mesaisi", cls: "warn" },
+  tatil: { label: "Hafta tatili", cls: "neu" },
+};
+
+function weekStart(date) {
+  const dow = date.getUTCDay();
+  return addDays(date, -((dow + 6) % 7));
+}
+function weekLabel(key) {
+  const a = fromIso(key), b = addDays(a, 6);
+  const am = a.getUTCMonth(), bm = b.getUTCMonth();
+  return am === bm
+    ? a.getUTCDate() + "–" + b.getUTCDate() + " " + AY3[am]
+    : a.getUTCDate() + " " + AY3[am] + " – " + b.getUTCDate() + " " + AY3[bm];
+}
+function periodLabel(key) {
+  const [y, m] = key.split("-");
+  return AYLAR[+m - 1] + " " + y;
+}
+const fileLabel = (f) => String(f).replace(/\.(xlsx|xlsm|xls|csv)$/i, "");
+
+function computeDay(r, cfg) {
+  const d = Object.assign({}, r);
+  const planned = r.planned != null && r.planned > 0;
+  d.isPlanned = planned;
+  d.dow = r.date.getUTCDay();
+  d.iso = isoOf(r.date);
+  d.dayLabel = pad(r.date.getUTCDate()) + " " + AY3[r.date.getUTCMonth()] + " " + GUN3[d.dow];
+  d.period = r.date.getUTCFullYear() + "-" + pad(r.date.getUTCMonth() + 1);
+  d.week = isoOf(weekStart(r.date));
+
+  const hasIn = r.tin != null, hasOut = r.tout != null;
+  let span = null, outAdj = null;
+  if (hasIn && hasOut) {
+    outAdj = r.tout;
+    if (outAdj < r.tin) outAdj += 86400;
+    span = outAdj - r.tin;
+  }
+  d.outAdj = outAdj; d.span = span;
+  d.breakTotal = (r.brk || 0) + (r.otBrk || 0);
+  d.netWork = r.net != null ? r.net : span != null ? Math.max(0, span - d.breakTotal) : null;
+  d.late = hasIn ? Math.max(0, r.tin - cfg.lateAfter) : null;
+  d.earlyLeave = outAdj != null ? Math.max(0, cfg.shiftEnd - outAdj) : null;
+  d.beforeShift = hasIn ? Math.max(0, cfg.shiftStart - r.tin) : 0;
+  d.afterShift = outAdj != null ? Math.max(0, outAdj - cfg.shiftEnd) : 0;
+
+  if (!planned) {
+    if (span != null && span >= cfg.minDay) d.type = "hafta_mesai";
+    else if (hasIn || hasOut) d.type = "eksik_kayit";
+    else d.type = "tatil";
+  } else if (hasIn && hasOut) d.type = span >= cfg.minDay ? "calisti" : "hatali";
+  else if (hasIn || hasOut) d.type = "eksik_kayit";
+  else if (r.leave > 0) d.type = "izinli";
+  else d.type = "kayitsiz";
+
+  const deduct = cfg.deductLeave ? Math.min(r.leave || 0, cfg.target) : 0;
+  d.expPresence = Math.max(0, cfg.target - deduct);
+  d.expNet = Math.max(0, cfg.target - cfg.breakAllow - deduct);
+
+  if (d.type === "calisti") {
+    d.presDiff = span - d.expPresence;
+    d.netDiff = d.netWork - d.expNet;
+    d.contrib = true;
+  } else if (d.type === "hafta_mesai") {
+    d.expPresence = 0; d.expNet = 0;
+    d.presDiff = span; d.netDiff = d.netWork;
+    d.contrib = !!cfg.weekendCounts;
+  } else {
+    d.presDiff = null; d.netDiff = null; d.contrib = false;
+  }
+  d.eff = span && span > 0 && d.netWork != null ? d.netWork / span : null;
+  return d;
+}
+
+/* ---------- ölçüte göre erişim ---------- */
+const isNet = () => S.metric === "net";
+const dDiff = (d) => (isNet() ? d.netDiff : d.presDiff);
+const dWorked = (d) => (isNet() ? d.netWork || 0 : d.span || 0);
+const dExp = (d) => (isNet() ? d.expNet : d.expPresence);
+const pBal = (p) => (isNet() ? p.netBal : p.presBal);
+const metricName = () => (isNet() ? "net çalışma" : "bulunma");
+const dailyExp = () => (isNet() ? S.cfg.target - S.cfg.breakAllow : S.cfg.target);
+
+/* ---------- kişi toplamı ---------- */
+function summarize(name, days) {
+  const work = days.filter((d) => d.type === "calisti");
+  const wk = days.filter((d) => d.type === "hafta_mesai");
+  const contrib = days.filter((d) => d.contrib);
+  const first = (k) => (days.find((d) => d[k]) || {})[k] || "";
+  const p = {
+    name, reg: first("reg"), role: first("role"), wtype: first("wtype"), days,
+    workDays: work.length,
+    plannedDays: days.filter((d) => d.isPlanned).length,
+    leaveDays: days.filter((d) => d.type === "izinli").length,
+    absentDays: days.filter((d) => d.type === "kayitsiz").length,
+    badDays: days.filter((d) => d.type === "eksik_kayit" || d.type === "hatali").length,
+    weekendDays: wk.length,
+    weekendWork: sum(wk.map((d) => d.netWork || 0)),
+    pendingDays: days.filter((d) => d.pending).length,
+  };
+  const ins = work.map((d) => d.tin), outs = work.map((d) => d.outAdj);
+  const spans = work.map((d) => d.span), nets = work.map((d) => d.netWork || 0), brks = work.map((d) => d.breakTotal);
+  p.inMean = mean(ins); p.inMed = median(ins); p.inStd = stdev(ins);
+  p.outMean = mean(outs); p.outMed = median(outs);
+  p.inMin = ins.length ? Math.min(...ins) : null;
+  p.inMax = ins.length ? Math.max(...ins) : null;
+  p.outMax = outs.length ? Math.max(...outs) : null;
+  p.spanSum = sum(spans); p.spanMean = mean(spans);
+  p.netSum = sum(nets); p.netMean = mean(nets);
+  p.brkSum = sum(brks); p.brkMean = mean(brks);
+
+  p.presWorked = sum(contrib.map((d) => d.span || 0));
+  p.netWorked = sum(contrib.map((d) => d.netWork || 0));
+  p.expPresence = sum(contrib.map((d) => d.expPresence));
+  p.expNet = sum(contrib.map((d) => d.expNet));
+  p.presBal = sum(contrib.map((d) => d.presDiff || 0));
+  p.netBal = sum(contrib.map((d) => d.netDiff || 0));
+  p.presRate = p.expPresence > 0 ? p.presWorked / p.expPresence : null;
+  p.netRate = p.expNet > 0 ? p.netWorked / p.expNet : null;
+  p.eff = p.spanSum > 0 ? p.netSum / p.spanSum : null;
+  p.brkRate = p.spanSum > 0 ? p.brkSum / p.spanSum : null;
+
+  p.lateDays = work.filter((d) => d.late > 0).length;
+  p.lateSum = sum(work.map((d) => d.late || 0));
+  p.earlyOutDays = work.filter((d) => d.earlyLeave > 0).length;
+  p.shortDays = work.filter((d) => d.presDiff < 0).length;
+  p.netShortDays = work.filter((d) => d.netDiff < 0).length;
+  p.afterHours = sum(work.map((d) => d.afterShift || 0));
+  p.beforeHours = sum(work.map((d) => d.beforeShift || 0));
+  p.leaveHours = sum(days.map((d) => d.leave || 0));
+  p.sysOt = sum(days.map((d) => d.sysOt || 0));
+  p.sysShort = sum(days.map((d) => d.sysShort || 0));
+  return p;
+}
+function stateOf(p) {
+  const b = pBal(p);
+  if (!p.workDays) return { t: "Veri yok", c: "neu" };
+  if (b >= 0) return { t: "Fazla", c: "ok" };
+  if (b >= -4 * 3600) return { t: "Sınırda", c: "warn" };
+  return { t: "Eksik", c: "bad" };
+}
+
+function analyze(records, cfg, period) {
+  const all = records.map((r) => computeDay(r, cfg));
+  const days = period === "*" ? all : all.filter((d) => d.period === period);
+  const byName = new Map();
+  days.forEach((d) => { if (!byName.has(d.name)) byName.set(d.name, []); byName.get(d.name).push(d); });
+  const people = Array.from(byName.entries())
+    .map(([n, ds]) => summarize(n, ds.sort((a, b) => a.iso.localeCompare(b.iso))))
+    .sort((a, b) => a.name.localeCompare(b.name, "tr"));
+  return { all, days, people };
+}
+
+/* ---------- gruplama: hafta / ay / dosya ---------- */
+function gKey(d, g) { return g === "week" ? d.week : g === "month" ? d.period : d.file; }
+function gLabel(k, g) { return g === "week" ? weekLabel(k) : g === "month" ? periodLabel(k) : fileLabel(k); }
+function gSub(k, g) {
+  if (g === "week") { const a = fromIso(k); return "Hafta " + isoWeekNo(a); }
+  if (g === "month") return "";
+  const f = S.files.find((x) => x.name === k);
+  return f ? f.range : "";
+}
+function isoWeekNo(date) {
+  const d = new Date(date.getTime());
+  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+  const y0 = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil(((d - y0) / 86400000 + 1) / 7);
+}
+function bucket(days, g, metric) {
+  const net = (metric || S.metric) === "net";
+  const m = new Map();
+  days.forEach((d) => {
+    if (!d.contrib) return;
+    const k = gKey(d, g);
+    let b = m.get(k);
+    if (!b) { b = { key: k, bal: 0, n: 0, worked: 0, exp: 0, first: d.iso }; m.set(k, b); }
+    b.bal += (net ? d.netDiff : d.presDiff) || 0;
+    b.n += 1;
+    b.worked += net ? d.netWork || 0 : d.span || 0;
+    b.exp += net ? d.expNet : d.expPresence;
+    if (d.iso < b.first) b.first = d.iso;
+  });
+  return m;
+}
+function orderedKeys(days, g) {
+  const first = new Map();
+  days.forEach((d) => { if (!d.contrib) return; const k = gKey(d, g); if (!first.has(k) || d.iso < first.get(k)) first.set(k, d.iso); });
+  return Array.from(first.entries()).sort((a, b) => a[1].localeCompare(b[1]) || String(a[0]).localeCompare(String(b[0]))).map((x) => x[0]);
+}
+</script>
+<script>
+"use strict";
+/* ============================================================
+   Durum
+   ============================================================ */
+const DEF_CFG = { shiftStart: 28800, shiftEnd: 64800, target: 36000, breakAllow: 4500, lateAfter: 39600, deductLeave: true, weekendCounts: false, minDay: 900 };
+const S = {
+  records: [], files: [], cfg: Object.assign({}, DEF_CFG), period: "*", periods: [],
+  metric: "net", gran: "week", A: null, person: null, pane: "overview",
+  sort: { days: { k: "iso", d: 1 }, mx: { k: "total", d: 1 } },
+  filter: { q: "", type: "*" }, mxq: "", pq: "",
+};
+const store = {
+  get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+};
+(function restore() {
+  const c = store.get("bdks-cfg");
+  if (c && typeof c === "object") Object.keys(DEF_CFG).forEach((k) => { if (typeof c[k] === typeof DEF_CFG[k]) S.cfg[k] = c[k]; });
+  const m = store.get("bdks-metric");
+  if (m === "net" || m === "pres") S.metric = m;
+  const g = store.get("bdks-gran");
+  if (g === "week" || g === "month" || g === "file") S.gran = g;
+})();
+
+function toast(msg) {
+  const t = $("#toast");
+  t.textContent = msg; t.hidden = false;
+  clearTimeout(t._t); t._t = setTimeout(() => (t.hidden = true), 2800);
+}
+
+/* ============================================================
+   Grafikler (saf SVG)
+   ============================================================ */
+const svgOpen = (w, h) => `<svg viewBox="0 0 ${w} ${h}" width="100%" preserveAspectRatio="xMidYMid meet" role="img">`;
+function niceStep(raw) {
+  const steps = [0.25, 0.5, 1, 2, 4, 5, 10, 20, 25, 50, 100, 200].map((x) => x * 3600);
+  return steps.find((s) => s >= raw) || steps[steps.length - 1];
+}
+const tickLbl = (v) => (Math.abs(v) < 1 ? "0" : (v < 0 ? MINUS : "+") + (Math.abs(v) % 3600 ? hm(Math.abs(v)) : Math.abs(v) / 3600 + " sa"));
+
+/* sıfır çizgisinden iki yöne sütun */
+function divColumns(items) {
+  if (!items.length) return '<p class="empty">Gösterilecek veri yok.</p>';
+  const w = 760, h = 230, L = 58, R = 10, T = 16, B = 36;
+  const maxAbs = Math.max(1800, ...items.map((i) => Math.abs(i.value)));
+  const step = niceStep(maxAbs / 2), top = Math.ceil(maxAbs / step) * step;
+  const Y = (v) => T + ((top - v) / (2 * top)) * (h - T - B);
+  const y0 = Y(0), slot = (w - L - R) / items.length, bw = Math.max(4, Math.min(slot * 0.62, 54));
+  let s = svgOpen(w, h);
+  for (let v = -top; v <= top + 1; v += step) {
+    s += `<line x1="${L}" x2="${w - R}" y1="${Y(v)}" y2="${Y(v)}" class="axis" opacity="${v === 0 ? 1 : 0.5}"/>`;
+    s += `<text x="${L - 8}" y="${Y(v) + 3.5}" text-anchor="end" class="axis-t">${tickLbl(v)}</text>`;
+  }
+  const every = Math.ceil(items.length / 12);
+  items.forEach((it, i) => {
+    const x = L + i * slot + (slot - bw) / 2, yv = Y(it.value);
+    const neg = it.value < 0, col = neg ? "var(--minus)" : "var(--plus)";
+    s += `<rect x="${x}" y="${Math.min(yv, y0)}" width="${bw}" height="${Math.max(Math.abs(yv - y0), 1)}" rx="3" fill="${col}"><title>${esc(it.title || it.label + ": " + sg(it.value))}</title></rect>`;
+    if (items.length <= 14) s += `<text x="${x + bw / 2}" y="${neg ? yv + 13 : yv - 5}" text-anchor="middle" class="axis-t" fill="${col}" style="fill:${col};font-weight:600">${sg(it.value)}</text>`;
+    if (i % every === 0) s += `<text x="${x + bw / 2}" y="${h - B + 18}" text-anchor="middle" class="axis-t">${esc(it.label)}</text>`;
+  });
+  return s + "</svg>";
+}
+
+/* dikey sütun */
+function columnChart(items, opt) {
+  opt = opt || {};
+  if (!items.length) return '<p class="empty">Gösterilecek veri yok.</p>';
+  const w = 760, h = opt.h || 220, L = 50, B = 32, T = 14, R = 8;
+  const pw = w - L - R, ph = h - T - B;
+  const maxV = Math.max(1, ...items.map((i) => i.value), opt.refLine || 0);
+  const step = pw / items.length, bw = Math.max(3, Math.min(step - 6, 44));
+  let s = svgOpen(w, h);
+  for (let g = 0; g <= 4; g++) {
+    const y = T + (ph * g) / 4;
+    s += `<line x1="${L}" y1="${y}" x2="${w - R}" y2="${y}" class="axis" opacity="${g === 4 ? 1 : 0.45}"/>`;
+    s += `<text x="${L - 8}" y="${y + 4}" text-anchor="end" class="axis-t">${opt.fmtY ? opt.fmtY(maxV * (1 - g / 4)) : Math.round(maxV * (1 - g / 4))}</text>`;
+  }
+  items.forEach((it, i) => {
+    const bh = (it.value / maxV) * ph, x = L + i * step + (step - bw) / 2;
+    s += `<rect x="${x}" y="${T + ph - bh}" width="${bw}" height="${Math.max(bh, 0.5)}" rx="3" fill="${it.color || "var(--accent)"}" opacity=".88"><title>${esc(it.label)}: ${esc(it.title || it.value)}</title></rect>`;
+    if (!opt.every || i % opt.every === 0) s += `<text x="${L + i * step + step / 2}" y="${h - B + 17}" text-anchor="middle" class="axis-t">${esc(it.label)}</text>`;
+  });
+  if (opt.refLine != null) {
+    const y = T + ph - (opt.refLine / maxV) * ph;
+    s += `<line x1="${L}" y1="${y}" x2="${w - R}" y2="${y}" stroke="var(--minus)" stroke-width="1.2" stroke-dasharray="4 3"/>`;
+    s += `<text x="${w - R}" y="${y - 5}" text-anchor="end" class="axis-t" style="fill:var(--minus)">${esc(opt.refLabel || "")}</text>`;
+  }
+  return s + "</svg>";
+}
+
+/* biriken bakiye çizgisi */
+function runChart(pts) {
+  if (pts.length < 2) return '<p class="empty">Grafik için en az iki çalışılan gün gerekir.</p>';
+  const w = 760, h = 250, L = 60, R = 16, T = 16, B = 30;
+  let lo = Math.min(0, ...pts.map((p) => p.v)), hi = Math.max(0, ...pts.map((p) => p.v));
+  if (hi - lo < 3600) { hi += 1800; lo -= 1800; }
+  const step = niceStep((hi - lo) / 4);
+  lo = Math.floor(lo / step) * step; hi = Math.ceil(hi / step) * step;
+  const X = (i) => L + (i / (pts.length - 1)) * (w - L - R);
+  const Y = (v) => T + ((hi - v) / (hi - lo)) * (h - T - B);
+  const uid = "rc" + Math.random().toString(36).slice(2, 8), y0 = Y(0);
+  let s = svgOpen(w, h);
+  s += `<defs><clipPath id="${uid}p"><rect x="0" y="0" width="${w}" height="${y0}"/></clipPath><clipPath id="${uid}n"><rect x="0" y="${y0}" width="${w}" height="${h - y0}"/></clipPath></defs>`;
+  for (let v = lo; v <= hi + 1; v += step) {
+    s += `<line x1="${L}" x2="${w - R}" y1="${Y(v)}" y2="${Y(v)}" class="axis" opacity="${Math.abs(v) < 1 ? 1 : 0.45}"${Math.abs(v) < 1 ? ' style="stroke:var(--faint)"' : ""}/>`;
+    s += `<text x="${L - 8}" y="${Y(v) + 3.5}" text-anchor="end" class="axis-t">${tickLbl(v)}</text>`;
+  }
+  const line = pts.map((p, i) => X(i).toFixed(1) + "," + Y(p.v).toFixed(1)).join(" ");
+  const area = `${X(0)},${y0} ${line} ${X(pts.length - 1)},${y0}`;
+  s += `<polygon points="${area}" fill="var(--plus)" opacity=".2" clip-path="url(#${uid}p)"/>`;
+  s += `<polygon points="${area}" fill="var(--minus)" opacity=".2" clip-path="url(#${uid}n)"/>`;
+  s += `<polyline points="${line}" fill="none" stroke="var(--ink-2)" stroke-width="1.8" stroke-linejoin="round"/>`;
+  const every = Math.ceil(pts.length / 9);
+  pts.forEach((p, i) => {
+    s += `<circle cx="${X(i)}" cy="${Y(p.v)}" r="3" fill="${p.diff < 0 ? "var(--minus)" : "var(--plus)"}" stroke="var(--surface)" stroke-width="1.2"><title>${esc(p.label)}: o gün ${sg(p.diff)}, biriken ${sg(p.v)}</title></circle>`;
+    if (i % every === 0) s += `<text x="${X(i)}" y="${h - 9}" text-anchor="middle" class="axis-t">${esc(p.short)}</text>`;
+  });
+  const last = pts[pts.length - 1];
+  s += `<text x="${X(pts.length - 1) - 6}" y="${Y(last.v) + (last.v < 0 ? 18 : -9)}" text-anchor="end" class="lbl" style="font-weight:600;fill:${last.v < 0 ? "var(--minus)" : "var(--plus)"}">${sg(last.v)}</text>`;
+  return s + "</svg>";
+}
+
+/* gün şeridi */
+function dayTimeline(days, cfg) {
+  const rows = days.filter((d) => d.type !== "tatil");
+  if (!rows.length) return '<p class="empty">Gösterilecek gün yok.</p>';
+  const H0 = 6 * 3600, H1 = 24 * 3600;
+  const w = 760, L = 100, R = 70, T = 24, rh = 18;
+  const h = T + rows.length * rh + 10, pw = w - L - R;
+  const X = (sec) => L + ((Math.min(Math.max(sec, H0), H1) - H0) / (H1 - H0)) * pw;
+  let s = svgOpen(w, h);
+  s += `<rect x="${X(cfg.shiftStart)}" y="${T - 6}" width="${X(cfg.shiftEnd) - X(cfg.shiftStart)}" height="${rows.length * rh + 8}" rx="4" fill="var(--accent-soft)" opacity=".7"/>`;
+  for (let t = 6; t <= 24; t += 2) {
+    const x = X(t * 3600);
+    s += `<line x1="${x}" y1="${T - 6}" x2="${x}" y2="${h - 6}" class="axis" opacity=".5"/>`;
+    s += `<text x="${x}" y="${T - 11}" text-anchor="middle" class="axis-t">${pad(t % 24)}</text>`;
+  }
+  rows.forEach((d, i) => {
+    const y = T + i * rh;
+    s += `<text x="${L - 10}" y="${y + 12}" text-anchor="end" class="lbl" ${d.isPlanned ? "" : 'opacity=".6"'}>${esc(d.dayLabel)}</text>`;
+    if (d.span != null && d.span > 0) {
+      const x0 = X(d.tin), x1 = X(d.outAdj), tw = Math.max(x1 - x0, 1.5);
+      const nf = Math.max(0, Math.min(1, (d.netWork || 0) / d.span));
+      s += `<rect x="${x0}" y="${y + 3}" width="${tw}" height="11" rx="3" fill="var(--warn)" opacity=".35"/>`;
+      s += `<rect x="${x0}" y="${y + 3}" width="${Math.max(tw * nf, 1)}" height="11" rx="3" fill="${d.isPlanned ? "var(--accent)" : "var(--warn)"}"><title>${esc(d.dayLabel)}: ${clock(d.tin)}–${clock(d.outAdj)}, net ${hm(d.netWork)}, ara ${hm(d.breakTotal)}</title></rect>`;
+      const df = d.contrib ? dDiff(d) : null;
+      const col = df == null ? "var(--faint)" : df < 0 ? "var(--minus)" : "var(--plus)";
+      s += `<text x="${w - R + 10}" y="${y + 12}" class="lbl" style="fill:${col};font-weight:600">${df == null ? hm(d.span) : sg(df)}</text>`;
+    } else {
+      s += `<text x="${L + 4}" y="${y + 12}" class="lbl" opacity=".65">${esc(DAY_TYPES[d.type].label)}${d.leave > 0 ? ", " + dur(d.leave) + " izin" : ""}</text>`;
+    }
+  });
+  return s + "</svg>";
+}
+
+/* ============================================================
+   Ortak parçalar
+   ============================================================ */
+const ICON_SEARCH = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="9" r="5.5"/><path d="m13.5 13.5 3 3"/></svg>';
+function scopeText() {
+  if (S.period !== "*") return periodLabel(S.period);
+  if (S.periods.length === 1) return periodLabel(S.periods[0]);
+  return periodLabel(S.periods[0]) + " – " + periodLabel(S.periods[S.periods.length - 1]);
+}
+function heat(v, maxAbs) {
+  if (v == null || Math.abs(v) < 30) return "";
+  const a = Math.round(10 + 48 * Math.sqrt(Math.min(1, Math.abs(v) / maxAbs)));
+  return `background:color-mix(in srgb, var(${v < 0 ? "--minus" : "--plus"}) ${a}%, var(--surface))`;
+}
+function barStyle(v, maxAbs, half) {
+  const w = (Math.min(Math.abs(v), maxAbs) / maxAbs) * (half || 50);
+  const left = v < 0 ? 50 - w : 50;
+  return `left:${left}%;width:${Math.max(w, 0.6)}%;background:${v < 0 ? "var(--minus)" : "var(--plus)"}`;
+}
+function goPerson(name) { S.person = name; showPane("person"); window.scrollTo({ top: 0 }); }
+
+/* ============================================================
+   Render çekirdeği
+   ============================================================ */
+function recompute() {
+  S.A = analyze(S.records, S.cfg, S.period);
+  if (!S.person || !S.A.people.some((p) => p.name === S.person)) S.person = S.A.people.length ? S.A.people[0].name : null;
+  renderChips();
+  renderPane();
+}
+function renderPane() {
+  if (!S.A) return;
+  ({ overview: renderOverview, matrix: renderMatrix, person: renderPerson, days: renderDays, method: renderMethod })[S.pane]();
+}
+function showPane(name) {
+  S.pane = name;
+  $$("#nav button").forEach((b) => b.classList.toggle("on", b.dataset.pane === name));
+  ["overview", "matrix", "person", "days", "method"].forEach((n) => ($("#pane-" + n).hidden = n !== name));
+  renderPane();
+}
+
+function renderChips() {
+  $("#chips").innerHTML = S.files.map((f) =>
+    `<span class="chip" title="${esc(f.name)}: ${f.count} satır, ${esc(f.range)}"><span>${esc(fileLabel(f.name))}</span><em>${f.count}</em><button data-rm="${esc(f.name)}" aria-label="${esc(f.name)} dosyasını kaldır"><svg width="10" height="10" viewBox="0 0 10 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 2l6 6M8 2 2 8"/></svg></button></span>`
+  ).join("");
+  $$("#chips [data-rm]").forEach((b) => b.addEventListener("click", () => removeFile(b.dataset.rm)));
+  $("#srcLabel").textContent = S.files.length > 1 ? S.files.length + " dosya birlikte inceleniyor" : "BDKS giriş–çıkış dökümü";
+}
+
+/* ---------- genel bakış ---------- */
+function renderOverview() {
+  const P = S.A.people.filter((p) => p.workDays > 0 || (p.weekendDays && S.cfg.weekendCounts));
+  const el = $("#pane-overview");
+  if (!P.length) { el.innerHTML = '<div class="panel empty">Seçili dönemde çalışılan gün bulunamadı.</div>'; return; }
+  const bals = P.map(pBal);
+  const bal = sum(bals);
+  const plusP = P.filter((p) => pBal(p) >= 30), minusP = P.filter((p) => pBal(p) <= -30);
+  const plusSum = sum(plusP.map(pBal)), minusSum = -sum(minusP.map(pBal));
+  const tot = plusSum + minusSum || 1;
+  const workDays = sum(P.map((p) => p.workDays));
+  const W = S.A.days.filter((d) => d.type === "calisti");
+  const inM = mean(P.map((p) => p.inMean).filter((v) => v != null));
+  const outM = mean(P.map((p) => p.outMean).filter((v) => v != null));
+  const avgMetric = W.length ? mean(W.map(dWorked)) : null;
+  const effAll = sum(W.map((d) => d.span || 0)) ? sum(W.map((d) => d.netWork || 0)) / sum(W.map((d) => d.span || 0)) : null;
+
+  // kişi listesi
+  const sorted = P.slice().sort((a, b) => pBal(a) - pBal(b));
+  const maxAbs = Math.max(1800, ...bals.map(Math.abs));
+  const dl = sorted.map((p) => {
+    const v = pBal(p);
+    return `<button class="drow" data-p="${esc(p.name)}" title="${esc(p.name)}: ${p.workDays} iş günü, bakiye ${sdur(v)}">
+      <span class="n">${esc(p.name)}</span><span class="t"><i style="${barStyle(v, maxAbs)}"></i></span><span class="v ${sgnCls(v)}">${sg(v)}</span></button>`;
+  }).join("");
+
+  // haftalık takım
+  const wkeys = orderedKeys(S.A.days, "week");
+  const tb = bucket(S.A.days, "week");
+  const wItems = wkeys.map((k) => { const b = tb.get(k); return { label: weekLabel(k), value: b.bal, title: `${weekLabel(k)}: ${b.n} kişi-gün, takım bakiyesi ${sdur(b.bal)}` }; });
+
+  // giriş dağılımı
+  const buckets = new Map();
+  W.forEach((d) => { const b = Math.floor(d.tin / 1800) * 1800; buckets.set(b, (buckets.get(b) || 0) + 1); });
+  const hist = Array.from(buckets.keys()).sort((a, b) => a - b).map((b) => ({ label: clock(b), value: buckets.get(b), title: buckets.get(b) + " gün", color: b >= S.cfg.lateAfter ? "var(--minus)" : "var(--accent)" }));
+
+  // hafta günleri
+  const dow = [1, 2, 3, 4, 5].map((dw) => {
+    const ds = W.filter((d) => d.dow === dw), v = ds.length ? mean(ds.map((d) => dDiff(d) || 0)) : 0;
+    return { label: GUNLER[dw], value: v, title: `${GUNLER[dw]}: kişi başı ortalama ${sdur(v)}, ${ds.length} gün` };
+  });
+
+  // dikkat
+  const att = [];
+  const absent = P.filter((p) => p.absentDays).sort((a, b) => b.absentDays - a.absentDays);
+  if (absent.length) att.push(`<b>${sum(absent.map((p) => p.absentDays))} gün</b> hiç kayıt yok: ${absent.slice(0, 4).map((p) => `<button class="linkish" data-p="${esc(p.name)}">${esc(p.name)}</button> (${p.absentDays})`).join(", ")}${absent.length > 4 ? " ve " + (absent.length - 4) + " kişi daha" : ""}.`);
+  const bad = P.filter((p) => p.badDays);
+  if (bad.length) att.push(`<b>${sum(bad.map((p) => p.badDays))} gün</b> tek yönlü okutma ya da şüpheli kayıt var; bu günler bakiyeye girmez.`);
+  const late = P.filter((p) => p.lateDays).sort((a, b) => b.lateDays - a.lateDays);
+  if (late.length) att.push(`<b>${sum(late.map((p) => p.lateDays))} gün</b> ${clock(S.cfg.lateAfter)} sonrası giriş: ${late.slice(0, 3).map((p) => `<button class="linkish" data-p="${esc(p.name)}">${esc(p.name)}</button> (${p.lateDays})`).join(", ")}.`);
+  const wk = P.filter((p) => p.weekendDays);
+  if (wk.length) att.push(`<b>${sum(wk.map((p) => p.weekendDays))} gün</b> hafta tatilinde çalışma, toplam ${dur(sum(wk.map((p) => p.weekendWork)))}; ${S.cfg.weekendCounts ? "bakiyeye eklendi" : "bakiyeye eklenmedi (Kurallar'dan açılabilir)"}.`);
+  const pend = P.filter((p) => p.pendingDays);
+  if (pend.length) att.push(`<b>${sum(pend.map((p) => p.pendingDays))} gün</b> için bekleyen izin talebi görünüyor.`);
+
+  el.innerHTML = `
+  <div class="headline">
+    <div class="verdict">
+      <div class="cap">${esc(scopeText())}, takımın toplam ${metricName()} bakiyesi</div>
+      <div class="big">${sdur(bal)}</div>
+      <p>${P.length} kişi, ${workDays} iş günü. <b>${plusP.length} kişi</b> beklenenden fazla çalıştı, toplam ${dur(plusSum)}. <b>${minusP.length} kişi</b> eksik kaldı, toplam ${dur(minusSum)}.</p>
+      <div class="split"><i style="width:${(minusSum / tot) * 100}%;background:var(--minus)"></i><i style="width:${(plusSum / tot) * 100}%;background:var(--plus)"></i></div>
+      <div class="splitlbl"><span>Eksik ${dur(minusSum)}</span><span>Fazla ${dur(plusSum)}</span></div>
+    </div>
+    <div class="stats">
+      <div class="stat" data-tip title="Her kişinin ortalama giriş saati bulunur, sonra bunların ortalaması alınır."><div class="k">Ortalama giriş</div><div class="v">${clock(inM)}</div><div class="s">Vardiya ${clock(S.cfg.shiftStart)}</div></div>
+      <div class="stat" data-tip title="Her kişinin ortalama çıkış saati bulunur, sonra bunların ortalaması alınır."><div class="k">Ortalama çıkış</div><div class="v">${clock(outM)}</div><div class="s">Vardiya ${clock(S.cfg.shiftEnd)}</div></div>
+      <div class="stat" data-tip title="Çalışılan günlerde kişi başı ortalama ${metricName()} süresi."><div class="k">Günlük ortalama ${metricName()}</div><div class="v ${sgnCls(avgMetric - dailyExp())}">${hm(avgMetric)}</div><div class="s">Beklenen ${hm(dailyExp())}</div></div>
+      <div class="stat" data-tip title="Toplam net çalışma ÷ toplam bulunma. Binada geçen sürenin ne kadarının ara dışında geçtiği."><div class="k">Masa başı oranı</div><div class="v">${pct(effAll)}</div><div class="s">Kalan kısım ara süre</div></div>
+    </div>
+  </div>
+
+  <div class="grid split-a mt">
+    <div class="panel">
+      <div class="ph"><div><h2>Kişi bazında bakiye</h2><p>En çok eksik kalan en üstte. Bir kişiye tıklayın, hafta hafta dökümü açılsın.</p></div></div>
+      <div class="dscale"><span></span><div><span>${MINUS}${hm(maxAbs)}</span><span>0</span><span>+${hm(maxAbs)}</span></div><span></span></div>
+      <div class="dlist">${dl}</div>
+    </div>
+    <div class="grid" style="align-content:start">
+      <div class="panel">
+        <div class="ph"><div><h3>Haftalara göre takım bakiyesi</h3><p>Her hafta tüm kişilerin farkları toplanır.</p></div></div>
+        ${divColumns(wItems)}
+      </div>
+      ${att.length ? `<div class="panel"><div class="ph"><div><h3>Göz atılması gerekenler</h3><p>Bakiyeyi etkileyebilecek kayıt durumları.</p></div></div><div class="notes" style="margin:0">${att.map((a) => `<div><span>${a}</span></div>`).join("")}</div></div>` : ""}
+    </div>
+  </div>
+
+  <div class="grid g2 mt">
+    <div class="panel"><div class="ph"><div><h3>Giriş saati dağılımı</h3><p>Yarım saatlik dilimlerde kaç günde giriş yapıldı. Kırmızı dilimler geç giriş eşiğinin sonrası.</p></div></div>${columnChart(hist, { every: hist.length > 14 ? 2 : 1 })}</div>
+    <div class="panel"><div class="ph"><div><h3>Haftanın gününe göre ortalama fark</h3><p>O gün çalışan bir kişinin beklenen ${hm(dailyExp())} ${metricName()} süresine göre ortalama farkı.</p></div></div>${divColumns(dow)}</div>
+  </div>`;
+  $$("#pane-overview [data-p]").forEach((b) => b.addEventListener("click", () => goPerson(b.dataset.p)));
+}
+
+/* ---------- bakiye tablosu ---------- */
+function renderMatrix() {
+  const g = S.gran, el = $("#pane-matrix");
+  const keys = orderedKeys(S.A.days, g);
+  const q = norm(S.mxq);
+  let rows = S.A.people.map((p) => ({ p, b: bucket(p.days, g), total: pBal(p) }));
+  const shown = rows.filter((r) => !q || norm(r.p.name).includes(q));
+  const st = S.sort.mx;
+  shown.sort((a, b) => {
+    if (st.k === "name") return a.p.name.localeCompare(b.p.name, "tr") * st.d;
+    const va = st.k === "total" ? a.total : (a.b.get(st.k) || {}).bal;
+    const vb = st.k === "total" ? b.total : (b.b.get(st.k) || {}).bal;
+    if (va == null && vb == null) return 0;
+    if (va == null) return 1;
+    if (vb == null) return -1;
+    return (va - vb) * st.d;
+  });
+  let maxAbs = 1800;
+  rows.forEach((r) => r.b.forEach((c) => (maxAbs = Math.max(maxAbs, Math.abs(c.bal)))));
+  const maxTot = Math.max(1800, ...rows.map((r) => Math.abs(r.total)));
+  const arrow = (k) => (st.k === k ? `<span class="ar">${st.d > 0 ? "▲" : "▼"}</span>` : "");
+  const teamB = bucket(S.A.days, g);
+
+  const head = `<tr><th class="l sort" data-k="name">Kişi${arrow("name")}</th>` +
+    keys.map((k) => `<th class="wk sort" data-k="${esc(k)}">${esc(gLabel(k, g))}${arrow(k)}<small>${esc(gSub(k, g))}</small></th>`).join("") +
+    `<th class="sort" data-k="total" title="Seçili dönemdeki tüm günlerin toplamı">Toplam${arrow("total")}</th></tr>`;
+  const body = shown.map((r) => {
+    const cells = keys.map((k) => {
+      const c = r.b.get(k);
+      if (!c) return `<td class="hc"><span class="c z">—</span></td>`;
+      const cls = Math.abs(c.bal) < 30 ? "z" : c.bal < 0 ? "m" : "p";
+      const tip = `${r.p.name}, ${gLabel(k, g)}: ${c.n} gün, ${dur(c.worked)} ${metricName()}, beklenen ${dur(c.exp)}, fark ${sdur(c.bal)}`;
+      return `<td class="hc"><button class="c ${cls}" style="${heat(c.bal, maxAbs)}" data-p="${esc(r.p.name)}" title="${esc(tip)}">${sg(c.bal)}<small>${c.n} gün</small></button></td>`;
+    }).join("");
+    return `<tr><td class="l name"><button data-p="${esc(r.p.name)}">${esc(r.p.name)}</button></td>${cells}
+      <td class="tot ${sgnCls(r.total)}" style="${heat(r.total, maxTot)}" title="${esc(sdur(r.total))}">${sg(r.total)}</td></tr>`;
+  }).join("");
+  const foot = `<tr><td class="l">Takım toplamı</td>` + keys.map((k) => {
+    const c = teamB.get(k); return `<td class="${c ? sgnCls(c.bal) : "dim"}" style="text-align:center">${c ? sg(c.bal) : "—"}</td>`;
+  }).join("") + `<td class="tot ${sgnCls(sum(rows.map((r) => r.total)))}">${sg(sum(rows.map((r) => r.total)))}</td></tr>`;
+
+  const granNote = g === "week"
+    ? (S.period !== "*" ? "Ay başına ve sonuna denk gelen haftalar yalnız bu aydaki günleri içerir. " : "")
+    : g === "file" ? "Her sütun bir yüklenen dosya. " : "";
+  el.innerHTML = `
+  <div class="panel flush">
+    <div class="ph">
+      <div><h2>${esc(scopeText())} ${metricName()} bakiyesi</h2>
+      <p>Her hücre o dönemde beklenen süreye göre fark. ${granNote}En sağdaki toplam, seçili dönemdeki tüm günleri kapsar${S.periods.length > 1 && S.period !== "*" ? "; tüm dosyaların toplamı için üstteki dönem seçiminden Tüm dönemler'i seçin" : ""}.</p></div>
+      <div class="mx-tools">
+        <div class="seg" id="granSeg" role="group" aria-label="Sütunlar">
+          <button data-g="week" class="${g === "week" ? "on" : ""}">Hafta</button>
+          <button data-g="month" class="${g === "month" ? "on" : ""}">Ay</button>
+          <button data-g="file" class="${g === "file" ? "on" : ""}">Dosya</button>
+        </div>
+        <label class="search">${ICON_SEARCH}<input type="search" id="mxq" placeholder="Kişi ara" value="${esc(S.mxq)}" aria-label="Kişi ara"></label>
+      </div>
+    </div>
+    <div class="tblwrap" style="margin-top:14px;border-top:1px solid var(--line)"><table class="mx"><thead>${head}</thead><tbody>${body || `<tr><td class="l dim" colspan="${keys.length + 2}">Aramayla eşleşen kişi yok.</td></tr>`}</tbody><tfoot>${foot}</tfoot></table></div>
+    <div class="ramp"><span>Eksik</span><span class="bar"></span><span>Fazla</span><span style="margin-left:auto">Hücreye tıklayınca kişinin gün gün dökümü açılır.</span></div>
+  </div>`;
+
+  $$("#granSeg button").forEach((b) => b.addEventListener("click", () => { S.gran = b.dataset.g; store.set("bdks-gran", S.gran); if (!["name", "total"].includes(S.sort.mx.k)) S.sort.mx = { k: "total", d: 1 }; renderMatrix(); }));
+  $$("#pane-matrix th.sort").forEach((th) => th.addEventListener("click", () => {
+    const k = th.dataset.k;
+    S.sort.mx = st.k === k ? { k, d: -st.d } : { k, d: 1 };
+    renderMatrix();
+  }));
+  $$("#pane-matrix [data-p]").forEach((b) => b.addEventListener("click", () => goPerson(b.dataset.p)));
+  const inp = $("#mxq");
+  inp.addEventListener("input", () => { S.mxq = inp.value; const pos = inp.selectionStart; renderMatrix(); const n = $("#mxq"); n.focus(); n.setSelectionRange(pos, pos); });
+}
+
+/* ---------- kişi detayı ---------- */
+function renderPerson() {
+  const el = $("#pane-person");
+  const all = S.A.people;
+  const q = norm(S.pq);
+  const list = all.filter((p) => !q || norm(p.name).includes(q));
+  const maxAbs = Math.max(1800, ...all.map((p) => Math.abs(pBal(p) || 0)));
+  const side = `<aside class="plist">
+    <label class="search">${ICON_SEARCH}<input type="search" id="pq" placeholder="${all.length} kişi içinde ara" value="${esc(S.pq)}" aria-label="Kişi ara"></label>
+    <div class="items">${list.map((p) => {
+      const v = pBal(p);
+      return `<button class="pitem${p.name === S.person ? " on" : ""}" data-p="${esc(p.name)}"><span class="r1"><span>${esc(p.name)}</span><b class="${sgnCls(v)}">${sg(v)}</b></span><span class="mini"><u></u><i style="${barStyle(v, maxAbs)}"></i></span></button>`;
+    }).join("") || '<p class="dim" style="padding:10px">Eşleşen kişi yok.</p>'}</div></aside>`;
+
+  const p = all.find((x) => x.name === S.person);
+  if (!p) { el.innerHTML = `<div class="pgrid">${side}<div class="panel empty">Soldan bir kişi seçin.</div></div>`; wirePerson(); return; }
+
+  const idx = all.indexOf(p);
+  const bal = pBal(p), st = stateOf(p);
+  const worked = isNet() ? p.netWorked : p.presWorked, exp = isNet() ? p.expNet : p.expPresence;
+  const nDays = p.days.filter((d) => d.contrib).length;
+  let say;
+  if (!nDays) say = "Bu dönemde bakiyeye giren çalışma günü yok.";
+  else if (bal >= 30) say = `${nDays} iş gününde toplam ${dur(worked)} ${metricName()} var. Beklenen ${dur(exp)} idi; yani <b>${dur(bal)} fazla</b> çalıştı.`;
+  else if (bal <= -30) say = `${nDays} iş gününde toplam ${dur(worked)} ${metricName()} var. Beklenen ${dur(exp)} idi; yani <b>${dur(-bal)} eksik</b> kaldı.`;
+  else say = `${nDays} iş gününde beklenen ${dur(exp)} ${metricName()} süresini tam karşıladı.`;
+  const shortN = isNet() ? p.netShortDays : p.shortDays;
+
+  // hafta hafta
+  const wb = bucket(p.days, "week");
+  const wkeys = orderedKeys(p.days, "week");
+  const wMax = Math.max(1800, ...Array.from(wb.values()).map((b) => Math.abs(b.bal)));
+  const wl = wkeys.map((k) => {
+    const b = wb.get(k);
+    return `<div class="wrow" title="${esc(`${weekLabel(k)}: ${b.n} gün, ${dur(b.worked)} ${metricName()}, beklenen ${dur(b.exp)}`)}"><span class="lb">${esc(weekLabel(k))}<small>${b.n} gün</small></span><span class="t"><i style="${barStyle(b.bal, wMax)}"></i></span><span class="v ${sgnCls(b.bal)}">${sg(b.bal)}</span></div>`;
+  }).join("");
+
+  // tüm dosyalar (dönem seçiminden bağımsız)
+  const mine = S.A.all.filter((d) => d.name === p.name);
+  const mb = bucket(mine, "month"), mkeys = orderedKeys(mine, "month");
+  const otherNet = isNet() ? "pres" : "net";
+  const mbAlt = bucket(mine, "month", otherNet);
+  const filesOf = (k) => Array.from(new Set(mine.filter((d) => d.period === k).map((d) => fileLabel(d.file)))).join(", ");
+  const mRows = mkeys.map((k) => {
+    const b = mb.get(k), a = mbAlt.get(k);
+    return `<tr${S.period === k ? ' style="font-weight:600"' : ""}><td class="l">${esc(periodLabel(k))}</td><td class="l dim">${esc(filesOf(k))}</td><td>${b.n}</td><td>${hm(b.worked)}</td><td>${hm(b.exp)}</td><td class="${sgnCls(b.bal)} strong">${sg(b.bal)}</td><td class="${sgnCls(a ? a.bal : 0)}">${a ? sg(a.bal) : "—"}</td></tr>`;
+  }).join("");
+  const T = Array.from(mb.values()), TA = Array.from(mbAlt.values());
+  const grand = sum(T.map((b) => b.bal));
+  const mTable = `<div class="panel flush">
+    <div class="ph"><div><h3>Tüm dosyalarda toplam</h3><p>Yüklü bütün dosyalardaki aylar; üstteki dönem seçimi bu tabloyu etkilemez.</p></div></div>
+    <div class="tblwrap" style="margin-top:12px;border-top:1px solid var(--line)"><table>
+      <thead><tr><th class="l">Ay</th><th class="l">Dosya</th><th>Gün</th><th>Çalışılan</th><th>Beklenen</th><th>${isNet() ? "Net bakiye" : "Bulunma bakiyesi"}</th><th>${isNet() ? "Bulunma bakiyesi" : "Net bakiye"}</th></tr></thead>
+      <tbody>${mRows || '<tr><td class="l dim" colspan="7">Kayıt yok.</td></tr>'}</tbody>
+      <tfoot><tr><td class="l">Tüm dosyalar</td><td></td><td>${sum(T.map((b) => b.n))}</td><td>${hm(sum(T.map((b) => b.worked)))}</td><td>${hm(sum(T.map((b) => b.exp)))}</td><td class="${sgnCls(grand)}">${sg(grand)}</td><td class="${sgnCls(sum(TA.map((b) => b.bal)))}">${sg(sum(TA.map((b) => b.bal)))}</td></tr></tfoot>
+    </table></div></div>`;
+
+  // biriken bakiye
+  let cum = 0;
+  const pts = p.days.filter((d) => d.contrib).map((d) => { cum += dDiff(d) || 0; return { v: cum, diff: dDiff(d) || 0, label: d.dayLabel, short: d.iso.slice(8) + "." + d.iso.slice(5, 7) }; });
+
+  const kp = [
+    ["Tipik giriş", clock(p.inMed), "Ortalama " + clock(p.inMean), "Giriş saatlerinin medyanı: tek bir aykırı gün sonucu bozmaz."],
+    ["Tipik çıkış", clock(p.outMed), "Ortalama " + clock(p.outMean), "Çıkış saatlerinin medyanı. Gece yarısını geçen çıkışlar 24:00 üzerine eklenir."],
+    ["Ort. bulunma", hm(p.spanMean), "Beklenen " + hm(S.cfg.target), "Çıkış − giriş, aralar dahil; çalışılan gün ortalaması."],
+    ["Ort. net çalışma", hm(p.netMean), "Beklenen " + hm(S.cfg.target - S.cfg.breakAllow), "Bulunmadan tüm ara süreler düşülmüş hâli."],
+    ["Ort. ara süre", hm(p.brkMean), "Hak " + hm(S.cfg.breakAllow), "Ara Süre + Fazla Mesai Ara Süre; kapıdan çıkılan tüm süre."],
+    ["Masa başı oranı", pct(p.eff), "Net ÷ bulunma", "Binada geçen sürenin ara dışında kalan payı."],
+    ["Geç giriş", p.lateDays + " gün", clock(S.cfg.lateAfter) + " sonrası", "Girişin geç giriş eşiğini geçtiği gün sayısı."],
+    ["Eksik kalınan gün", shortN + " / " + p.workDays, "Günlük " + metricName() + " beklenenin altında", "Fazla kalınan günler bu sayıyı azaltmaz."],
+  ];
+
+  const notes = [];
+  if (p.absentDays) notes.push(`${p.absentDays} iş gününde hiç giriş–çıkış kaydı ve izin yok.`);
+  if (p.badDays) notes.push(`${p.badDays} günde kayıt eksik ya da şüpheli (tek yönlü okutma); bu günler bakiyeye girmedi.`);
+  if (p.leaveDays) notes.push(`${p.leaveDays} gün tam gün izinli; bu günler bakiyeyi etkilemez.`);
+  if (p.pendingDays) notes.push(`${p.pendingDays} günde bekleyen izin talebi görünüyor.`);
+  if (p.weekendDays) notes.push(`${p.weekendDays} hafta tatili gününde toplam ${dur(p.weekendWork)} çalışma var${S.cfg.weekendCounts ? ", bakiyeye eklendi" : ", bakiyeye eklenmedi"}.`);
+
+  const rowsHtml = p.days.filter((d) => d.type !== "tatil").map((d) => {
+    const t = DAY_TYPES[d.type], df = d.contrib ? dDiff(d) : null;
+    return `<tr><td class="l">${esc(d.dayLabel)}</td><td class="l"><span class="pill ${t.cls}">${t.label}</span></td>
+      <td>${clock(d.tin)}</td><td>${d.outAdj != null ? clock(d.outAdj) + (d.outAdj >= 86400 ? " +1" : "") : "—"}</td>
+      <td>${d.span != null ? hm(d.span) : "—"}</td><td>${d.netWork != null && d.span != null ? hm(d.netWork) : "—"}</td>
+      <td>${d.span != null ? hm(d.breakTotal) : "—"}</td><td>${d.contrib ? hm(dExp(d)) : "—"}</td>
+      <td class="${df == null ? "dim" : sgnCls(df)} strong">${df == null ? "—" : sg(df)}</td>
+      <td>${d.leave ? hm(d.leave) : "—"}</td><td class="l dim">${esc(d.leaveType || (d.pending ? "izin talebi beklemede" : ""))}</td></tr>`;
+  }).join("");
+
+  el.innerHTML = `<div class="pgrid">${side}<div style="min-width:0">
+    <div class="phead">
+      <div><h2>${esc(p.name)}</h2><div class="meta">${esc([p.role, p.wtype, p.reg ? "Sicil " + p.reg : ""].filter(Boolean).join(", ")) || "&nbsp;"}</div></div>
+      <div class="pnav"><span class="pill ${st.c}" style="align-self:center">${st.t}</span>
+        <button class="btn icon" id="pPrev" aria-label="Önceki kişi" ${idx <= 0 ? "disabled" : ""}><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5l-5 5 5 5"/></svg></button>
+        <button class="btn icon" id="pNext" aria-label="Sonraki kişi" ${idx >= all.length - 1 ? "disabled" : ""}><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 5l5 5-5 5"/></svg></button></div>
+    </div>
+    <div class="grid split-b">
+      <div class="pbal ${bal >= 30 ? "p" : bal <= -30 ? "m" : ""}">
+        <div class="cap">${esc(scopeText())}, ${metricName()} bakiyesi</div>
+        <div class="big">${sdur(bal)}</div>
+        <p>${say}</p>
+        <div class="alt">
+          <div title="Bulunmadan aralar düşülmüş süreye göre">Net bakiye<b class="${sgnCls(p.netBal)}">${sg(p.netBal)}</b></div>
+          <div title="Giriş ile çıkış arası süreye göre">Bulunma bakiyesi<b class="${sgnCls(p.presBal)}">${sg(p.presBal)}</b></div>
+          <div title="Çalışılan ÷ beklenen">Gerçekleşme<b>${pct(isNet() ? p.netRate : p.presRate)}</b></div>
+          <div>Çalışılan gün<b>${p.workDays}</b></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="ph"><div><h3>Hafta hafta</h3><p>Her haftanın beklenen süreye göre farkı.</p></div></div>
+        <div class="wlist">${wl || '<p class="dim">Çalışılan hafta yok.</p>'}</div>
+      </div>
+    </div>
+    <div class="mt">${mTable}</div>
+    <div class="panel mt"><div class="ph"><div><h3>Biriken bakiye</h3><p>Her çalışılan günün farkı bir öncekine eklenir. Çizgi sıfırın üstündeyse o güne kadar fazlada, altındaysa eksikte.</p></div></div>${runChart(pts)}</div>
+    <div class="kgrid mt">${kp.map((k) => `<div title="${esc(k[3])}" data-tip><div class="k">${k[0]}</div><div class="v">${k[1]}</div><div class="s">${esc(k[2])}</div></div>`).join("")}</div>
+    ${notes.length ? `<div class="notes">${notes.map((n) => `<div><span>${esc(n)}</span></div>`).join("")}</div>` : ""}
+    <div class="panel mt"><div class="ph"><div><h3>Gün şeridi</h3><p>Her çubuk girişten çıkışa binada geçen süre. Koyu kısım net çalışma, açık kısım ara süre; sağdaki değer o günün farkı.</p></div></div>
+      <div class="legend"><span><i style="background:var(--accent)"></i>Net çalışma</span><span><i style="background:var(--warn);opacity:.45"></i>Ara süre</span><span><i style="background:var(--accent-soft)"></i>Vardiya ${clock(S.cfg.shiftStart)}–${clock(S.cfg.shiftEnd)}</span></div>
+      <div class="tlwrap">${dayTimeline(p.days, S.cfg)}</div></div>
+    <div class="panel flush mt"><div class="ph"><div><h3>Gün gün döküm</h3><p>Fark sütunu seçili ölçüte (${metricName()}) göredir.</p></div></div>
+      <div class="tblwrap" style="margin-top:12px;border-top:1px solid var(--line)"><table><thead><tr>
+      <th class="l">Gün</th><th class="l">Durum</th><th>Giriş</th><th>Çıkış</th><th>Bulunma</th><th>Net çalışma</th><th>Ara süre</th><th>Beklenen</th><th>Fark</th><th>İzin</th><th class="l">Not</th>
+      </tr></thead><tbody>${rowsHtml}</tbody></table></div></div>
+  </div></div>`;
+  $("#pPrev").addEventListener("click", () => { S.person = all[idx - 1].name; renderPerson(); });
+  $("#pNext").addEventListener("click", () => { S.person = all[idx + 1].name; renderPerson(); });
+  wirePerson();
+}
+function wirePerson() {
+  $$("#pane-person .pitem").forEach((b) => b.addEventListener("click", () => { S.person = b.dataset.p; renderPerson(); }));
+  const inp = $("#pq");
+  if (inp) inp.addEventListener("input", () => { S.pq = inp.value; const pos = inp.selectionStart; renderPerson(); const n = $("#pq"); n.focus(); n.setSelectionRange(pos, pos); });
+}
+
+/* ---------- günlük kayıtlar ---------- */
+function renderDays() {
+  const q = norm(S.filter.q);
+  let rows = S.A.days.filter((d) => (S.filter.type === "*" || d.type === S.filter.type) && (!q || norm(d.name).includes(q)));
+  const st = S.sort.days;
+  const get = (d) => ({ iso: d.iso, name: d.name, type: d.type, tin: d.tin, tout: d.outAdj, span: d.span, net: d.netWork, brk: d.span != null ? d.breakTotal : null, diff: d.contrib ? dDiff(d) : null, leave: d.leave || null, file: d.file }[st.k]);
+  rows = rows.slice().sort((a, b) => {
+    const va = get(a), vb = get(b);
+    if (va == null && vb == null) return a.name.localeCompare(b.name, "tr");
+    if (va == null) return 1;
+    if (vb == null) return -1;
+    if (typeof va === "string") return va.localeCompare(vb, "tr") * st.d || a.name.localeCompare(b.name, "tr");
+    return (va - vb) * st.d;
+  });
+  const cols = [["iso", "Tarih", 1], ["name", "Kişi", 1], ["type", "Durum", 1], ["tin", "Giriş", 0], ["tout", "Çıkış", 0], ["span", "Bulunma", 0], ["net", "Net çalışma", 0], ["brk", "Ara süre", 0], ["diff", "Fark", 0], ["leave", "İzin", 0], ["file", "Dosya", 1]];
+  const head = cols.map(([k, t, l]) => `<th class="sort ${l ? "l" : ""}" data-k="${k}">${t}${st.k === k ? `<span class="ar">${st.d > 0 ? "▲" : "▼"}</span>` : ""}</th>`).join("");
+  const body = rows.slice(0, 2000).map((d) => {
+    const t = DAY_TYPES[d.type], df = d.contrib ? dDiff(d) : null;
+    return `<tr><td class="l">${esc(d.dayLabel)}</td><td class="l name"><button data-p="${esc(d.name)}">${esc(d.name)}</button></td>
+      <td class="l"><span class="pill ${t.cls}">${t.label}</span></td><td>${clock(d.tin)}</td><td>${d.outAdj != null ? clock(d.outAdj) : "—"}</td>
+      <td>${d.span != null ? hm(d.span) : "—"}</td><td>${d.netWork != null && d.span != null ? hm(d.netWork) : "—"}</td><td>${d.span != null ? hm(d.breakTotal) : "—"}</td>
+      <td class="${df == null ? "dim" : sgnCls(df)} strong">${df == null ? "—" : sg(df)}</td><td>${d.leave ? hm(d.leave) : "—"}</td><td class="l dim">${esc(fileLabel(d.file))}</td></tr>`;
+  }).join("");
+  $("#pane-days").innerHTML = `<div class="panel flush">
+    <div class="ph"><div><h2>Günlük kayıtlar</h2><p>Kaynak dosyalardaki her satır, hesaplanmış farkıyla. Fark sütunu ${metricName()} ölçütüne göredir.</p></div>
+      <div class="filters">
+        <label class="search">${ICON_SEARCH}<input type="search" id="dq" placeholder="Kişi ara" value="${esc(S.filter.q)}" aria-label="Kişi ara"></label>
+        <select class="sel" id="dt" aria-label="Gün türü"><option value="*">Tüm gün türleri</option>${Object.keys(DAY_TYPES).map((k) => `<option value="${k}"${S.filter.type === k ? " selected" : ""}>${DAY_TYPES[k].label}</option>`).join("")}</select>
+        <span class="count">${rows.length} kayıt${rows.length > 2000 ? ", ilk 2000 gösteriliyor" : ""}</span>
+      </div></div>
+    <div class="tblwrap" style="margin-top:14px;border-top:1px solid var(--line)"><table><thead><tr>${head}</tr></thead><tbody>${body || '<tr><td class="l dim" colspan="11">Filtreyle eşleşen kayıt yok.</td></tr>'}</tbody></table></div></div>`;
+  const inp = $("#dq");
+  inp.addEventListener("input", () => { S.filter.q = inp.value; const pos = inp.selectionStart; renderDays(); const n = $("#dq"); n.focus(); n.setSelectionRange(pos, pos); });
+  $("#dt").addEventListener("change", (e) => { S.filter.type = e.target.value; renderDays(); });
+  $$("#pane-days th.sort").forEach((th) => th.addEventListener("click", () => { const k = th.dataset.k; S.sort.days = st.k === k ? { k, d: -st.d } : { k, d: 1 }; renderDays(); }));
+  $$("#pane-days [data-p]").forEach((b) => b.addEventListener("click", () => goPerson(b.dataset.p)));
+}
+
+/* ---------- yöntem ---------- */
+function renderMethod() {
+  const c = S.cfg, en = c.target - c.breakAllow;
+  $("#pane-method").innerHTML = `<div class="grid g2 method">
+    <div class="panel"><h3>İki ayrı bakiye</h3><p>Üstteki <b>Net çalışma / Bulunma</b> düğmesi bütün tabloları bu iki ölçüt arasında değiştirir. <b>Bulunma</b>, kişinin giriş ile çıkış arasında binada geçirdiği süredir; aralar dahildir. <b>Net çalışma</b>, bu süreden yemek ve diğer tüm ara süreler düşülmüş hâlidir.</p>
+      <div class="formula">Günlük beklenen bulunma ${hm(c.target)}, günlük beklenen net çalışma ${hm(en)} (${hm(c.target)} − ${Math.round(c.breakAllow / 60)} dk mola hakkı).</div></div>
+    <div class="panel"><h3>Bakiye nasıl birikir</h3><p>Her çalışılan gün için o günün süresinden beklenen süre çıkarılır. Bu günlük farklar haftaya, aya ya da dosyaya göre toplanır. Fazla kalınan bir gün, eksik kalınan bir günü dengeler.</p>
+      <div class="formula">Bakiye = Σ (günlük süre − günlük beklenen)<br>Örnek: Pazartesi 9:15 net (+0:30), Salı 8:00 net (${MINUS}0:45) → ${MINUS}0:15</div></div>
+    <div class="panel"><h3>Hangi günler hesaba girer</h3><p><b>Çalışıldı</b> sayılan günler girer: planlı iş günü, hem giriş hem çıkış okutulmuş, bulunma ${Math.round(c.minDay / 60)} dakikadan uzun. İzinli günler, hiç kaydı olmayan günler ve tek yönlü okutmalar bakiyeyi etkilemez; ayrıca listelenir. Hafta tatili çalışması ${c.weekendCounts ? "şu an fazla çalışma olarak eklenir" : "şu an bakiyeye eklenmez, ayrı gösterilir"}.</p></div>
+    <div class="panel"><h3>Kısmi izin</h3><p>${c.deductLeave ? "O gün kullanılan izin süresi beklentiden düşülür." : "Kısmi izin şu an beklentiden düşülmüyor."} 2 saat görev izni alan birinden o gün ${hm(Math.max(0, c.target - 7200))} bulunma, ${hm(Math.max(0, en - 7200))} net çalışma beklenir.</p></div>
+    <div class="panel"><h3>Birden çok dosya</h3><p>Yüklenen tüm dosyalar birleştirilir. Aynı kişinin aynı tarihi iki dosyada da varsa son yüklenen dosyadaki satır kullanılır, böylece çakışan dosyalar iki kez sayılmaz. Dönem seçiminde <b>Tüm dönemler</b> açıkken toplamlar bütün dosyaları kapsar; kişi sayfasındaki <b>Tüm dosyalarda toplam</b> tablosu ise her zaman hepsini gösterir.</p></div>
+    <div class="panel"><h3>Hafta</h3><p>Haftalar pazartesi başlar, ISO hafta numarasıyla etiketlenir. Bir ay seçiliyken ay sınırındaki haftalar yalnız o aya düşen günleri içerir; tam haftayı görmek için Tüm dönemler'i seçin.</p></div>
+    <div class="panel"><h3>Ortalama giriş ve çıkış</h3><p>Yalnız çalışılan günlerden hesaplanır. Kişi sayfasında medyan (tipik değer) gösterilir, çünkü tek bir aykırı gün ortalamayı kaydırır. Gece yarısını geçen çıkışlar 24:00'ün üzerine eklenir.</p></div>
+    <div class="panel"><h3>Veri gizliliği</h3><p>Dosyalar yalnızca bu tarayıcıda okunur ve hiçbir yere gönderilmez. Sayfayı kapattığınızda veriler silinir; yalnızca Kurallar ayarları hatırlanır.</p></div>
+  </div>`;
+}
+
+/* ============================================================
+   Ayarlar
+   ============================================================ */
+const hmIn = (s) => pad(Math.floor(s / 3600)) + ":" + pad(Math.floor((s % 3600) / 60));
+function fillCfg() {
+  const c = S.cfg;
+  $("#cfgShiftStart").value = hmIn(c.shiftStart); $("#cfgShiftEnd").value = hmIn(c.shiftEnd);
+  $("#cfgTarget").value = hmIn(c.target); $("#cfgBreak").value = Math.round(c.breakAllow / 60);
+  $("#cfgLate").value = hmIn(c.lateAfter); $("#cfgLeave").value = c.deductLeave ? "1" : "0";
+  $("#cfgWeekend").value = c.weekendCounts ? "1" : "0"; $("#cfgMin").value = Math.round(c.minDay / 60);
+  $("#cfgBreakNote").textContent = "Beklenen net çalışma = beklenen bulunma − mola hakkı. Şu an " + hm(c.target - c.breakAllow) + ".";
+  updateMetricTips();
+}
+function readCfg() {
+  const t = (v) => { const m = String(v).match(/(\d{1,2})[:.](\d{2})/); return m ? +m[1] * 3600 + +m[2] * 60 : null; };
+  const c = Object.assign({}, S.cfg);
+  c.shiftStart = t($("#cfgShiftStart").value) ?? DEF_CFG.shiftStart;
+  c.shiftEnd = t($("#cfgShiftEnd").value) ?? DEF_CFG.shiftEnd;
+  c.target = t($("#cfgTarget").value) ?? DEF_CFG.target;
+  c.breakAllow = Math.max(0, +$("#cfgBreak").value || 0) * 60;
+  c.lateAfter = t($("#cfgLate").value) ?? DEF_CFG.lateAfter;
+  c.deductLeave = $("#cfgLeave").value === "1";
+  c.weekendCounts = $("#cfgWeekend").value === "1";
+  c.minDay = Math.max(0, +$("#cfgMin").value || 0) * 60;
+  S.cfg = c; store.set("bdks-cfg", c);
+  fillCfg();
+  if (S.records.length) recompute();
+}
+function updateMetricTips() {
+  const [a, b] = $$("#metricSeg button");
+  a.title = "Binada geçen süreden aralar düşülmüş hâli. Günlük beklenen " + dur(S.cfg.target - S.cfg.breakAllow) + ".";
+  b.title = "Giriş ile çıkış arası süre, aralar dahil. Günlük beklenen " + dur(S.cfg.target) + ".";
+}
+
+/* ============================================================
+   Dosyalar
+   ============================================================ */
+function ingest(recs, mode) {
+  const map = new Map();
+  if (mode === "append") S.records.forEach((r) => map.set(r.name + "|" + isoOf(r.date), r));
+  let dup = 0;
+  recs.forEach((r) => { const k = r.name + "|" + isoOf(r.date); if (map.has(k)) dup++; map.set(k, r); });
+  S.records = Array.from(map.values());
+  rebuildMeta();
+  return dup;
+}
+function rebuildMeta() {
+  const fm = new Map();
+  S.records.forEach((r) => {
+    const iso = isoOf(r.date);
+    let f = fm.get(r.file);
+    if (!f) { f = { name: r.file, count: 0, min: iso, max: iso }; fm.set(r.file, f); }
+    f.count++; if (iso < f.min) f.min = iso; if (iso > f.max) f.max = iso;
+  });
+  S.files = Array.from(fm.values()).sort((a, b) => a.min.localeCompare(b.min));
+  S.files.forEach((f) => {
+    const a = fromIso(f.min), b = fromIso(f.max);
+    f.range = a.getUTCDate() + " " + AY3[a.getUTCMonth()] + " – " + b.getUTCDate() + " " + AY3[b.getUTCMonth()] + " " + b.getUTCFullYear();
+  });
+  S.periods = Array.from(new Set(S.records.map((r) => r.date.getUTCFullYear() + "-" + pad(r.date.getUTCMonth() + 1)))).sort();
+  if (S.period !== "*" && !S.periods.includes(S.period)) S.period = "*";
+  if (S.periods.length === 1) S.period = S.periods[0];
+  const sel = $("#periodSel");
+  sel.innerHTML = (S.periods.length > 1 ? `<option value="*">Tüm dönemler</option>` : "") + S.periods.map((p) => `<option value="${p}">${periodLabel(p)}</option>`).join("");
+  sel.value = S.period;
+}
+function enterApp() {
+  $("#landing").hidden = true;
+  ["app", "subbar", "periodSel", "metricSeg", "addBtn", "setBtn", "expBtn"].forEach((id) => ($("#" + id).hidden = false));
+  recompute();
+}
+function removeFile(name) {
+  S.records = S.records.filter((r) => r.file !== name);
+  if (!S.records.length) {
+    S.files = []; S.A = null;
+    $("#landing").hidden = false;
+    ["app", "subbar", "periodSel", "metricSeg", "addBtn", "setBtn", "expBtn"].forEach((id) => ($("#" + id).hidden = true));
+    $("#srcLabel").textContent = "BDKS giriş–çıkış dökümü";
+    return;
+  }
+  rebuildMeta(); recompute();
+  toast(fileLabel(name) + " kaldırıldı");
+}
+async function loadFiles(files, mode) {
+  const list = Array.from(files || []);
+  if (!list.length) return;
+  $("#landErr").innerHTML = "";
+  if (typeof XLSX === "undefined") { report("Excel okuyucu yüklenemedi. İnternet bağlantınızı kontrol edip sayfayı yenileyin."); return; }
+  let recs = [];
+  const errs = [];
+  for (const f of list) {
+    try {
+      const r = readWorkbook(await f.arrayBuffer(), f.name);
+      if (!r.length) errs.push(`“${f.name}” içinde beklenen başlıklar bulunamadı. Dosyada “Ad Soyad” ve “Mesai Tarihi” sütunları olmalı.`);
+      recs = recs.concat(r);
+    } catch (err) { errs.push(`“${f.name}” okunamadı: ${err.message}`); }
+  }
+  if (errs.length) report(errs.join(" "));
+  if (!recs.length) return;
+  const wasDemo = S.files.some((f) => f.demo);
+  const dup = ingest(recs, mode === "append" && !wasDemo ? "append" : "replace");
+  S.files.forEach((f) => (f.demo = false));
+  enterApp();
+  toast(`${recs.length} satır yüklendi` + (dup ? `, ${dup} tekrar eden gün güncellendi` : ""));
+}
+function report(msg) {
+  if (!$("#landing").hidden) $("#landErr").innerHTML = `<div class="err">${esc(msg)}</div>`;
+  else toast(msg);
+}
+
+/* ============================================================
+   Örnek veri
+   ============================================================ */
+function demoRecords() {
+  let s = 20260805 >>> 0;
+  const rnd = () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
+  const gauss = () => Math.sqrt(-2 * Math.log(rnd() || 1e-9)) * Math.cos(2 * Math.PI * rnd());
+  const P = [
+    ["Ayşe Demir", "Uzman", 8.0, 18.55, 65, 0.25], ["Mehmet Kaya", "Mühendis", 9.15, 18.4, 80, 0.35],
+    ["Zeynep Arslan", "Şef", 8.4, 18.5, 70, 0.2], ["Emre Yıldız", "Uzman", 9.55, 19.3, 95, 0.4],
+    ["Elif Şahin", "Memur", 8.1, 18.2, 75, 0.15], ["Burak Öztürk", "Tekniker", 8.8, 18.6, 62, 0.3],
+    ["Selin Aydın", "Mühendis", 7.9, 19.0, 85, 0.3], ["Can Koç", "Uzman Yrd.", 10.1, 19.6, 70, 0.45],
+    ["Deniz Çelik", "Memur", 8.3, 18.3, 110, 0.2], ["Merve Polat", "Şef", 8.5, 18.8, 60, 0.25],
+    ["Oğuz Kurt", "Tekniker", 9.0, 18.7, 75, 0.3], ["Hande Erdem", "Uzman", 8.6, 18.6, 72, 0.25],
+  ];
+  const months = [[2026, 7, "BDKS_Agustos_2026.xlsx"], [2026, 8, "BDKS_Eylul_2026.xlsx"]];
+  const out = [];
+  months.forEach(([y, m, file]) => {
+    const n = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+    P.forEach(([name, role, inH, outH, brkM, jit], pi) => {
+      for (let dd = 1; dd <= n; dd++) {
+        const date = new Date(Date.UTC(y, m, dd)), dow = date.getUTCDay();
+        const weekday = dow >= 1 && dow <= 5;
+        const r = { file, name, reg: String(41200 + pi * 7), role, wtype: "Tam zamanlı", status: "", date, tin: null, tout: null, planned: weekday ? 36000 : 0, net: null, brk: 0, otBrk: 0, sysShort: 0, sysOt: 0, leave: 0, leaveType: "", pending: "" };
+        const x = rnd();
+        if (weekday) {
+          if (x < 0.03) { r.status = "Tamamlanmadı"; }
+          else if (x < 0.08) { r.leave = 36000; r.leaveType = "Yıllık izin"; r.status = "İzinli"; }
+          else {
+            let tin = inH * 3600 + gauss() * jit * 3600, tout = outH * 3600 + gauss() * jit * 1.2 * 3600;
+            if (x < 0.11) { r.leave = 7200; r.leaveType = "Görev izni"; tin += 7200; }
+            if (pi === 6 && rnd() < 0.15) tout += 3 * 3600;
+            tin = Math.round(tin / 60) * 60; tout = Math.round(Math.min(tout, 86340) / 60) * 60;
+            const brk = Math.max(600, Math.round((brkM + gauss() * 15) * 60 / 60) * 60);
+            r.tin = tin; r.tout = x > 0.985 ? null : tout; r.brk = brk;
+            if (r.tout != null) r.net = Math.max(0, tout - tin - brk);
+            r.status = r.tout == null ? "Eksik" : "Tamamlandı";
+          }
+        } else if (pi === 3 && dow === 6 && rnd() < 0.35) {
+          r.tin = 10 * 3600; r.tout = 14 * 3600 + Math.round(rnd() * 90) * 60; r.brk = 900; r.net = r.tout - r.tin - 900;
+        }
+        out.push(r);
+      }
+    });
+  });
+  return out;
+}
+function loadDemo() {
+  ingest(demoRecords(), "replace");
+  S.files.forEach((f) => (f.demo = true));
+  enterApp();
+  toast("Örnek veri yüklendi: 12 kişi, 2 dosya");
+}
+function renderPreview() {
+  const recs = demoRecords().filter((r) => ["Ayşe Demir", "Mehmet Kaya", "Deniz Çelik", "Selin Aydın", "Emre Yıldız"].includes(r.name) && r.date.getUTCMonth() === 8);
+  const A = analyze(recs, S.cfg, "*");
+  const keys = orderedKeys(A.days, "week").slice(1, 5);
+  let maxAbs = 1800;
+  const rows = A.people.map((p) => { const b = bucket(p.days, "week", "net"); b.forEach((c) => (maxAbs = Math.max(maxAbs, Math.abs(c.bal)))); return { p, b }; });
+  $("#previewBox").innerHTML = `<div class="tblwrap"><table class="mx"><thead><tr><th class="l">Kişi</th>${keys.map((k) => `<th class="wk">${weekLabel(k)}</th>`).join("")}<th>Toplam</th></tr></thead><tbody>${rows.map((r) =>
+    `<tr><td class="l" style="min-width:120px">${esc(r.p.name)}</td>${keys.map((k) => { const c = r.b.get(k); return c ? `<td class="hc"><span class="c ${c.bal < 0 ? "m" : "p"}" style="${heat(c.bal, maxAbs)}">${sg(c.bal)}</span></td>` : `<td class="hc"><span class="c z">—</span></td>`; }).join("")}${(() => { const t = sum(keys.map((k) => (r.b.get(k) || { bal: 0 }).bal)); return `<td class="tot ${sgnCls(t)}">${sg(t)}</td>`; })()}</tr>`).join("")}</tbody></table></div>`;
+}
+
+/* ============================================================
+   Dışa aktarma
+   ============================================================ */
+function buildWorkbook() {
+  const c = S.cfg;
+  const sum1 = [["Ad Soyad", "Sicil", "Görev", "Çalışılan gün", "İzinli gün", "Kayıtsız gün", "Eksik/şüpheli kayıt",
+    "Ort. giriş", "Medyan giriş", "Ort. çıkış", "En erken giriş", "En geç giriş",
+    "Toplam bulunma", "Beklenen bulunma", "Bulunma bakiyesi", "Bulunma gerçekleşme %",
+    "Toplam net çalışma", "Beklenen net çalışma", "Net bakiye", "Net gerçekleşme %",
+    "Ort. ara süre", "Masa başı oranı %", "Geç giriş günü", "Eksik bulunma günü", "Eksik net gün",
+    "Tatil mesaisi günü", "Tatil mesaisi süresi", "İzin saati", "Sistem fazla mesai", "Sistem eksik mesai"]];
+  S.A.people.forEach((p) => sum1.push([p.name, p.reg, p.role, p.workDays, p.leaveDays, p.absentDays, p.badDays,
+    clock(p.inMean), clock(p.inMed), clock(p.outMean), clock(p.inMin), clock(p.inMax),
+    hm(p.presWorked), hm(p.expPresence), sg(p.presBal), p.presRate == null ? "" : Math.round(p.presRate * 100),
+    hm(p.netWorked), hm(p.expNet), sg(p.netBal), p.netRate == null ? "" : Math.round(p.netRate * 100),
+    hm(p.brkMean), p.eff == null ? "" : Math.round(p.eff * 100), p.lateDays, p.shortDays, p.netShortDays,
+    p.weekendDays, hm(p.weekendWork), hm(p.leaveHours), hm(p.sysOt), hm(p.sysShort)]));
+
+  // ekrandaki bakiye tablosu
+  const g = S.gran, keys = orderedKeys(S.A.days, g);
+  const piv = [["Ad Soyad"].concat(keys.map((k) => gLabel(k, g)), ["Toplam"])];
+  S.A.people.forEach((p) => { const b = bucket(p.days, g); piv.push([p.name].concat(keys.map((k) => (b.get(k) ? sg(b.get(k).bal) : "")), [sg(pBal(p))])); });
+
+  const longSheet = (gg, title) => {
+    const rows = [[title, "Ad Soyad", "Gün", "Net çalışma", "Beklenen net", "Net bakiye", "Bulunma", "Beklenen bulunma", "Bulunma bakiyesi"]];
+    S.A.people.forEach((p) => {
+      const bn = bucket(p.days, gg, "net"), bp = bucket(p.days, gg, "pres");
+      orderedKeys(p.days, gg).forEach((k) => { const a = bn.get(k), b = bp.get(k); rows.push([gLabel(k, gg), p.name, a.n, hm(a.worked), hm(a.exp), sg(a.bal), hm(b.worked), hm(b.exp), sg(b.bal)]); });
+    });
+    return rows;
+  };
+
+  const det = [["Tarih", "Gün", "Ad Soyad", "Gün türü", "Giriş", "Çıkış", "Bulunma", "Beklenen bulunma", "Bulunma farkı", "Net çalışma", "Beklenen net", "Net fark", "Ara süre", "İzin", "İzin türü", "Dosya"]];
+  S.A.days.slice().sort((a, b) => a.name.localeCompare(b.name, "tr") || a.iso.localeCompare(b.iso)).forEach((d) => det.push([
+    d.iso, GUNLER[d.dow], d.name, DAY_TYPES[d.type].label, clock(d.tin), d.outAdj == null ? "" : clock(d.outAdj),
+    d.span == null ? "" : hm(d.span), d.contrib ? hm(d.expPresence) : "", d.contrib ? sg(d.presDiff) : "",
+    d.netWork == null || d.span == null ? "" : hm(d.netWork), d.contrib ? hm(d.expNet) : "", d.contrib ? sg(d.netDiff) : "",
+    d.span == null ? "" : hm(d.breakTotal), d.leave ? hm(d.leave) : "", d.leaveType, d.file]));
+
+  const rules = [["Kural", "Değer"], ["Vardiya", clock(c.shiftStart) + " – " + clock(c.shiftEnd)], ["Günlük beklenen bulunma", hm(c.target)],
+    ["Günlük mola hakkı", Math.round(c.breakAllow / 60) + " dk"], ["Günlük beklenen net çalışma", hm(c.target - c.breakAllow)],
+    ["Geç giriş eşiği", clock(c.lateAfter)], ["Kısmi izin beklentiden düşülür", c.deductLeave ? "Evet" : "Hayır"],
+    ["Tatil mesaisi bakiyeye eklenir", c.weekendCounts ? "Evet" : "Hayır"], ["Anlamlı gün eşiği", Math.round(c.minDay / 60) + " dk"],
+    ["Bakiye tablosu ölçütü", isNet() ? "Net çalışma" : "Bulunma"], ["Dönem", S.period === "*" ? "Tüm dönemler" : periodLabel(S.period)],
+    ["Dosyalar", S.files.map((f) => f.name).join(", ")], ["Oluşturma", new Date().toLocaleString("tr-TR")]];
+
+  const wb = XLSX.utils.book_new();
+  const add = (aoa, name, first) => {
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    ws["!cols"] = aoa[0].map((h, i) => ({ wch: i === first ? 24 : Math.max(10, String(h).length + 2) }));
+    XLSX.utils.book_append_sheet(wb, ws, name);
+  };
+  add(sum1, "Özet", 0);
+  add(piv, "Bakiye tablosu", 0);
+  add(longSheet("week", "Hafta"), "Haftalık bakiye", 1);
+  add(longSheet("month", "Ay"), "Aylık bakiye", 1);
+  if (S.files.length > 1) add(longSheet("file", "Dosya"), "Dosya bazında", 1);
+  add(det, "Günlük döküm", 2);
+  add(rules, "Kurallar", 0);
+  return wb;
+}
+let dlCap;
+async function exportXlsx() {
+  if (!S.A) return;
+  if (typeof XLSX === "undefined") { toast("Excel kütüphanesi yüklenemedi."); return; }
+  const out = XLSX.write(buildWorkbook(), { bookType: "xlsx", type: "array" });
+  const blob = new Blob([out], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+  const fname = "mesai-analizi-" + (S.period === "*" ? "tum-donemler" : S.period) + ".xlsx";
+  if (dlCap) {
+    try { await dlCap.save({ filename: fname, data: blob }); toast("Excel kaydedildi"); }
+    catch (err) { if (err && err.code === "declined") return; toast("Kaydedilemedi: " + (err && err.message ? err.message : "bilinmeyen hata")); }
+    return;
+  }
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = fname;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  toast("Excel indiriliyor");
+}
+
+/* ============================================================
+   Bağlantılar
+   ============================================================ */
+(function wire() {
+  // tema
+  try { const t = localStorage.getItem("bdks-theme"); if (t) document.documentElement.setAttribute("data-theme", t); } catch (e) {}
+  $("#themeBtn").addEventListener("click", () => {
+    const cur = document.documentElement.getAttribute("data-theme");
+    const dark = cur ? cur === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    const next = dark ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem("bdks-theme", next); } catch (e) {}
+  });
+  // sekmeler
+  $$("#nav button").forEach((b) => b.addEventListener("click", () => showPane(b.dataset.pane)));
+  // ölçüt
+  $$("#metricSeg button").forEach((b) => {
+    b.classList.toggle("on", b.dataset.m === S.metric);
+    b.addEventListener("click", () => {
+      S.metric = b.dataset.m; store.set("bdks-metric", S.metric);
+      $$("#metricSeg button").forEach((x) => x.classList.toggle("on", x === b));
+      renderPane();
+    });
+  });
+  $("#periodSel").addEventListener("change", (e) => { S.period = e.target.value; recompute(); });
+  // ayarlar
+  fillCfg();
+  ["cfgShiftStart", "cfgShiftEnd", "cfgTarget", "cfgBreak", "cfgLate", "cfgLeave", "cfgWeekend", "cfgMin"].forEach((id) => $("#" + id).addEventListener("change", readCfg));
+  $("#setBtn").addEventListener("click", () => { $("#drawer").hidden = false; $("#cfgClose").focus(); });
+  $("#cfgClose").addEventListener("click", () => ($("#drawer").hidden = true));
+  $("#drawer").addEventListener("click", (e) => { if (e.target.id === "drawer") $("#drawer").hidden = true; });
+  $("#cfgReset").addEventListener("click", () => { S.cfg = Object.assign({}, DEF_CFG); store.set("bdks-cfg", S.cfg); fillCfg(); if (S.records.length) recompute(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") $("#drawer").hidden = true; });
+  // dosya
+  let mode = "replace";
+  const pick = (m) => { mode = m; $("#fileIn").value = ""; $("#fileIn").click(); };
+  $("#addBtn").addEventListener("click", () => pick("append"));
+  $("#drop").addEventListener("click", () => pick("replace"));
+  $("#drop").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick("replace"); } });
+  $("#fileIn").addEventListener("change", (e) => loadFiles(e.target.files, mode));
+  $("#demoBtn").addEventListener("click", loadDemo);
+  ["dragenter", "dragover"].forEach((ev) => $("#drop").addEventListener(ev, (e) => { e.preventDefault(); $("#drop").classList.add("hot"); }));
+  ["dragleave", "drop"].forEach((ev) => $("#drop").addEventListener(ev, (e) => { e.preventDefault(); $("#drop").classList.remove("hot"); }));
+  window.addEventListener("dragover", (e) => e.preventDefault());
+  window.addEventListener("drop", (e) => {
+    e.preventDefault();
+    if (!e.dataTransfer || !e.dataTransfer.files.length) return;
+    loadFiles(e.dataTransfer.files, $("#landing").hidden ? "append" : "replace");
+  });
+  $("#expBtn").addEventListener("click", exportXlsx);
+  renderPreview();
+  // indirme yeteneği
+  if (window.claude && typeof window.claude.use === "function") {
+    window.claude.use("downloads").then((d) => { dlCap = d || null; }).catch(() => { dlCap = null; });
+  }
+})();
+</script>
+</body>
+</html>

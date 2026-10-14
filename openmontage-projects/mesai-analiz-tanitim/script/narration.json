@@ -1,0 +1,96 @@
+{
+  "project": "mesai-analiz-tanitim",
+  "title": "BDKS Mesai Analizi — Arayüz Rehberi",
+  "language": "tr",
+  "aspect": "16:9",
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "source": "Uygulamanın gerçek ekranlarından (Chromium + Playwright) alınan görüntülerle hazırlanan kullanım videosu",
+  "segments": [
+    {
+      "id": "s01",
+      "scene": "s01_landing",
+      "text": "Mesai Analizi, BDKS giriş çıkış dökümünden kimin ne kadar fazla, kimin ne kadar eksik çalıştığını çıkarır.",
+      "captions": ["Mesai Analizi", "BDKS dökümünden", "fazla ve eksik mesaiyi çıkarır"]
+    },
+    {
+      "id": "s02",
+      "scene": "s02_drop",
+      "text": "BDKS'den istediğiniz tarih aralığını seçip indirdiğiniz Excel dosyasını bu alana bırakmanız yeterli. Birden çok ay ve birden çok dosya aynı anda yüklenebilir.",
+      "captions": ["BDKS'den tarih aralığını seçip indirin", "Excel'i bu alana bırakın", "Birden çok ay ve dosya", "aynı anda yüklenebilir"]
+    },
+    {
+      "id": "s03",
+      "scene": "s03_demo",
+      "text": "Hiç veri yüklemeden denemek isterseniz, örnek veriyle göz at düğmesi hazır bir ay açar.",
+      "captions": ["Veri yüklemeden denemek için:", "«Örnek veriyle göz at»"]
+    },
+    {
+      "id": "s04",
+      "scene": "s04_overview",
+      "text": "Genel bakış açılır. Üstte takımın toplam bakiyesi, altında kişi bazında fark ve haftalık seyir vardır.",
+      "captions": ["Genel bakış açılır", "Üstte takım bakiyesi,", "altında kişi ve hafta kırılımı"]
+    },
+    {
+      "id": "s05",
+      "scene": "s05_hero",
+      "text": "Büyük rakam, seçili dönemde beklenen süreye göre toplam farktır. Yanında ortalama giriş ve çıkış saati ile masa başı oranı yer alır.",
+      "captions": ["Büyük rakam: toplam fark", "Yanında ortalama giriş ve çıkış,", "bir de masa başı oranı"]
+    },
+    {
+      "id": "s06",
+      "scene": "s06_flags",
+      "text": "Göz atılması gerekenler panelinde eksik kayıt, şüpheli giriş ve tatil mesaisi gibi dikkat isteyen günler toplanır.",
+      "captions": ["«Göz atılması gerekenler»", "eksik kayıt, şüpheli giriş,", "tatil mesaisi tek yerde"]
+    },
+    {
+      "id": "s07",
+      "scene": "s07_metric",
+      "text": "Üstteki düğme tüm tabloları iki ölçüt arasında değiştirir. Bulunma, giriş ile çıkış arasıdır; net çalışma ise aralar düşülmüş hâlidir.",
+      "captions": ["İki ölçüt: Net çalışma / Bulunma", "Bulunma: giriş ile çıkış arası", "Net çalışma: aralar düşülmüş"]
+    },
+    {
+      "id": "s08",
+      "scene": "s08_matrix",
+      "text": "Bakiye tablosunda satırlar kişi, sütunlar haftadır. Yeşil fazla, kırmızı eksik; en sağdaki sütun dönem toplamını verir. Hafta, ay veya dosya kırılımına geçebilirsiniz.",
+      "captions": ["Satırlar kişi, sütunlar hafta", "Yeşil fazla, kırmızı eksik", "En sağda dönem toplamı", "Hafta · Ay · Dosya kırılımı"]
+    },
+    {
+      "id": "s09",
+      "scene": "s09_person",
+      "text": "Kişi detayında bir isim seçtiğinizde o kişinin haftalık dökümü, tüm dosyalardaki toplamı ve biriken bakiye grafiği görünür.",
+      "captions": ["Kişi detayı: bir isim seçin", "Haftalık döküm,", "tüm dosyalarda toplam,", "biriken bakiye grafiği"]
+    },
+    {
+      "id": "s10",
+      "scene": "s10_days",
+      "text": "Günlük kayıtlar her rakamın arkasındaki kanıttır: giriş, çıkış, ara süresi ve fark. Üstteki filtrelerle izinli, eksik ya da şüpheli günleri ayırabilirsiniz.",
+      "captions": ["Günlük kayıtlar: her rakamın kanıtı", "Giriş, çıkış, ara süresi, fark", "Filtrelerle izinli, eksik,", "şüpheli günler ayrılır"]
+    },
+    {
+      "id": "s11",
+      "scene": "s11_rules",
+      "text": "Kurallar bölümünde vardiya saatleri, günlük beklenen süre, geç giriş eşiği ve günlük mola hakkı yani ara süresi ayarlanır.",
+      "captions": ["Kurallar bölümü", "Vardiya saatleri, beklenen süre,", "geç giriş eşiği", "ve günlük mola hakkı"]
+    },
+    {
+      "id": "s12",
+      "scene": "s12_rules_changed",
+      "text": "Örnek olarak mola hakkını yetmiş beş dakikadan kırk beş dakikaya çekelim.",
+      "captions": ["Mola hakkı: 75 dakika →", "45 dakika"]
+    },
+    {
+      "id": "s13",
+      "scene": "s13_recalc",
+      "text": "Bütün sayılar anında yeniden hesaplanır. Ayarlarınız bu tarayıcıda hatırlanır.",
+      "captions": ["Bütün sayılar anında yeniden hesaplanır", "Ayarlar tarayıcıda hatırlanır"]
+    },
+    {
+      "id": "s14",
+      "scene": "s14_export",
+      "text": "Sonucu tek tuşla Excel'e aktarabilirsiniz. Dosyalarınız tarayıcıdan dışarı gönderilmez; hesaplama tamamen kendi bilgisayarınızda yapılır.",
+      "captions": ["Sonucu Excel'e aktarın", "Dosyalar tarayıcıdan çıkmaz", "Hesaplama kendi bilgisayarınızda"]
+    }
+  ]
+}

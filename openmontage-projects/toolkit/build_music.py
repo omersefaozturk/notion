@@ -12,6 +12,7 @@ Outputs:
 """
 from __future__ import annotations
 
+import argparse
 import json
 import math
 import subprocess
@@ -20,7 +21,7 @@ from pathlib import Path
 
 import numpy as np
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path.cwd()          # set from --project in main()
 AUDIO = ROOT / "audio"
 BUILD = ROOT / "build"
 SR = 48000
@@ -107,6 +108,15 @@ def write_wav(path: Path, data: np.ndarray) -> None:
 
 
 def main() -> None:
+    global ROOT, AUDIO, BUILD
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--project", default=".", type=Path, help="project directory")
+    ap.add_argument("--bed-level", type=float, default=0.55,
+                    help="bed level in the mix relative to the narration (0.3 = well back)")
+    args = ap.parse_args()
+    ROOT = args.project.resolve()
+    AUDIO, BUILD = ROOT / "audio", ROOT / "build"
+
     timeline = json.loads((BUILD / "timeline.json").read_text(encoding="utf-8"))
     duration = timeline["duration_seconds"]
     accents = [s["start"] for s in timeline["segments"] if s["scene"] in
@@ -133,7 +143,8 @@ def main() -> None:
          "[1:a]aformat=channel_layouts=stereo[bed];"
          "[voice]asplit=2[voice_out][key];"
          "[bed][key]sidechaincompress=threshold=0.05:ratio=6:attack=25:release=420:makeup=1[bed_duck];"
-         "[voice_out][bed_duck]amix=inputs=2:duration=longest:dropout_transition=0:weights=1 0.55[mix];"
+         "[voice_out][bed_duck]amix=inputs=2:duration=longest:dropout_transition=0:"
+         f"weights=1 {args.bed_level}[mix];"
          "[mix]loudnorm=I=-15:TP=-1.2:LRA=11[out]",
          "-map", "[out]", "-ar", "48000", "-ac", "2", str(AUDIO / "mix.wav")],
         check=True,

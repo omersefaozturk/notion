@@ -11,10 +11,10 @@ setup:
 	cd composer && npm install
 
 narration:          ## Turkish narration + caption timeline
-	$(VENV)/bin/python scripts/build_narration.py --rate 186
+	$(VENV)/bin/python ../toolkit/build_narration.py --project . --voice ema
 
 music:              ## locally synthesized ambient bed + ducked mix
-	$(VENV)/bin/python scripts/build_music.py
+	$(VENV)/bin/python ../toolkit/build_music.py --project .
 
 video:              ## Remotion render -> renders/final.mp4
 	bash scripts/render.sh

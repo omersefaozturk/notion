@@ -1,0 +1,358 @@
+{
+  "project": "mesai-analiz-tanitim",
+  "title": "BDKS Mesai Analizi — Arayüz Rehberi",
+  "voice_backend": "ema",
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "duration_seconds": 99.12,
+  "narration_sample_rate": 48000,
+  "segments": [
+    {
+      "id": "s01",
+      "scene": "s01_landing",
+      "text": "Mesai Analizi, BDKS giriş çıkış dökümünden kimin ne kadar fazla, kimin ne kadar eksik çalıştığını çıkarır.",
+      "start": 0.6,
+      "duration": 5.96,
+      "captions": [
+        {
+          "text": "Mesai Analizi",
+          "start": 0.6,
+          "duration": 1.4
+        },
+        {
+          "text": "BDKS dökümünden",
+          "start": 2.0,
+          "duration": 1.48
+        },
+        {
+          "text": "fazla ve eksik mesaiyi çıkarır",
+          "start": 3.48,
+          "duration": 3.08
+        }
+      ]
+    },
+    {
+      "id": "s02",
+      "scene": "s02_drop",
+      "text": "BDKS'den istediğiniz tarih aralığını seçip indirdiğiniz Excel dosyasını bu alana bırakmanız yeterli. Birden çok ay ve birden çok dosya aynı anda yüklenebilir.",
+      "start": 6.88,
+      "duration": 8.6,
+      "captions": [
+        {
+          "text": "BDKS'den tarih aralığını seçip indirin",
+          "start": 6.88,
+          "duration": 3.16
+        },
+        {
+          "text": "Excel'i bu alana bırakın",
+          "start": 10.04,
+          "duration": 2.24
+        },
+        {
+          "text": "Birden çok ay ve dosya",
+          "start": 12.28,
+          "duration": 1.32
+        },
+        {
+          "text": "aynı anda yüklenebilir",
+          "start": 13.6,
+          "duration": 1.88
+        }
+      ]
+    },
+    {
+      "id": "s03",
+      "scene": "s03_demo",
+      "text": "Hiç veri yüklemeden denemek isterseniz, örnek veriyle göz at düğmesi hazır bir ay açar.",
+      "start": 15.8,
+      "duration": 4.92,
+      "captions": [
+        {
+          "text": "Veri yüklemeden denemek için:",
+          "start": 15.8,
+          "duration": 2.6
+        },
+        {
+          "text": "«Örnek veriyle göz at»",
+          "start": 18.4,
+          "duration": 2.32
+        }
+      ]
+    },
+    {
+      "id": "s04",
+      "scene": "s04_overview",
+      "text": "Genel bakış açılır. Üstte takımın toplam bakiyesi, altında kişi bazında fark ve haftalık seyir vardır.",
+      "start": 21.04,
+      "duration": 5.72,
+      "captions": [
+        {
+          "text": "Genel bakış açılır",
+          "start": 21.04,
+          "duration": 1.52
+        },
+        {
+          "text": "Üstte takım bakiyesi,",
+          "start": 22.56,
+          "duration": 1.52
+        },
+        {
+          "text": "altında kişi ve hafta kırılımı",
+          "start": 24.08,
+          "duration": 2.68
+        }
+      ]
+    },
+    {
+      "id": "s05",
+      "scene": "s05_hero",
+      "text": "Büyük rakam, seçili dönemde beklenen süreye göre toplam farktır. Yanında ortalama giriş ve çıkış saati ile masa başı oranı yer alır.",
+      "start": 27.08,
+      "duration": 7.36,
+      "captions": [
+        {
+          "text": "Büyük rakam: toplam fark",
+          "start": 27.08,
+          "duration": 2.12
+        },
+        {
+          "text": "Yanında ortalama giriş ve çıkış,",
+          "start": 29.2,
+          "duration": 3.32
+        },
+        {
+          "text": "bir de masa başı oranı",
+          "start": 32.52,
+          "duration": 1.92
+        }
+      ]
+    },
+    {
+      "id": "s06",
+      "scene": "s06_flags",
+      "text": "Göz atılması gerekenler panelinde eksik kayıt, şüpheli giriş ve tatil mesaisi gibi dikkat isteyen günler toplanır.",
+      "start": 34.76,
+      "duration": 6.2,
+      "captions": [
+        {
+          "text": "«Göz atılması gerekenler»",
+          "start": 34.76,
+          "duration": 2.16
+        },
+        {
+          "text": "eksik kayıt, şüpheli giriş,",
+          "start": 36.92,
+          "duration": 2.16
+        },
+        {
+          "text": "tatil mesaisi tek yerde",
+          "start": 39.08,
+          "duration": 1.88
+        }
+      ]
+    },
+    {
+      "id": "s07",
+      "scene": "s07_metric",
+      "text": "Üstteki düğme tüm tabloları iki ölçüt arasında değiştirir. Bulunma, giriş ile çıkış arasıdır; net çalışma ise aralar düşülmüş hâlidir.",
+      "start": 41.28,
+      "duration": 7.64,
+      "captions": [
+        {
+          "text": "İki ölçüt: Net çalışma / Bulunma",
+          "start": 41.28,
+          "duration": 2.48
+        },
+        {
+          "text": "Bulunma: giriş ile çıkış arası",
+          "start": 43.76,
+          "duration": 2.84
+        },
+        {
+          "text": "Net çalışma: aralar düşülmüş",
+          "start": 46.6,
+          "duration": 2.32
+        }
+      ]
+    },
+    {
+      "id": "s08",
+      "scene": "s08_matrix",
+      "text": "Bakiye tablosunda satırlar kişi, sütunlar haftadır. Yeşil fazla, kırmızı eksik; en sağdaki sütun dönem toplamını verir. Hafta, ay veya dosya kırılımına geçebilirsiniz.",
+      "start": 49.24,
+      "duration": 9.52,
+      "captions": [
+        {
+          "text": "Satırlar kişi, sütunlar hafta",
+          "start": 49.24,
+          "duration": 2.96
+        },
+        {
+          "text": "Yeşil fazla, kırmızı eksik",
+          "start": 52.2,
+          "duration": 1.88
+        },
+        {
+          "text": "En sağda dönem toplamı",
+          "start": 54.08,
+          "duration": 2.0
+        },
+        {
+          "text": "Hafta · Ay · Dosya kırılımı",
+          "start": 56.08,
+          "duration": 2.68
+        }
+      ]
+    },
+    {
+      "id": "s09",
+      "scene": "s09_person",
+      "text": "Kişi detayında bir isim seçtiğinizde o kişinin haftalık dökümü, tüm dosyalardaki toplamı ve biriken bakiye grafiği görünür.",
+      "start": 59.08,
+      "duration": 6.56,
+      "captions": [
+        {
+          "text": "Kişi detayı: bir isim seçin",
+          "start": 59.08,
+          "duration": 1.88
+        },
+        {
+          "text": "Haftalık döküm,",
+          "start": 60.96,
+          "duration": 1.4
+        },
+        {
+          "text": "tüm dosyalarda toplam,",
+          "start": 62.36,
+          "duration": 1.52
+        },
+        {
+          "text": "biriken bakiye grafiği",
+          "start": 63.88,
+          "duration": 1.76
+        }
+      ]
+    },
+    {
+      "id": "s10",
+      "scene": "s10_days",
+      "text": "Günlük kayıtlar her rakamın arkasındaki kanıttır: giriş, çıkış, ara süresi ve fark. Üstteki filtrelerle izinli, eksik ya da şüpheli günleri ayırabilirsiniz.",
+      "start": 65.96,
+      "duration": 8.56,
+      "captions": [
+        {
+          "text": "Günlük kayıtlar: her rakamın kanıtı",
+          "start": 65.96,
+          "duration": 2.64
+        },
+        {
+          "text": "Giriş, çıkış, ara süresi, fark",
+          "start": 68.6,
+          "duration": 2.12
+        },
+        {
+          "text": "Filtrelerle izinli, eksik,",
+          "start": 70.72,
+          "duration": 2.16
+        },
+        {
+          "text": "şüpheli günler ayrılır",
+          "start": 72.88,
+          "duration": 1.64
+        }
+      ]
+    },
+    {
+      "id": "s11",
+      "scene": "s11_rules",
+      "text": "Kurallar bölümünde vardiya saatleri, günlük beklenen süre, geç giriş eşiği ve günlük mola hakkı yani ara süresi ayarlanır.",
+      "start": 74.84,
+      "duration": 6.8,
+      "captions": [
+        {
+          "text": "Kurallar bölümü",
+          "start": 74.84,
+          "duration": 1.4
+        },
+        {
+          "text": "Vardiya saatleri, beklenen süre,",
+          "start": 76.24,
+          "duration": 2.52
+        },
+        {
+          "text": "geç giriş eşiği",
+          "start": 78.76,
+          "duration": 1.36
+        },
+        {
+          "text": "ve günlük mola hakkı",
+          "start": 80.12,
+          "duration": 1.52
+        }
+      ]
+    },
+    {
+      "id": "s12",
+      "scene": "s12_rules_changed",
+      "text": "Örnek olarak mola hakkını yetmiş beş dakikadan kırk beş dakikaya çekelim.",
+      "start": 81.96,
+      "duration": 3.92,
+      "captions": [
+        {
+          "text": "Mola hakkı: 75 dakika →",
+          "start": 81.96,
+          "duration": 2.76
+        },
+        {
+          "text": "45 dakika",
+          "start": 84.72,
+          "duration": 1.16
+        }
+      ]
+    },
+    {
+      "id": "s13",
+      "scene": "s13_recalc",
+      "text": "Bütün sayılar anında yeniden hesaplanır. Ayarlarınız bu tarayıcıda hatırlanır.",
+      "start": 86.2,
+      "duration": 4.16,
+      "captions": [
+        {
+          "text": "Bütün sayılar anında yeniden hesaplanır",
+          "start": 86.2,
+          "duration": 2.32
+        },
+        {
+          "text": "Ayarlar tarayıcıda hatırlanır",
+          "start": 88.52,
+          "duration": 1.84
+        }
+      ]
+    },
+    {
+      "id": "s14",
+      "scene": "s14_export",
+      "text": "Sonucu tek tuşla Excel'e aktarabilirsiniz. Dosyalarınız tarayıcıdan dışarı gönderilmez; hesaplama tamamen kendi bilgisayarınızda yapılır.",
+      "start": 90.68,
+      "duration": 7.24,
+      "captions": [
+        {
+          "text": "Sonucu Excel'e aktarın",
+          "start": 90.68,
+          "duration": 2.44
+        },
+        {
+          "text": "Dosyalar tarayıcıdan çıkmaz",
+          "start": 93.12,
+          "duration": 2.28
+        },
+        {
+          "text": "Hesaplama kendi bilgisayarınızda",
+          "start": 95.4,
+          "duration": 2.52
+        }
+      ]
+    }
+  ]
+}

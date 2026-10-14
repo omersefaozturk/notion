@@ -1,0 +1,7 @@
+audio/*.wav
+build/stills*/
+build/explore/
+build/*_sheet.png
+build/concat.txt
+composer/public/mix.wav
+composer/node_modules
