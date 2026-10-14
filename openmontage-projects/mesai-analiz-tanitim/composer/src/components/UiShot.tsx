@@ -16,23 +16,22 @@ const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v
 /** Camera: hold the whole page, then ease into the focus box and stay there. */
 function camera(focus: number[] | null, t: number) {
   if (!focus) {
-    const s = interpolate(t, [0, 1], [1.0, 1.045]);
-    return { scale: s, x: (VIEW.w - VIEW.w * s) / 2, y: (VIEW.h - VIEW.h * s) / 2 };
+    return { scale: 1, x: 0, y: 0 };          // whole page, held still
   }
   const [fx, fy, fw, fh] = focus;
   // Leave air around the box, never crop a wide one, never push past 2.4x.
   const target = clamp(Math.min(VIEW.w / fw, VIEW.h / fh) * 0.82, 1.0, 2.4);
   if (target < 1.06) {
-    const s = interpolate(t, [0, 1], [1.0, 1.035]);
-    return { scale: s, x: (VIEW.w - VIEW.w * s) / 2, y: (VIEW.h - VIEW.h * s) / 2 };
+    return { scale: 1, x: 0, y: 0 };          // box already fills the frame
   }
-  const ease = interpolate(t, [0.12, 0.46], [0, 1], {
+  // Ease in once, then hold perfectly still: a frozen frame costs the encoder
+  // almost nothing, and dense tables are easier to read when they stop moving.
+  const ease = interpolate(t, [0.1, 0.42], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: (x) => 1 - Math.pow(1 - x, 3),
   });
-  const drift = interpolate(t, [0.46, 1], [0, 0.03], { extrapolateLeft: "clamp" });
-  const scale = 1 + (target - 1) * ease + drift * ease;
+  const scale = 1 + (target - 1) * ease;
   const cx = fx + fw / 2;
   const cy = fy + fh / 2;
   const wantX = VIEW.w / 2 - cx * scale;
