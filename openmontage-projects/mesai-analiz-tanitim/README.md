@@ -8,7 +8,7 @@ oraya koyar. Mockup yok.
 
 ## Çıktı
 
-- `renders/final.mp4` — 1920x1080, 30 fps, ~101 sn, H.264 + AAC
+- `renders/final.mp4` — 1920x1080, 30 fps, ~101 sn, H.264 + AAC, ~11 MB
 - `docs/arayuz-rehberi.md` — aynı içeriğin yazılı hâli
 
 ## Üretim zinciri
@@ -19,6 +19,10 @@ oraya koyar. Mockup yok.
 | Seslendirme | `make narration` | EMA Lightning ile Türkçe anlatım + `build/timeline.json` |
 | Müzik | `make music` | Yerel sentezlenmiş ambient yatak, sese göre ducking |
 | Render | `make video` | Remotion → `renders/final.mp4` |
+
+Kamera her sahnede bir kez yakınlaşıp **tam durur**; sürekli kayan bir görüntü
+kodlayıcıya hiç sabit piksel bırakmadığı için aynı video 35 MB yerine 11 MB
+sürüyor, üstelik duran tabloyu okumak daha kolay.
 
 ```bash
 make all
